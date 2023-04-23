@@ -12,7 +12,8 @@ from scipy.optimize import curve_fit, OptimizeWarning
 
 
 def get_p_ratio_table(target, cone_radius, candidates_raw_data, sigma_cc_min, sigma_model_min):
-    """Calculates the odds ratio based on the target, the model and the raw candidates data.
+    """Calculates the odds ratio based on the target,
+    the model and the raw candidates data.
     Args:
         target (str): Name of the host star.
         cone_radius (float): Radius of the cone in degrees.
@@ -40,16 +41,16 @@ def get_p_ratio_table(target, cone_radius, candidates_raw_data, sigma_cc_min, si
     #  Calculate the fit coefficients
     #  Can be accessed e.g. host_star.parallax_mean_model_coeff_gaiacalc
     host_star.pmm_parameters(
-        list_of_df_bp=[df_gaia_bp, df_tmass_bp], 
-        band='band', 
-        candidates_df=None, 
+        list_of_df_bp=[df_gaia_bp,df_tmass_bp],
+        band='band',
+        candidates_df=None,
         include_candidates=False
     )
     #  Get the candidates data
     candidates_calc_df = get_candidates_parameters(target, candidates_raw_data, host_star)
     #  Calculate p_ratios
     host_star.candidates_table(
-        candidates_calc_df, 
+        candidates_calc_df,
         sigma_cc_min=sigma_cc_min,
         sigma_model_min=sigma_model_min
     )
@@ -59,7 +60,7 @@ def get_p_ratio_table(target, cone_radius, candidates_raw_data, sigma_cc_min, si
 
 def get_candidates_parameters(target, survey, host_star):
     """
-    Based on the target name returns a dataframe 
+    Based on the target name returns a dataframe
     containing all the survey data to this target
     and calculates the proper motion.
     Args:
@@ -68,20 +69,20 @@ def get_candidates_parameters(target, survey, host_star):
     Returns:
         df_survey (pandas.DataFrame): Contains the filtered survey data.
     """
-    survey_target = survey[survey['Main_ID']==target]
-    if len(survey_target['final_uuid'].unique())<2:
+    survey_target = survey[survey['Main_ID'] == target]
+    if len(survey_target['final_uuid'].unique()) < 2:
         raise ValueError('There are not enough cross matches in the survey.')
-    if len(survey_target['date'].unique())<2:
+    if len(survey_target['date'].unique()) < 2:
         raise ValueError('This object was once observed. Necessary are at least two observations.')
 
     final_uuids, mean_pmras, mean_pmdecs, band, \
         band_error, pmra_error, pmdec_error, snr_list,\
-            sep, sep_mean, pmra_pmdec_corr, dRAs, dDECs, times, dRAs_err, dDECs_err = ([] for i in range(16))
-    survey_target = survey[survey['Main_ID']==target].copy()
+        sep, sep_mean, pmra_pmdec_corr, dRAs, dDECs, times, dRAs_err, dDECs_err = ([] for i in range(16))
+    survey_target = survey[survey['Main_ID'] == target].copy()
     survey_target['date'] = pd.to_datetime(survey_target['date'])
 
     for final_uuid in survey_target['final_uuid'].unique():
-        survey_finaluuid = survey_target[survey_target['final_uuid']==final_uuid]
+        survey_finaluuid = survey_target[survey_target['final_uuid'] == final_uuid]
         if len(survey_finaluuid) >= 2:
             time = survey_finaluuid['date'].values
             dRA_dDEC = survey_finaluuid[['dRA', 'dDEC']].values
@@ -90,7 +91,7 @@ def get_candidates_parameters(target, survey, host_star):
             pmra, pmdec = ((dRA_dDEC[1] - dRA_dDEC[0])/deltayears)
             bst_err1 = np.sqrt((dRA_dDEC_err[1]/deltayears)**2 + (dRA_dDEC_err[0]/deltayears)**2)
             pmra_err, pmdec_err = bst_err1[0], bst_err1[1]
-            
+
             times.append(time)
             dRAs.append(survey_finaluuid['dRA'].values)
             dDECs.append(survey_finaluuid['dDEC'].values)
@@ -108,26 +109,26 @@ def get_candidates_parameters(target, survey, host_star):
             sep.append(survey_finaluuid['sep'].values)
             sep_mean.append(np.mean(survey_finaluuid['sep'].values))
     df_survey = pd.DataFrame({
-            'final_uuid':final_uuids,
+            'final_uuid': final_uuids,
             'dates': times,
-            'dRA':dRAs,
-            'dDEC':dDECs,
-            'dRA_err':dRAs_err,
-            'dDEC_err':dDECs_err,
-            'pmra_mean':mean_pmras, 
-            'pmdec_mean':mean_pmdecs, 
+            'dRA': dRAs,
+            'dDEC': dDECs,
+            'dRA_err': dRAs_err,
+            'dDEC_err': dDECs_err,
+            'pmra_mean': mean_pmras,
+            'pmdec_mean': mean_pmdecs,
             'pmra_pmdec_corr': pmra_pmdec_corr,
-            'band':band, 
-            'band_error':band_error, 
-            'pmra_error':pmra_error, 
-            'pmdec_error':pmdec_error,
-            'snr_list':snr_list,
-            'sep':sep,
-            'sep_mean':sep_mean
+            'band': band,
+            'band_error': band_error,
+            'pmra_error': pmra_error,
+            'pmdec_error': pmdec_error,
+            'snr_list': snr_list,
+            'sep': sep,
+            'sep_mean': sep_mean
     })
     df_survey['pmra_abs'] = df_survey['pmra_mean']+host_star.pmra
     df_survey['pmdec_abs'] = df_survey['pmdec_mean']+host_star.pmdec
-    
+
     df_survey['pmra_abs_error'] = (df_survey['pmra_error']**2+host_star.pmra_error**2)**(1/2)
     df_survey['pmdec_abs_error'] = (df_survey['pmdec_error']**2+host_star.pmdec_error**2)**(1/2)
     return df_survey
@@ -139,59 +140,52 @@ class CovarianceMatrix():
         var_prime = (time*host_star.pmra_error)**2+(plx_proj*host_star.parallax_error)**2+2*time*plx_proj*cov_plx_pm
         return var_prime
 
-
     def calc_variance_y(time, plx_proj, host_star):
         cov_plx_pm = host_star.pmdec_error*host_star.parallax_error*host_star.parallax_pmdec_corr
         var_prime = (time*host_star.pmdec_error)**2+(plx_proj*host_star.parallax_error)**2+2*time*plx_proj*cov_plx_pm
         return var_prime
 
-
     def calc_covariance_xiyi(time, plx_proj_x, plx_proj_y, host_star):
         cov_plx_pmra = host_star.pmra_error*host_star.parallax_error*host_star.parallax_pmra_corr
         cov_plx_pmdec = host_star.pmdec_error*host_star.parallax_error*host_star.parallax_pmdec_corr
-        cov = time**2*host_star.pmra_pmdec_corr*host_star.pmra_error*host_star.pmdec_error\
-            +plx_proj_x*plx_proj_y*host_star.parallax_error**2\
-                +time*plx_proj_y*cov_plx_pmra\
-                    +time*plx_proj_x*cov_plx_pmdec
+        cov = time**2 * host_star.pmra_pmdec_corr*host_star.pmra_error*host_star.pmdec_error
+        + plx_proj_x*plx_proj_y*host_star.parallax_error**2
+        + time*plx_proj_y*cov_plx_pmra
+        + time*plx_proj_x*cov_plx_pmdec
         return cov
-
 
     def calc_covariance_xixj(timei, timej, plx_proj_ra_i, plx_proj_ra_j, host_star):
         cov_plx_pmra = host_star.pmra_error*host_star.parallax_error*host_star.parallax_pmra_corr
-        cov = timei*timej*host_star.pmra_error**2\
-            + plx_proj_ra_i*plx_proj_ra_j*host_star.parallax_error**2\
-                + (timei*plx_proj_ra_j + timej*plx_proj_ra_i)*cov_plx_pmra
+        cov = timei*timej*host_star.pmra_error**2
+        + plx_proj_ra_i*plx_proj_ra_j*host_star.parallax_error**2
+        + (timei*plx_proj_ra_j + timej*plx_proj_ra_i)*cov_plx_pmra
         return cov
-
 
     def calc_covariance_yiyj(timei, timej, plx_proj_dec_i, plx_proj_dec_j, host_star):
         cov_plx_pmdec = host_star.pmdec_error*host_star.parallax_error*host_star.parallax_pmdec_corr
-        cov = timei*timej*host_star.pmdec_error**2\
-            + plx_proj_dec_i*plx_proj_dec_j*host_star.parallax_error**2\
-                + (timei*plx_proj_dec_j + timej*plx_proj_dec_i)*cov_plx_pmdec
+        cov = timei*timej*host_star.pmdec_error**2
+        + plx_proj_dec_i*plx_proj_dec_j*host_star.parallax_error**2
+        + (timei*plx_proj_dec_j + timej*plx_proj_dec_i)*cov_plx_pmdec
         return cov
-
 
     def calc_covariance_xiyj(timei, timej, plx_proj_ra_i, plx_proj_dec_j, host_star):
         cov_pmra_pmdec = host_star.pmra_error*host_star.pmdec_error*host_star.pmra_pmdec_corr
         cov_plx_pmra = host_star.pmra_error*host_star.parallax_error*host_star.parallax_pmra_corr
         cov_plx_pmdec = host_star.pmdec_error*host_star.parallax_error*host_star.parallax_pmdec_corr
-        cov = timei*timej*cov_pmra_pmdec\
-            + plx_proj_ra_i*plx_proj_dec_j*host_star.parallax_error**2\
-                + timei*plx_proj_dec_j*cov_plx_pmra\
-                    + timej*plx_proj_ra_i*cov_plx_pmdec
+        cov = timei*timej*cov_pmra_pmdec
+        + plx_proj_ra_i*plx_proj_dec_j*host_star.parallax_error**2
+        + timei*plx_proj_dec_j*cov_plx_pmra
+        + timej*plx_proj_ra_i*cov_plx_pmdec
         return cov
-
 
     def calc_covariance_yixj(timei, timej, plx_proj_dec_i, plx_proj_ra_j, host_star):
         cov_pmra_pmdec = host_star.pmra_error*host_star.pmdec_error*host_star.pmra_pmdec_corr
         cov_plx_pmra = host_star.pmra_error*host_star.parallax_error*host_star.parallax_pmra_corr
         cov_plx_pmdec = host_star.pmdec_error*host_star.parallax_error*host_star.parallax_pmdec_corr
-        cov = timei*timej*cov_pmra_pmdec\
-            + plx_proj_dec_i*plx_proj_ra_j*host_star.parallax_error**2\
-                + timej*plx_proj_dec_i*cov_plx_pmra+timei*plx_proj_ra_j*cov_plx_pmdec
+        cov = timei*timej*cov_pmra_pmdec
+        + plx_proj_dec_i*plx_proj_ra_j*host_star.parallax_error**2
+        + timej*plx_proj_dec_i*cov_plx_pmra+timei*plx_proj_ra_j*cov_plx_pmdec
         return cov
-
 
     def cov_propagation(C_0, days_1, days_2, plx_proj_x, plx_proj_y, host_star):
         time = (days_2-days_1)/365.35
@@ -210,7 +204,6 @@ class CovarianceMatrix():
         C = C_0 + C_prime_2
         return C
 
-
     def covariance_matrix(times, plx_proj_ra, plx_proj_dec, host_star):
         dict_var_covar = {}
         J = list(range(1, len(times)+1))
@@ -218,7 +211,7 @@ class CovarianceMatrix():
             dict_var_covar[f'var_x{i+1}'] = CovarianceMatrix.calc_variance_x(time/365.25, plx_proj_ra[time], host_star)
             dict_var_covar[f'var_y{i+1}'] = CovarianceMatrix.calc_variance_y(time/365.25, plx_proj_dec[time], host_star)
             for j in J:
-                if i+1!=j:
+                if i+1 != j:
                     dict_var_covar[f'covar_x{i+1}x{j}'] = CovarianceMatrix.calc_covariance_xixj(times[i]/365.25, times[j-1]/365.25, plx_proj_ra[times[i]], plx_proj_ra[times[j-1]], host_star)
                     dict_var_covar[f'covar_y{i+1}y{j}'] = CovarianceMatrix.calc_covariance_yiyj(times[i]/365.25, times[j-1]/365.25, plx_proj_dec[times[i]], plx_proj_dec[times[j-1]], host_star)
                 dict_var_covar[f'covar_x{i+1}y{j}'] = CovarianceMatrix.calc_covariance_xiyi(times[j-1]/365.25, plx_proj_ra[times[j-1]], plx_proj_dec[times[j-1]], host_star)
@@ -238,7 +231,7 @@ class CovarianceMatrix():
             sorted_covars[f'covar_keys_y{i+1}'] = sorted([el for el in list(dict_var_covar.keys()) if el.startswith(f'covar_y{i+1}')], key=lambda x: x[-2:])
         for i, cov_list in enumerate(list(sorted_covars.keys())):
             empty_matrix[i][i+1:] = np.array([dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]])
-            empty_matrix[:,i][i+1:] = np.array([dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]])
+            empty_matrix[:, i][i+1:] = np.array([dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]])
         return empty_matrix
 
 
@@ -247,36 +240,29 @@ class CovarianceMatrixPopulation():
         var_prime = (plx_proj*host_star.parallax_error)**2
         return var_prime
 
-
     def calc_variance_y(plx_proj, host_star):
         var_prime = (plx_proj*host_star.parallax_error)**2
         return var_prime
-
 
     def calc_covariance_xiyi(plx_proj_x, plx_proj_y, host_star):
         cov = plx_proj_x*plx_proj_y*host_star.parallax_error**2
         return cov
 
-
     def calc_covariance_xixj(plx_proj_ra_i, plx_proj_ra_j, host_star):
         cov = plx_proj_ra_i*plx_proj_ra_j*host_star.parallax_error**2
         return cov
-
 
     def calc_covariance_yiyj(plx_proj_dec_i, plx_proj_dec_j, host_star):
         cov = plx_proj_dec_i*plx_proj_dec_j*host_star.parallax_error**2
         return cov
 
-
     def calc_covariance_xiyj(plx_proj_ra_i, plx_proj_dec_j, host_star):
         cov = plx_proj_ra_i*plx_proj_dec_j*host_star.parallax_error**2
         return cov
 
-
     def calc_covariance_yixj(plx_proj_dec_i, plx_proj_ra_j, host_star):
         cov = plx_proj_dec_i*plx_proj_ra_j*host_star.parallax_error**2
         return cov
-
 
     def cov_propagation(C_0, days_1, days_2, plx_proj_x, plx_proj_y, host_star):
         var_x_prime_2 = CovarianceMatrixPopulation.calc_variance_x(plx_proj_x, host_star)
@@ -293,7 +279,6 @@ class CovarianceMatrixPopulation():
         C = C_0 + C_prime_2
         return C
 
-
     def covariance_matrix(times, plx_proj_ra, plx_proj_dec, host_star):
         dict_var_covar = {}
         J = list(range(1, len(times)+1))
@@ -301,7 +286,7 @@ class CovarianceMatrixPopulation():
             dict_var_covar[f'var_x{i+1}'] = CovarianceMatrixPopulation.calc_variance_x(plx_proj_ra[time], host_star)
             dict_var_covar[f'var_y{i+1}'] = CovarianceMatrixPopulation.calc_variance_y(plx_proj_dec[time], host_star)
             for j in J:
-                if i+1!=j:
+                if i+1 != j:
                     dict_var_covar[f'covar_x{i+1}x{j}'] = CovarianceMatrixPopulation.calc_covariance_xixj(plx_proj_ra[times[i]], plx_proj_ra[times[j-1]], host_star)
                     dict_var_covar[f'covar_y{i+1}y{j}'] = CovarianceMatrixPopulation.calc_covariance_yiyj(plx_proj_dec[times[i]], plx_proj_dec[times[j-1]], host_star)
                 dict_var_covar[f'covar_x{i+1}y{j}'] = CovarianceMatrixPopulation.calc_covariance_xiyi(plx_proj_ra[times[j-1]], plx_proj_dec[times[j-1]], host_star)
@@ -321,7 +306,7 @@ class CovarianceMatrixPopulation():
             sorted_covars[f'covar_keys_y{i+1}'] = sorted([el for el in list(dict_var_covar.keys()) if el.startswith(f'covar_y{i+1}')], key=lambda x: x[-2:])
         for i, cov_list in enumerate(list(sorted_covars.keys())):
             empty_matrix[i][i+1:] = np.array([dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]])
-            empty_matrix[:,i][i+1:] = np.array([dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]])
+            empty_matrix[:, i][i+1:] = np.array([dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]])
         return empty_matrix
 
 
@@ -338,7 +323,8 @@ class HelperFunctions:
                 minor_axis (float): Semi-minor axis.
                 angle (float): Angle of rotation of the ellipse.
         """
-        # Compute the value of the chi-squared distribution that corresponds to the
+        # Compute the value of the chi-squared distribution
+        # that corresponds to the
         # desired level of confidence
         r_prime = np.sqrt(-2*np.log(1-confidence))
         eigenvalues, eigenvectors = np.linalg.eig(cov)
@@ -347,59 +333,56 @@ class HelperFunctions:
         angle = np.arctan(eigenvectors[1, 0]/eigenvectors[1, 1])
         return major_axis, minor_axis, angle
 
-
     def add_ellp_patch(pdf, major, minor, angle, color, axis):
         '''
-            Adds a patch to a figure. The patch includes a 
-            ellipse at the means of a pdf with a scalable 
+            Adds a patch to a figure. The patch includes a
+            ellipse at the means of a pdf with a scalable
             magnitude in the both axis directions.
             Args:
                 pdf (astropy.modeling.Gaussian2D): 2D Gaussian function.
-                eigvalue (list): List of eigenvalues of the cov matrix. 
-                angle (float): Angle of the eigenvectors in radian. 
+                eigvalue (list): List of eigenvalues of the cov matrix.
+                angle (float): Angle of the eigenvectors in radian.
                 i (float): Scaling the magnitude of the eigenvalues.
-                axis (figure axis): E.g. plt, axs[1,0] 
+                axis (figure axis): E.g. plt, axs[1,0]
         '''
         axis.add_patch(
                 Ellipse(
-                    (pdf.x_mean.value, pdf.y_mean.value), 
+                    (pdf.x_mean.value, pdf.y_mean.value),
                     width=2*major,
                     height=2*minor,
                     angle=360*angle/(2*np.pi),
-                    facecolor='none', 
+                    facecolor='none',
                     edgecolor=color,
                     linewidth=1,
-                    #label=f'{i*100:.0f}'
+                    # label=f'{i*100:.0f}'
                 )
             )
-   
-   
+
     def add_ellp_patch2(x_mean, y_mean, major, minor, angle, color, linestyle, axis):
         '''
-            Adds a patch to a figure. The patch includes a 
-            ellipse at the means of a pdf with a scalable 
+            Adds a patch to a figure. The patch includes a
+            ellipse at the means of a pdf with a scalable
             magnitude in the both axis directions.
             Args:
                 pdf (astropy.modeling.Gaussian2D): 2D Gaussian function.
-                eigvalue (list): List of eigenvalues of the cov matrix. 
-                angle (float): Angle of the eigenvectors in radian. 
+                eigvalue (list): List of eigenvalues of the cov matrix.
+                angle (float): Angle of the eigenvectors in radian.
                 i (float): Scaling the magnitude of the eigenvalues.
-                axis (figure axis): E.g. plt, axs[1,0] 
+                axis (figure axis): E.g. plt, axs[1,0]
         '''
         axis.add_patch(
                 Ellipse(
-                    (x_mean, y_mean), 
+                    (x_mean, y_mean),
                     width=2*major,
                     height=2*minor,
                     angle=360*angle/(2*np.pi),
-                    facecolor='none', 
+                    facecolor='none',
                     edgecolor=color,
                     linewidth=1,
                     linestyle=linestyle
-                    #label=f'{i*100:.0f}'
+                    # label=f'{i*100:.0f}'
                 )
             )
-
 
     def convert_df_to_array(df, x_col_name, y_col_name):
         '''
@@ -410,17 +393,15 @@ class HelperFunctions:
         y_data = data[y_col_name].values
         return x_data, y_data
 
-
     def gaussian1D(g2d_astropy_func, x_or_y):
         stddev = f'{x_or_y}_stddev'
         mean = f'{x_or_y}_mean'
         g1d = Gaussian1D(
-            (np.sqrt(2*np.pi)*g2d_astropy_func.__getattribute__(stddev))**(-1), 
-            g2d_astropy_func.__getattribute__(mean), 
+            (np.sqrt(2*np.pi)*g2d_astropy_func.__getattribute__(stddev))**(-1),
+            g2d_astropy_func.__getattribute__(mean),
             g2d_astropy_func.__getattribute__(stddev)
         )
         return g1d
-
 
     def get_g2d_parameters(x_data, y_data):
         '''
@@ -431,26 +412,24 @@ class HelperFunctions:
         x_stddev = np.std(x_data)
         y_stddev = np.std(y_data)
         cov = np.cov(m=[x_data, y_data])
-        rho = cov[1,0]/(x_stddev*y_stddev)
+        rho = cov[1, 0]/(x_stddev*y_stddev)
         amplitude = 2*np.pi*x_stddev*y_stddev*np.sqrt(1-rho**2)
         return amplitude, x_mean, y_mean, x_stddev, y_stddev, cov, rho
 
-    
     def get_g2d_func(x_mean, y_mean, x_std, y_std, rho):
         cov = np.array([
-            [x_std**2, rho*x_std*y_std], 
+            [x_std**2, rho*x_std*y_std],
             [rho*x_std*y_std, y_std**2]
         ])
-        denom = 2*np.pi*np.linalg.det(cov)**(1/2)       
+        denom = 2*np.pi*np.linalg.det(cov)**(1/2)
         g2d = Gaussian2D(
             amplitude=1/denom,
-            x_mean=x_mean, 
+            x_mean=x_mean,
             y_mean=y_mean,
             cov_matrix=cov
         )
         return g2d, cov
 
-    
     def convolution2d(a, b, A, B):
         """
             Returns a Gaussian2D functions and its covariance matrix 
@@ -464,23 +443,23 @@ class HelperFunctions:
         x_mean = (a+b)[0]
         y_mean = (a+b)[1]
         cov_c = A+B
-        denom = (2*np.pi*np.linalg.det(cov_c)**(1/2))       
-        g2d_c = Gaussian2D(amplitude=1/denom, x_mean=x_mean, y_mean=y_mean, \
-            cov_matrix=cov_c)
+        denom = (2*np.pi*np.linalg.det(cov_c)**(1/2))
+        g2d_c = Gaussian2D(
+            amplitude=1/denom,
+            x_mean=x_mean,
+            y_mean=y_mean,
+            cov_matrix=cov_c
+        )
         return g2d_c, cov_c
-
 
     def func_exp(x, a, b, c):
         return a*expit(-b*x)+c
-    
 
     def func_exp_inc(x, a, b, c):
         return a*expit(b*x)+c
-    
 
     def func_lin(x, a, b):
         return a*x+b
-    
 
     def func_const(x, a):
         return a
@@ -488,7 +467,6 @@ class HelperFunctions:
 
 class Candidate:
     """Model, true data and likelihoods, p_ratios of one candidate.
-    
     Attributes:
         cc_true_data: True data from df_survey.
         cc_true_data: Model data based on host star fits.
@@ -525,7 +503,7 @@ class Candidate:
             'sep',
             'final_uuid',
             band]].to_dict()
-        
+
         pm_options = ['pmra', 'pmdec']
         y_options = ['mean', 'stddev']
         cc_model_data = {}
@@ -533,9 +511,9 @@ class Candidate:
             for y_option in y_options:
                 column = f'{pm_value}_{y_option}_model_coeff_{catalogue}'
                 host_star_data = host_star.__getattribute__(column)
-                if y_option=='mean' or len(host_star_data)==2:
+                if y_option == 'mean' or len(host_star_data) == 2:
                     cc_model_data[pm_value+'_'+y_option] = host_star_data[0]*cc_true_data[band]+host_star_data[1]
-                elif y_option=='stddev':
+                elif y_option == 'stddev':
                     cc_model_data[pm_value+'_'+y_option] = host_star_data[0]*np.exp(-host_star_data[1]*cc_true_data[band])+host_star_data[2]
         column = f'pmra_pmdec_model_{catalogue}'
         cc_model_data['rho_mean'] = host_star.__getattribute__(column)
@@ -543,7 +521,6 @@ class Candidate:
         self.cc_true_data = cc_true_data
         self.cc_model_data = cc_model_data
         self.final_uuid = cc_true_data['final_uuid']
-
 
     def calc_liklihoods(self, host_star, sigma_model_min, sigma_cc_min):
         """
@@ -553,16 +530,16 @@ class Candidate:
             sigma_cc_min (float or int): The inflating factor for its likelihood.
         """
         g2d_model, cov_model = HelperFunctions.get_g2d_func(
-            self.cc_model_data['pmra_mean']-host_star.pmra, 
-            self.cc_model_data['pmdec_mean']-host_star.pmdec, 
-            np.sqrt(self.cc_model_data['pmra_stddev']**2+sigma_model_min**2), 
+            self.cc_model_data['pmra_mean']-host_star.pmra,
+            self.cc_model_data['pmdec_mean']-host_star.pmdec,
+            np.sqrt(self.cc_model_data['pmra_stddev']**2+sigma_model_min**2),
             np.sqrt(self.cc_model_data['pmdec_stddev']**2+sigma_model_min**2),
             self.cc_model_data['rho_mean']
         )
         g2d_cc, cov_cc = HelperFunctions.get_g2d_func(
-            self.cc_true_data['pmra_mean'], 
-            self.cc_true_data['pmdec_mean'], 
-            np.sqrt(self.cc_true_data['pmra_error']**2+sigma_cc_min**2), 
+            self.cc_true_data['pmra_mean'],
+            self.cc_true_data['pmdec_mean'],
+            np.sqrt(self.cc_true_data['pmra_error']**2+sigma_cc_min**2),
             np.sqrt(self.cc_true_data['pmdec_error']**2+sigma_cc_min**2),
             self.cc_true_data['pmra_pmdec_corr']
         )
@@ -570,15 +547,15 @@ class Candidate:
             np.array([
                 [self.cc_model_data['pmra_mean']-host_star.pmra],
                 [self.cc_model_data['pmdec_mean']-host_star.pmdec]
-            ]), 
-            np.array([[0],[0]]), 
-            cov_model, 
+            ]),
+            np.array([[0], [0]]),
+            cov_model,
             cov_cc
         )
         g2d_pmuM1, cov_pmuM1 = HelperFunctions.get_g2d_func(
             0,
             0,
-            np.sqrt(self.cc_true_data['pmra_error']**2+sigma_cc_min**2), 
+            np.sqrt(self.cc_true_data['pmra_error']**2+sigma_cc_min**2),
             np.sqrt(self.cc_true_data['pmdec_error']**2+sigma_cc_min**2),
             rho=0
         )
@@ -591,17 +568,16 @@ class Candidate:
         self.cov_conv = cov_conv
         self.cov_pmuM1 = cov_pmuM1
 
-
     def calc_prob_ratio(self):
         """Calculates the odds ratio based on the modelled g2d functions."""
         #  Calculate ratio and statement
         #  Adding the text to top right panel
         p_conv = self.g2d_conv(
-            self.cc_true_data['pmra_mean'], 
+            self.cc_true_data['pmra_mean'],
             self.cc_true_data['pmdec_mean']
             )[0]
         pmuM1 = self.g2d_pmuM1(
-            self.cc_true_data['pmra_mean'], 
+            self.cc_true_data['pmra_mean'],
             self.cc_true_data['pmdec_mean']
             )
         p_ratio = pmuM1/p_conv
@@ -641,7 +617,7 @@ class HostStar:
         cone_tmass_cross (pandas.DataFrame): Containing the cone cross matched objects.
         cone_tmass_cross (pandas.DataFrame): containing the cone Gaia objects.
         candidates (pandas.DataFrame): Containing id, p_ratio and p_ratio_catalogue.
-        
+
         Fitted parameters:
         Syntax:
             variable_{mean or stddev}_{coeff or cov}_{catalogue name}
@@ -656,11 +632,10 @@ class HostStar:
 
     """
     object_found = False
-    
-    
+
     def __init__(self, target):
         """
-        Searches for the given target id in the Simbad database 
+        Searches for the given target id in the Simbad database
         for the Gaia source id and returns the data on the star.
         Args:
             target (str): Name of the target.
@@ -672,7 +647,7 @@ class HostStar:
             for identifier in simbad_object_ids:
                 if 'Gaia DR3' in identifier:
                     source_id = identifier[8:]
-                    catalogue = 'gaiadr3.gaia_source'  
+                    catalogue = 'gaiadr3.gaia_source'
                     break
                 elif 'Gaia DR2' in identifier:
                     source_id = identifier[8:]
@@ -684,12 +659,12 @@ class HostStar:
                     catalogue = False
                     self.object_found = False
             if catalogue:
-                sql_query = f"""SELECT ra, ra_error, dec, dec_error, ref_epoch, 
-                parallax, parallax_error, pmra, pmdec, pmra_error, 
-                pmdec_error, pmra_pmdec_corr, parallax_pmra_corr, 
+                sql_query = f"""SELECT ra, ra_error, dec, dec_error, ref_epoch,
+                parallax, parallax_error, pmra, pmdec, pmra_error,
+                pmdec_error, pmra_pmdec_corr, parallax_pmra_corr,
                 parallax_pmdec_corr, phot_g_mean_mag, phot_bp_mean_mag, phot_rp_mean_mag
                     FROM {catalogue}
-                    WHERE source_id={source_id}    
+                    WHERE source_id={source_id}
                     """
                 try:
                     # Fetch the GAIA data with source_id from target name
@@ -719,7 +694,6 @@ class HostStar:
             self.object_found = False
             print('Not found in Simbad.')
 
-
     def cone_tmasscross_objects(self, cone_radius):
         """ Cone around the target star and cross match with 2MASS.
         Args:
@@ -740,7 +714,6 @@ class HostStar:
                 self.cone_tmass_cross = cone_objects
             except HTTPError as hperr:
                 print('Received HTTPError', hperr)
-    
 
     def cone_gaia_objects(self, cone_radius):
         """ Cone around the target star and colour transform G-Band to K_S-Band.
@@ -756,15 +729,14 @@ class HostStar:
             try:
                 cone_objects = job.get_results().to_pandas()
                 cone_objects['phot_bp_rp_mean_mag'] = cone_objects['phot_bp_mean_mag']-cone_objects['phot_rp_mean_mag']
-                cone_objects['ks_m_calc'] = cone_objects['phot_g_mean_mag'] \
-                    + 0.0981 \
-                        - 2.089*cone_objects['phot_bp_rp_mean_mag'] \
-                            + 0.1579*(cone_objects['phot_bp_rp_mean_mag'])**2
+                cone_objects['ks_m_calc'] = cone_objects['phot_g_mean_mag']
+                + 0.0981
+                - 2.089*cone_objects['phot_bp_rp_mean_mag']
+                + 0.1579*(cone_objects['phot_bp_rp_mean_mag'])**2
                 self.cone_gaia = cone_objects
 
             except HTTPError as hperr:
                 print('Received HTTPError', hperr)
-
 
     def binning_parameters(self, df, x_col_name, y_col_name, binsize, band):
         """ Gaussian 2D fits to each bin.
@@ -779,7 +751,6 @@ class HostStar:
             catalogue_bin_parameters (pandas.DataFrame): Parameters for each bin and each correlation.
         """
         nofbins = int(len(df[band].dropna())/binsize)
-        band_min, band_max = df[band].min(), df[band].max()
 
         df_dropna = df[[x_col_name, y_col_name, band]].dropna()
         df_sorted = df_dropna[band].sort_values()
@@ -789,7 +760,7 @@ class HostStar:
             m_min = df_sorted.iloc[bin_width-binsize:bin_width].min()
             m_max = df_sorted.iloc[bin_width-binsize:bin_width].max()
             df_r = df_dropna[df_dropna[band].between(m_min, m_max)]
-            if len(df_r)>1:
+            if len(df_r) > 1:
                 x_data, y_data = HelperFunctions.convert_df_to_array(df_r, x_col_name, y_col_name)
                 amplitude, x_mean, y_mean, x_stddev, y_stddev, cov, rho = HelperFunctions.get_g2d_parameters(x_data, y_data)
                 x_stds.append(x_stddev)
@@ -825,8 +796,8 @@ class HostStar:
         for combination in list(itertools.combinations(['pmra', 'pmdec', 'parallax'], r=2)):
             catalogue_bp[f'{combination[0]}_{combination[1]}'] = self.binning_parameters(
                 df_catalogue, 
-                combination[0], 
-                combination[1], 
+                combination[0],
+                combination[1],
                 binsize=50, 
                 band=band
             )
@@ -868,7 +839,7 @@ class HostStar:
                     if include_candidates:
                         np.append(x_data, candidates_df[band].values)
                         np.append(y_data, candidates_df[pm_value+'_abs'].values)
-                    if y_option=='mean' and pm_value in ['pmra', 'pmdec']:
+                    if y_option == 'mean' and pm_value in ['pmra', 'pmdec']:
                         fitting_func = HelperFunctions.func_lin
                         boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
                     elif y_option=='stddev' and pm_value in ['pmra', 'pmdec']:
@@ -922,7 +893,7 @@ class HostStar:
                 #  Create candidate object
                 candidate = Candidate(
                     candidates_df, 
-                    index_candidate=index_candidate, 
+                    index_candidate=index_candidate,
                     host_star=self, 
                     band='band', 
                     catalogue=catalogue
