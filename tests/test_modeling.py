@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 from compass.modelling import HelperFunctions
 
 def test_type():
