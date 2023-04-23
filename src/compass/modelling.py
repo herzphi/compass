@@ -894,8 +894,8 @@ class HostStar:
                 candidate = Candidate(
                     candidates_df, 
                     index_candidate=index_candidate,
-                    host_star=self, 
-                    band='band', 
+                    host_star=self,
+                    band='band',
                     catalogue=catalogue
                 )
                 # Compute liklihoods
