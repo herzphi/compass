@@ -1,5 +1,5 @@
 #  Making plots
-from proxis.modelling import HelperFunctions, Candidate
+from compass.modelling import HelperFunctions
 from decimal import Decimal
 import matplotlib.pyplot as plt
 import numpy as np
