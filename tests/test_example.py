@@ -1,5 +1,5 @@
 import pytest
-from my_package.example import add_one
+from compass.example import add_one
 
 def test_type():
     """
