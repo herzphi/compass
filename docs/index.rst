@@ -22,7 +22,7 @@ Usage
 Installation
 ------------
 
-To use `my_package` you need to install X, Y and Z. 
+To use `compass` you need to install X, Y and Z. 
 
 
 .. _code:
@@ -32,9 +32,9 @@ Code
 
 Here is an example of describing the use of your function.
 
-To add one to a number you can use the ``my_package.add_one()`` function:
+To add one to a number you can use the ``compass.add_one()`` function:
 
-.. py:function:: my_package.add_one(number)
+.. py:function:: compass.modelling.HelperFunctions.func_lin()
 
 
     :param number: Should be integer, floating point number or a string. 
@@ -64,4 +64,4 @@ Indices and tables
  The following will add the signature of the individual functions and pull
  their docstrings.
 
-.. automodapi:: my_package.example
+.. automodapi:: compass.modelling
