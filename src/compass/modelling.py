@@ -79,7 +79,7 @@ def get_candidates_parameters(target, survey, host_star):
                     - snr0: Signal-to-noise ratio.\n
                     - mag0: Magnitude of the candidate.\n
                     - sep: Separation of the candidate from the host star.\n
-    :type arg2: pandas.DataFrame
+    :type survey: pandas.DataFrame
     :return: Contains the filtered survey data.
     :rtype: pandas.DataFrame
 
