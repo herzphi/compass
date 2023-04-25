@@ -22,7 +22,9 @@ Usage
 Installation
 ------------
 
-To use `compass` you need to install astropy, astroquery, matplotlib, numpy, pandas, requests, scipy and seaborn.
+You can install `compass` by installing this repo:
+.. code-block::
+   pip install git+https://github.com/herzphi/compass.git
 
 
 .. _code:
