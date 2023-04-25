@@ -29,25 +29,20 @@ To use `compass` you need to install astropy, astroquery, matplotlib, numpy, pan
 
 Code
 ----
-
-Here is an example of describing the use of your function.
-
-To add one to a number you can use the ``compass.add_one()`` function:
-
-.. py:function:: compass.modelling.HelperFunctions.func_lin()
-
-
-    :param number: Should be integer, floating point number or a string. 
-
-    If ``number`` is not one of these types, an exception will be raised:
-
-    .. py:exception:: TypeError
-
-   Raised if the input is invalid.
-
-More about how to describe code can be hound 
-`here <https://www.sphinx-doc.org/en/master/tutorial/describing-code.html>`_
-
+.. py:function:: compass.get_p_ratio_table(target_name, cone_radius, candidates, sigma_cc_min, sigma_model_min)
+   Return a dataframe containing the data of all caniddates and the odds ratios.
+   :param target_name: Name of the host star.
+   :type target_name: str
+   :param cone_radius: Radius in degrees of the queried cone centered at the host stars position.
+   :type cone_radius: float
+   :param candidates: Astrometric data on the candidates.
+   :type candidates: pandas.DataFrame
+   :param sigma_cc_min: Inflating parameter for the caniddates likelihood in mas/yr.
+   :type sigma_cc_min: float
+   :param sigma_model_min: Inflating parameter for the model likelihood in mas/yr.
+   :type sigma_model_min: float
+   :return: Table containing the data and odds ratios of the candidates.
+   :rtype: pandas.DataFrame
 
 ..
   The following section creates an index, a list of modules and a 
