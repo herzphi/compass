@@ -23,11 +23,10 @@ Installation
 ------------
 
 You can install `compass` by installing this repo:
+
 .. code-block::
+   
    pip install git+https://github.com/herzphi/compass.git
-
-
-.. _code:
 
 Code
 ----
