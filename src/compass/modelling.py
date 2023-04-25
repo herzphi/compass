@@ -70,15 +70,15 @@ def get_candidates_parameters(target, survey, host_star):
     :param target: Name of the host star.
     :type target: str
     :param survey: Contains survey data. Necessary columns are:\n
-    - Main_ID: Host star name.\n
-    - final_uuid: Unique identifier of the two measurements of the same candidate.\n
-    - dRA: Relative distance candidate-hoststar in mas.\n
-    - dRA_err: Respective error.\n
-    - dDEC: Relative distance candidate-hoststar in mas.\n
-    - dDEC_err: Respective error.\n
-    - snr0: Signal-to-noise ratio.\n
-    - mag0: Magnitude of the candidate.\n
-    - sep: Separation of the candidate from the host star.\n
+                    - Main_ID: Host star name.\n
+                    - final_uuid: Unique identifier of the two measurements of the same candidate.\n
+                    - dRA: Relative distance candidate-hoststar in mas.\n
+                    - dRA_err: Respective error.\n
+                    - dDEC: Relative distance candidate-hoststar in mas.\n
+                    - dDEC_err: Respective error.\n
+                    - snr0: Signal-to-noise ratio.\n
+                    - mag0: Magnitude of the candidate.\n
+                    - sep: Separation of the candidate from the host star.\n
     :type survey: pandas.DataFrame
     :return: Contains the filtered survey data.
     :rtype: pandas.DataFrame
@@ -482,21 +482,21 @@ class HelperFunctions:
 
 class Candidate:
     """Model, true data and likelihoods, p_ratios of one candidate.
-    Attributes:
-        cc_true_data: True data from df_survey.
-        cc_true_data: Model data based on host star fits.
-        g2d_model (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the model.
-        g2d_conv (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the convolution.
-        g2d_cc (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the candidate.
-        g2d_pmuM1 (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the candidate at (0,0).
-        cov_model (numpy.array): 2x2 covariance matrix.
-        cov_cc (numpy.array): 2x2 covariance matrix.
-        cov_conv (numpy.array): 2x2 covariance matrix.
-        cov_pmuM1 (numpy.array): 2x2 covariance matrix.
-        p_b (float): Odd for being a background object.
-        p_ratio (float): Odds ratio.
-        p_tc (float): Odd for being a true companion.
-        back_true (str): true companion or background object
+    Attributes:\n
+        - cc_true_data: True data from df_survey.\n
+        - cc_true_data: Model data based on host star fits.\n
+        - g2d_model (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the model.\n
+        - g2d_conv (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the convolution.\n
+        - g2d_cc (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the candidate.\n
+        - g2d_pmuM1 (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the candidate at (0,0).\n
+        - cov_model (numpy.array): 2x2 covariance matrix.\n
+        - cov_cc (numpy.array): 2x2 covariance matrix.\n
+        - cov_conv (numpy.array): 2x2 covariance matrix.\n
+        - cov_pmuM1 (numpy.array): 2x2 covariance matrix.\n
+        - p_b (float): Odd for being a background object.\n
+        - p_ratio (float): Odds ratio.\n
+        - p_tc (float): Odd for being a true companion.\n
+        - back_true (str): true companion or background object\n
     """
     def __init__(self, df_survey, index_candidate, host_star, band, catalogue):
         """
