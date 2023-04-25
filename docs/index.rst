@@ -1,9 +1,9 @@
-.. my_package documentation master file, created by
+.. compass documentation master file, created by
    sphinx-quickstart on Tue Mar 22 13:13:41 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to my_package's documentation!
+Welcome to compass's documentation!
 ======================================
 
 .. toctree::
@@ -11,7 +11,7 @@ Welcome to my_package's documentation!
    :caption: Contents:
 
 
-Here is where you can write the documentation for your package. 
+This package presents a method to evaluate the likelihood of a candidate being a true companion to a host star using a proper motion model based on stochastic models.
 
 
 Usage
@@ -22,7 +22,7 @@ Usage
 Installation
 ------------
 
-To use `compass` you need to install X, Y and Z. 
+To use `compass` you need to install astropy, astroquery, matplotlib, numpy, pandas, requests, scipy and seaborn.
 
 
 .. _code:
