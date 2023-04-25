@@ -69,16 +69,16 @@ def get_candidates_parameters(target, survey, host_star):
     
     :param target: Name of the host star.
     :type target: str
-    :param survey: Contains survey data. Necessary columns are:
-        - Main_ID: Host star name.
-        - final_uuid: Unique identifier of the two measurements of the same candidate.
-        - dRA: Relative distance candidate-hoststar in mas.
-        - dRA_err: Respective error.
-        - dDEC: Relative distance candidate-hoststar in mas.
-        - dDEC_err: Respective error.
-        - snr0: Signal-to-noise ratio.
-        - mag0: Magnitude of the candidate.
-        - sep: Separation of the candidate from the host star.
+    :param survey: Contains survey data. Necessary columns are:\n
+                    - Main_ID: Host star name.\n
+                    - final_uuid: Unique identifier of the two measurements of the same candidate.\n
+                    - dRA: Relative distance candidate-hoststar in mas.\n
+                    - dRA_err: Respective error.\n
+                    - dDEC: Relative distance candidate-hoststar in mas.\n
+                    - dDEC_err: Respective error.\n
+                    - snr0: Signal-to-noise ratio.\n
+                    - mag0: Magnitude of the candidate.\n
+                    - sep: Separation of the candidate from the host star.\n
     :type arg2: pandas.DataFrame
     :return: Contains the filtered survey data.
     :rtype: pandas.DataFrame
