@@ -37,7 +37,7 @@ candidates_table.to_csv(
 # Show results as a odds ratio vs. seperation plot
 odds_ratio_sep_mag_plot(candidates_table, target_name)
 ```
-
+![Flow Diagram](diagram.png)
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first

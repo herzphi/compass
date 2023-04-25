@@ -41,7 +41,7 @@ def get_p_ratio_table(target, cone_radius, candidates_raw_data, sigma_cc_min, si
     #  Calculate the fit coefficients
     #  Can be accessed e.g. host_star.parallax_mean_model_coeff_gaiacalc
     host_star.pmm_parameters(
-        list_of_df_bp=[df_gaia_bp,df_tmass_bp],
+        list_of_df_bp=[df_gaia_bp, df_tmass_bp],
         band='band',
         candidates_df=None,
         include_candidates=False
