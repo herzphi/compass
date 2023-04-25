@@ -796,7 +796,6 @@ class HostStar:
             })
         return catalogue_bin_parameters
 
-
     def concat_binning_parameters(self, df_catalogue, band):
         """ Concat the binning parameters of the combinations of pmra, pmdec, parallax.
         Args:
@@ -819,7 +818,6 @@ class HostStar:
         df_catalogue_bp = pd.concat([catalogue_bp[key] for key in catalogue_bp.keys()], axis=1)
         df_catalogue_bp = df_catalogue_bp.loc[:,~df_catalogue_bp.columns.duplicated()].copy()
         return df_catalogue_bp
-
 
     def pmm_parameters(self, list_of_df_bp, band, candidates_df, include_candidates):
         """ Fit the binning parameters.
@@ -893,7 +891,6 @@ class HostStar:
                     attr_name = f'{col[4:]}_model_{df_label[idx]}'
                     setattr(self, attr_name, corr)
     
-
     def candidates_table(self, candidates_df, sigma_model_min, sigma_cc_min):
         """
         Returns all the candidates data of this host star for both catalogues.

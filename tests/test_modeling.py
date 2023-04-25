@@ -22,3 +22,5 @@ def test_host_star_object():
                       'phot_g_mean_mag', 'phot_bp_mean_mag',
                       'phot_rp_mean_mag']
     assert list(host_star.__dict__) == attribute_list
+    host_star.cone_gaia_objects(.1)
+    assert len(host_star.cone_gaia) == 9257
