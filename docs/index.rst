@@ -29,8 +29,12 @@ To use `compass` you need to install astropy, astroquery, matplotlib, numpy, pan
 
 Code
 ----
+To get the odds ratios of all caniddates use the ``get_p_ratio_table`` function:
+
 .. py:function:: compass.get_p_ratio_table(target_name, cone_radius, candidates, sigma_cc_min, sigma_model_min)
+   
    Return a dataframe containing the data of all caniddates and the odds ratios.
+   
    :param target_name: Name of the host star.
    :type target_name: str
    :param cone_radius: Radius in degrees of the queried cone centered at the host stars position.
