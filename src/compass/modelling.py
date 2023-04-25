@@ -59,13 +59,21 @@ def get_p_ratio_table(target, cone_radius, candidates_raw_data, sigma_cc_min, si
 
 
 def get_candidates_parameters(target, survey, host_star):
-    """
-    Based on the target name returns a dataframe
+    """Based on the target name returns a dataframe
     containing all the survey data to this target
     and calculates the proper motion.
     Args:
         target (str): Name of the host star.
-        survey (pandas.DataFrame): Contains survey data.
+        survey (pandas.DataFrame): Contains survey data. Necessary columns are:
+            - Main_ID: Host star name.
+            - final_uuid: Unique identifier of the two measurements of the same candidate.
+            - dRA: Relative distance candidate-hoststar in mas.
+            - dRA_err: Respective error.
+            - dDEC: Relative distance candidate-hoststar in mas.
+            - dDEC_err: Respective error.
+            - snr0: Signal-to-noise ratio.
+            - mag0: Magnitude of the candidate.
+            - sep: Separation of the candidate from the host star.
     Returns:
         df_survey (pandas.DataFrame): Contains the filtered survey data.
     """
