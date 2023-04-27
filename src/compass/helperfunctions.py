@@ -1,7 +1,6 @@
 import numpy as np
 from astropy.modeling.functional_models import Gaussian1D, Gaussian2D
 from matplotlib.patches import Ellipse
-from scipy.special import expit
 
 
 def parallax_projection(time, host_star):
@@ -164,11 +163,11 @@ def convolution2d(a, b, A, B):
 
 
 def func_exp(x, a, b, c):
-    return a * expit(-b * x) + c
+    return a * np.exp(-b * x) + c
 
 
 def func_exp_inc(x, a, b, c):
-    return a * expit(b * x) + c
+    return a * np.exp(b * x) + c
 
 
 def func_lin(x, a, b):
