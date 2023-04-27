@@ -511,10 +511,10 @@ class CovarianceMatrixPopulation:
                 key=lambda x: x[-2:],
             )
         for i, cov_list in enumerate(list(sorted_covars.keys())):
-            empty_matrix[i][i + 1 :] = np.array(
+            empty_matrix[i][i + 1:] = np.array(
                 [dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]]
             )
-            empty_matrix[:, i][i + 1 :] = np.array(
+            empty_matrix[:, i][i + 1:] = np.array(
                 [dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]]
             )
         return empty_matrix
@@ -728,7 +728,7 @@ class HostStar:
                 sql_query = f"""SELECT ra, ra_error, dec, dec_error, ref_epoch,
                 parallax, parallax_error, pmra, pmdec, pmra_error,
                 pmdec_error, pmra_pmdec_corr, parallax_pmra_corr,
-                parallax_pmdec_corr, phot_g_mean_mag, 
+                parallax_pmdec_corr, phot_g_mean_mag,
                 phot_bp_mean_mag, phot_rp_mean_mag
                     FROM {catalogue}
                     WHERE source_id={source_id}
@@ -772,7 +772,7 @@ class HostStar:
             FROM gaiadr3.gaia_source AS gaia
             JOIN gaiaedr3.tmass_psc_xsc_best_neighbour
             AS xmatch USING (source_id)
-            JOIN gaiaedr3.tmass_psc_xsc_join 
+            JOIN gaiaedr3.tmass_psc_xsc_join
             AS xjoin USING (clean_tmass_psc_xsc_oid)
             JOIN gaiadr1.tmass_original_valid AS tmass
             ON xjoin.original_psc_source_id = tmass.designation

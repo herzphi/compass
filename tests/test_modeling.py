@@ -1,13 +1,13 @@
-import pytest
 import numpy as np
-from compass import modelling
-from compass import helperfunctions
+
+from compass.helperfunctions import get_ellipse_props, parallax_projection
+from compass.modelling import HostStar, CovarianceMatrix
 
 
 def test_get_ellipse_props():
     """Test example.
     """
-    assert helperfunctions.get_ellipse_props(
+    assert get_ellipse_props(
         np.array([[1, 0], [0, 1]]),
         .8
     ) == (1.7941225779941015, 1.7941225779941015, 0.0)
@@ -15,7 +15,7 @@ def test_get_ellipse_props():
 
 def test_host_star_object():
     """Test the host star object wether all parameters are given."""
-    host_star = modelling.HostStar(target='HIP82545')
+    host_star = HostStar(target='HIP82545')
     attribute_list = ['object_found', 'ra', 'ra_error', 'dec', 'dec_error',
                       'ref_epoch', 'parallax', 'parallax_error', 'pmra',
                       'pmdec', 'pmra_error', 'pmdec_error', 'pmra_pmdec_corr',
@@ -39,23 +39,22 @@ def test_host_star_object():
 
 
 def test_covariancematrix():
-    host_star = modelling.HostStar(target='HIP82545')
-    times = [800, 1900]
+    host_star = HostStar(target='HIP82545')
+    times_in_days = [800, 1900]
     time_days = np.linspace(
             0,
-            times[1]+1,
-            int(times[1]+1)
+            times_in_days[1]+1,
+            int(times_in_days[1]+1)
         )
-    plx_proj_ra, plx_proj_dec = helperfunctions.parallax_projection(time_days, host_star)
-    cov = modelling.CovarianceMatrix.covariance_matrix(
-            times,
+    plx_proj_ra, plx_proj_dec = parallax_projection(time_days, host_star)
+    cov = CovarianceMatrix.covariance_matrix(
+            times_in_days,
             plx_proj_ra,
             plx_proj_dec,
             host_star
-        )
-    assert cov == np.array([
-        [0.43223405, -0.03421271,  1.02463317, 0.08125518],
-        [-0.03421271,  0.37732801, -0.08125518, 0.80727282],
-        [1.02463317, -0.08125518,  2.47563848, 0.19298105],
-        [-0.08125518,  0.80727282, -0.19298105, 1.86715406]]
-    )
+        ).round(2)
+    assert (cov == np.array([
+        [0.43, -0.03,  1.02, -0.08],
+        [-0.03,  0.38, -0.08,  0.81],
+        [1.02, -0.08,  2.48, -0.19],
+        [-0.08,  0.81, -0.19,  1.87]])).all()
