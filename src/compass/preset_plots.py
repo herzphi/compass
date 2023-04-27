@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from compass.helperfunctions import *
+from compass.helperfunctions import get_ellipse_props, gaussian1D, add_ellp_patch
 
 
 def pm_mag_plot(
@@ -93,32 +93,26 @@ def p_ratio_plot(candidate_object, target, band):
     mg_list = [
         abs(candidate_object.g2d_conv.x_mean + 6 * candidate_object.g2d_conv.x_stddev),
         abs(candidate_object.g2d_conv.y_mean + 6 * candidate_object.g2d_conv.y_stddev),
-        abs(
-            candidate_object.g2d_cc.x_mean
-            + 6 * np.sqrt(candidate_object.g2d_cc.x_stddev**2)
-        ),
-        abs(
-            candidate_object.g2d_cc.y_mean
-            + 6 * np.sqrt(candidate_object.g2d_cc.y_stddev**2)
-        ),
+        abs(candidate_object.g2d_cc.x_mean + 6 * np.sqrt(candidate_object.g2d_cc.x_stddev**2)),
+        abs(candidate_object.g2d_cc.y_mean + 6 * np.sqrt(candidate_object.g2d_cc.y_stddev**2)),
     ]
     mg = max(mg_list)
     step = 100
     y, x = np.mgrid[-mg:mg:100j, -mg:mg:100j]
     xline = np.linspace(-mg, mg, 400)
     for confd in [0.5, 0.9, 0.99]:
-        major_axis, minor_axis, angle = HelperFunctions.get_ellipse_props(
+        major_axis, minor_axis, angle = get_ellipse_props(
             candidate_object.cov_conv, confidence=confd
         )
-        HelperFunctions.add_ellp_patch(
+        add_ellp_patch(
             candidate_object.g2d_conv, major_axis, minor_axis, angle, "C0", axs[1, 0]
         )
 
     for confd in [0.5, 0.9, 0.99]:
-        major_axis, minor_axis, angle = HelperFunctions.get_ellipse_props(
+        major_axis, minor_axis, angle = get_ellipse_props(
             candidate_object.cov_pmuM1, confidence=confd
         )
-        HelperFunctions.add_ellp_patch(
+        add_ellp_patch(
             candidate_object.g2d_pmuM1, major_axis, minor_axis, angle, "C1", axs[1, 0]
         )
 
@@ -132,23 +126,23 @@ def p_ratio_plot(candidate_object, target, band):
     #  mu_ra plot
     axs[0, 0].plot(
         xline,
-        HelperFunctions.gaussian1D(candidate_object.g2d_conv, "x")(xline),
+        gaussian1D(candidate_object.g2d_conv, "x")(xline),
         label=r"$p(\mu_{\alpha}|M_b)$",
     )
     axs[0, 0].plot(
         xline,
-        HelperFunctions.gaussian1D(candidate_object.g2d_pmuM1, "x")(xline),
+        gaussian1D(candidate_object.g2d_pmuM1, "x")(xline),
         label=r"$p(\mu_{\alpha}|M_{tc})$",
     )
     axs[0, 0].set_ylabel("Probability")
     #  mu_dec plot
     axs[1, 1].plot(
-        HelperFunctions.gaussian1D(candidate_object.g2d_conv, "y")(xline),
+        gaussian1D(candidate_object.g2d_conv, "y")(xline),
         xline,
         label=r"$p(\mu_{\delta}|M_b)$",
     )
     axs[1, 1].plot(
-        HelperFunctions.gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
+        gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
         xline,
         label=r"$p(\mu_{\delta}|M_{tc})$",
     )
@@ -156,14 +150,14 @@ def p_ratio_plot(candidate_object, target, band):
 
     max_yaxis = max(
         [
-            *HelperFunctions.gaussian1D(candidate_object.g2d_conv, "x")(xline),
-            *HelperFunctions.gaussian1D(candidate_object.g2d_pmuM1, "x")(xline),
+            *gaussian1D(candidate_object.g2d_conv, "x")(xline),
+            *gaussian1D(candidate_object.g2d_pmuM1, "x")(xline),
         ]
     )
     max_xaxis = max(
         [
-            *HelperFunctions.gaussian1D(candidate_object.g2d_conv, "y")(xline),
-            *HelperFunctions.gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
+            *gaussian1D(candidate_object.g2d_conv, "y")(xline),
+            *gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
         ]
     )
     textyaxis = max_yaxis
@@ -231,8 +225,7 @@ def p_ratio_plot(candidate_object, target, band):
     # p_lim = 0.01
     mg = np.max(
         [
-            candidate_object.g2d_conv.x_mean.value
-            + 5 * np.sqrt(candidate_object.cov_conv[0, 0]),
+            candidate_object.g2d_conv.x_mean.value + 5 * np.sqrt(candidate_object.cov_conv[0, 0]),
             5 * np.sqrt(candidate_object.cov_pmuM1[0, 0]),
         ]
     )
@@ -240,12 +233,13 @@ def p_ratio_plot(candidate_object, target, band):
     axs[0, 0].set_xlim(-mg, mg)
     mg = np.max(
         [
-            candidate_object.g2d_conv.y_mean.value
-            + 5 * np.sqrt(candidate_object.cov_conv[1, 1]),
+            candidate_object.g2d_conv.y_mean.value + 5 * np.sqrt(candidate_object.cov_conv[1, 1]),
             5 * np.sqrt(candidate_object.cov_pmuM1[1, 1]),
         ]
     )
     axs[1, 1].set_ylim(-mg, mg)
+    plt.tight_layout()
+    plt.show()
 
 
 def odds_ratio_sep_mag_plot(candidates_table, target_name):

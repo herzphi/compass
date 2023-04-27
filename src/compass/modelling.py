@@ -3,6 +3,7 @@ import re
 
 import numpy as np
 import pandas as pd
+from scipy.special import expit
 from astroquery.gaia import Gaia
 from astroquery.simbad import Simbad
 from requests.exceptions import HTTPError
@@ -577,7 +578,7 @@ class Candidate:
                 elif y_option == "stddev":
                     cc_model_data[pm_value + "_" + y_option] = (
                         host_star_data[0]
-                        * np.exp(-host_star_data[1] * cc_true_data[band])
+                        * expit(-host_star_data[1] * cc_true_data[band])
                         + host_star_data[2]
                     )
         column = f"pmra_pmdec_model_{catalogue}"

@@ -10,14 +10,14 @@ def parallax_projection(time, host_star):
     eps = np.deg2rad(23.5)
     ra = np.deg2rad(host_star.ra)
     dec = np.deg2rad(host_star.dec)
-    s_ra_0, s_dec_0  = 0, 0
+    s_ra_0, s_dec_0 = 0, 0
     s_ra_i = s_ra_0\
         + np.sin(ra)*np.cos(2*np.pi*(t-t_eqx))\
-            - np.cos(eps)*np.cos(ra)*np.sin(2*np.pi*(t-t_eqx))
+        - np.cos(eps)*np.cos(ra)*np.sin(2*np.pi*(t-t_eqx))
     s_dec_i = s_dec_0\
         + np.cos(ra)*np.sin(dec)*np.cos(2*np.pi*(t-t_eqx))\
-            - (np.sin(eps)*np.cos(dec)-np.cos(eps)*np.sin(ra)*np.sin(dec))\
-                *np.sin(2*np.pi*(t-t_eqx))
+        - (np.sin(eps)*np.cos(dec)-np.cos(eps)*np.sin(ra)*np.sin(dec))\
+        * np.sin(2*np.pi*(t-t_eqx))
     return s_ra_i, s_dec_i
 
 
