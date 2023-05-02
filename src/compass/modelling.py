@@ -117,7 +117,7 @@ def get_candidates_parameters(target, survey, host_star):
     survey_target.loc[:, "t_day_since_Gaia"] = (
         pd.to_datetime(survey_target["date"]).apply(lambda x: x.to_julian_date())
         - 2451545.0
-        - host_star.ref_epoch
+        - (host_star.ref_epoch - 2000) * 365.25
     ).astype(int)
     for final_uuid in survey_target["final_uuid"].unique():
         survey_finaluuid = survey_target[survey_target["final_uuid"] == final_uuid]
@@ -610,8 +610,16 @@ class Candidate:
         self.final_uuid = cc_true_data["final_uuid"]
 
         # Parallax projections coordinates
-        days_since_gaia = cc_true_data["t_days_since_Gaia"]
-        time_days = np.linspace(0, days_since_gaia[1] + 1, int(days_since_gaia[1] + 1))
+        time_days = np.array(
+            range(
+                int(self.cc_true_data["t_days_since_Gaia"][0] % 365.25),
+                int(
+                    self.cc_true_data["t_days_since_Gaia"][-1]
+                    + self.cc_true_data["t_days_since_Gaia"][0] % 365.25
+                )
+                + 1,
+            )
+        )
         plx_proj_ra, plx_proj_dec = helperfunctions.parallax_projection(
             time_days / 365.25, host_star
         )
@@ -681,8 +689,8 @@ class Candidate:
                 time,
                 plx_proj=self.plx_proj_dec[int(days_since_gaia[i])],
             )
-            mean_b.append(float(x_b))
-            mean_b.append(float(y_b))
+            mean_b.append(x_b)
+            mean_b.append(y_b)
             # The second measured posiiton is the difference of both measurements
             # Because the first position is out zero point and the candidate deviates from
             # that position at the second observation by the difference.
@@ -721,7 +729,7 @@ class Candidate:
         self.cov_true_companion = self.cov_measured_positions + sigma_prime_tc
 
         # Covariance matrix for being backgorund object
-        sigma_prime_b = CovarianceMatrix.covariance_matrix(
+        sigma_prime_b = CovarianceMatrixPopulation.covariance_matrix(
             days_since_gaia, self.plx_proj_ra, self.plx_proj_dec, model
         )
         self.cov_background_object = self.cov_measured_positions + sigma_prime_b
@@ -793,6 +801,8 @@ class Candidate:
             self.mean_background_object,
             self.cov_background_object,
         )
+        if round(P_b, 10) == 0:
+            P_b = 1e-10
         r_tcb = np.log10(P_tc / P_b)
         self.r_tcb_2Dnmodel = r_tcb
 

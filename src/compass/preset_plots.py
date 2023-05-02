@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from compass.helperfunctions import get_ellipse_props, gaussian1D, add_ellp_patch
+from compass import helperfunctions
 
 
 def pm_mag_plot(
@@ -107,18 +107,18 @@ def p_ratio_plot(candidate_object, target, band):
     y, x = np.mgrid[-mg:mg:100j, -mg:mg:100j]
     xline = np.linspace(-mg, mg, 400)
     for confd in [0.5, 0.9, 0.99]:
-        major_axis, minor_axis, angle = get_ellipse_props(
+        major_axis, minor_axis, angle = helperfunctions.get_ellipse_props(
             candidate_object.cov_conv, confidence=confd
         )
-        add_ellp_patch(
+        helperfunctions.add_ellp_patch(
             candidate_object.g2d_conv, major_axis, minor_axis, angle, "C0", axs[1, 0]
         )
 
     for confd in [0.5, 0.9, 0.99]:
-        major_axis, minor_axis, angle = get_ellipse_props(
+        major_axis, minor_axis, angle = helperfunctions.get_ellipse_props(
             candidate_object.cov_pmuM1, confidence=confd
         )
-        add_ellp_patch(
+        helperfunctions.add_ellp_patch(
             candidate_object.g2d_pmuM1, major_axis, minor_axis, angle, "C1", axs[1, 0]
         )
 
@@ -132,23 +132,23 @@ def p_ratio_plot(candidate_object, target, band):
     #  mu_ra plot
     axs[0, 0].plot(
         xline,
-        gaussian1D(candidate_object.g2d_conv, "x")(xline),
+        helperfunctions.gaussian1D(candidate_object.g2d_conv, "x")(xline),
         label=r"$p(\mu_{\alpha}|M_b)$",
     )
     axs[0, 0].plot(
         xline,
-        gaussian1D(candidate_object.g2d_pmuM1, "x")(xline),
+        helperfunctions.gaussian1D(candidate_object.g2d_pmuM1, "x")(xline),
         label=r"$p(\mu_{\alpha}|M_{tc})$",
     )
     axs[0, 0].set_ylabel("Probability")
     #  mu_dec plot
     axs[1, 1].plot(
-        gaussian1D(candidate_object.g2d_conv, "y")(xline),
+        helperfunctions.gaussian1D(candidate_object.g2d_conv, "y")(xline),
         xline,
         label=r"$p(\mu_{\delta}|M_b)$",
     )
     axs[1, 1].plot(
-        gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
+        helperfunctions.gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
         xline,
         label=r"$p(\mu_{\delta}|M_{tc})$",
     )
@@ -156,14 +156,14 @@ def p_ratio_plot(candidate_object, target, band):
 
     max_yaxis = max(
         [
-            *gaussian1D(candidate_object.g2d_conv, "x")(xline),
-            *gaussian1D(candidate_object.g2d_pmuM1, "x")(xline),
+            *helperfunctions.gaussian1D(candidate_object.g2d_conv, "x")(xline),
+            *helperfunctions.gaussian1D(candidate_object.g2d_pmuM1, "x")(xline),
         ]
     )
     max_xaxis = max(
         [
-            *gaussian1D(candidate_object.g2d_conv, "y")(xline),
-            *gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
+            *helperfunctions.gaussian1D(candidate_object.g2d_conv, "y")(xline),
+            *helperfunctions.gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
         ]
     )
     textyaxis = max_yaxis
@@ -279,3 +279,123 @@ def odds_ratio_sep_mag_plot(candidates_table, target_name, p_ratio_name):
     axs.set_title(f"Odds ratios of all candidates of {target_name}")
     plt.tight_layout()
     plt.show()
+
+
+def propagation_plot(candidate_object, host_star, axs):
+    days_since_gaia = candidate_object.cc_true_data["t_days_since_Gaia"]
+    years = (
+        2000
+        + (
+            (candidate_object.cc_true_data["t_days_since_Gaia"])
+            + (host_star.ref_epoch - 2000) * 365.25
+        )
+        / 365.25
+    )
+    time_days = np.array(
+        range(
+            int(candidate_object.cc_true_data["t_days_since_Gaia"][0] % 365.25),
+            int(
+                candidate_object.cc_true_data["t_days_since_Gaia"][-1]
+                + candidate_object.cc_true_data["t_days_since_Gaia"][0] % 365.25
+            ),
+        )
+    )
+    # Initial position
+    axs.plot(
+        host_star.parallax * candidate_object.plx_proj_ra[int(days_since_gaia[0])],
+        host_star.parallax * candidate_object.plx_proj_dec[int(days_since_gaia[0])],
+        "s",
+        color="C0",
+        label=f"{years[0]:.1f}",
+    )
+    # TRUE CANDIDATE
+    axs.plot(
+        candidate_object.mean_true_companion[2],
+        candidate_object.mean_true_companion[3],
+        "o",
+        color="C1",
+        label=rf"$M_{{tc}}$: {years[1]:.1f}",
+    )
+    helperfunctions.ellipse(
+        candidate_object.mean_true_companion[2],
+        candidate_object.mean_true_companion[3],
+        candidate_object.cov_true_companion[2:, 2:],
+        "C1",
+        "-",
+        axs,
+    )
+    # BACKGROUND OBJECT
+    axs.plot(
+        candidate_object.mean_background_object[2],
+        candidate_object.mean_background_object[3],
+        "^",
+        color="C2",
+        label=rf"$M_{{b}}$: {years[1]:.1f}",
+    )
+    helperfunctions.ellipse(
+        candidate_object.mean_background_object[2],
+        candidate_object.mean_background_object[3],
+        candidate_object.cov_background_object[2:, 2:],
+        "C2",
+        "-",
+        axs,
+    )
+    # MEASURED POSITION
+    axs.plot(
+        candidate_object.mean_measured_positions[2],
+        candidate_object.mean_measured_positions[3],
+        "s",
+        color="C3",
+        label=f"c: {years[1]:.1f}",
+    )
+    helperfunctions.ellipse(
+        candidate_object.mean_measured_positions[2],
+        candidate_object.mean_measured_positions[3],
+        candidate_object.cov_measured_positions,
+        "C3",
+        "-",
+        axs,
+    )
+    # Parallax
+    x_track = helperfunctions.calc_prime_1(
+        0,
+        host_star.pmra,
+        host_star.parallax,
+        (
+            time_days[int(days_since_gaia[0]) : int(days_since_gaia[1])]
+            - time_days[int(days_since_gaia[0])]
+        )
+        / 365.25,
+        candidate_object.plx_proj_ra[int(days_since_gaia[0]) : int(days_since_gaia[1])],
+    )
+    y_track = helperfunctions.calc_prime_1(
+        0,
+        host_star.pmdec,
+        host_star.parallax,
+        (
+            time_days[int(days_since_gaia[0]) : int(days_since_gaia[1])]
+            - time_days[int(days_since_gaia[0])]
+        )
+        / 365.25,
+        candidate_object.plx_proj_dec[
+            int(days_since_gaia[0]) : int(days_since_gaia[1])
+        ],
+    )
+    axs.plot(
+        x_track,
+        y_track,
+        color="gray",
+        linestyle="dashed",
+        linewidth=0.5,
+    )
+
+    axs.invert_xaxis()
+    axs.legend()
+    axs.set_title(
+        "Propagation of a candidate"
+        + "\n"
+        + rf"with $r_{{tcb}}$={candidate_object.r_tcb_2Dnmodel:.2f}"
+    )
+    axs.set_xlabel("RA [mas]")
+    axs.set_ylabel("DEC [mas]")
+    # plt.savefig(f'./plots/{target_name}_same_cov_calc.png', dpi=300, format='png')
