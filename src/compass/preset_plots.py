@@ -250,14 +250,14 @@ def p_ratio_plot(candidate_object, target, band):
     plt.show()
 
 
-def odds_ratio_sep_mag_plot(candidates_table, target_name):
+def odds_ratio_sep_mag_plot(candidates_table, target_name, p_ratio_name):
     fig, axs = plt.subplots(1, figsize=(7, 3))
     g = sns.scatterplot(
         x="sep_mean",
-        y="p_ratios_2Dnmodel",
+        y=p_ratio_name,
         data=candidates_table,
         hue="band",
-        style="p_ratio_catalogue",
+        style="r_tcb_catalogue",
         s=60,
         ax=axs,
     )
@@ -270,8 +270,8 @@ def odds_ratio_sep_mag_plot(candidates_table, target_name):
         colors="gray",
     )
     axs.set_ylim(
-        np.percentile(candidates_table.p_ratios_2Dnmodel, q=10),
-        candidates_table.p_ratios_2Dnmodel.max() + 10,
+        np.percentile(candidates_table[p_ratio_name], q=10),
+        candidates_table[p_ratio_name].max() + 10,
     )
 
     axs.set_ylabel("Odds Ratio: " + r"$\log_{10}\frac{{P(\mu|M_{tc})}}{{P(\mu|M_b)}}$")

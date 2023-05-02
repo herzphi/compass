@@ -1131,9 +1131,7 @@ class HostStar:
             sigma_model_min (float or int): The inflating factor for the model likelihood.
             sigma_cc_min (float or int): The inflating factor for its likelihood.
         """
-        final_uuids, p_ratios_2Dnmodel, p_ratios_pmmodel, catalogues = (
-            [] for i in range(4)
-        )
+        final_uuids, r_tcb_2Dnmodel, r_tcb_pmmodel, catalogues = ([] for i in range(4))
         for index_candidate in range(len(candidates_df)):
             for catalogue in ["tmass", "gaiacalctmass"]:
                 #  Create candidate object
@@ -1151,18 +1149,18 @@ class HostStar:
                 candidate.calc_prob_ratio_pmmodel()
                 candidate.calc_prob_ratio_2Dnmodel()
                 final_uuids.append(candidate.final_uuid)
-                p_ratios_2Dnmodel.append(candidate.r_tcb_2Dnmodel)
-                p_ratios_pmmodel.append(candidate.r_tcb_pmmodel)
+                r_tcb_2Dnmodel.append(candidate.r_tcb_2Dnmodel)
+                r_tcb_pmmodel.append(candidate.r_tcb_pmmodel)
                 catalogues.append(catalogue)
-        candidates_p_ratios = pd.DataFrame(
+        candidates_r_tcb = pd.DataFrame(
             {
                 "final_uuid": final_uuids,
-                "p_ratios_2Dnmodel": p_ratios_2Dnmodel,
-                "p_ratios_pmmodel": p_ratios_pmmodel,
-                "p_ratio_catalogue": catalogues,
+                "r_tcb_2Dnmodel": r_tcb_2Dnmodel,
+                "r_tcb_pmmodel": r_tcb_pmmodel,
+                "r_tcb_catalogue": catalogues,
             }
         )
-        candidates = candidates_df.merge(candidates_p_ratios, on=["final_uuid"])
+        candidates = candidates_df.merge(candidates_r_tcb, on=["final_uuid"])
         self.candidates = candidates
 
 
