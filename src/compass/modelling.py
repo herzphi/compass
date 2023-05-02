@@ -619,6 +619,26 @@ class Candidate:
         self.plx_proj_dec = plx_proj_dec
 
     def calc_likelihoods_2Dnmodel(self, host_star):
+        """Attributes the likelihoods to the candidate object in terms
+            of the means and covariance matrices.
+        Args:
+            host_star (class object): Use of proper motion and parallax
+                of the star.
+        Attributes:
+            mean_measured_positions (numpy.darray): Measured position
+                of candidate.
+            mean_true_companion (numpy.darray): Calculated position
+                of candidate by pm and plx of star.
+            mean_background_object (numpy.darray): Calculated position
+                of candidate by pm and plx of backgorund model.
+            cov_measured_positions (numpy.darray): Covariance matrix
+                of measured position of candidate
+            cov_true_companion (numpy.darray): Covariance matrix
+                of candidate by pm and plx of star.
+            cov_background_object (numpy.darray): Covariance matrix
+                of candidate by pm and plx of backgorund model.
+
+        """
         cc_true_data = self.cc_true_data
         days_since_gaia = cc_true_data["t_days_since_Gaia"]
 
@@ -759,6 +779,10 @@ class Candidate:
         self.cov_pmuM1 = cov_pmuM1
 
     def calc_prob_ratio_2Dnmodel(self):
+        """Calculates the odds ratio based on the pm and plx model.
+        Attributes:
+            r_tcb_2Dnmodel (float): log10(P_tc / P_b)
+        """
         P_tc = helperfunctions.n_dim_gauss_evaluated(
             self.mean_measured_positions,
             self.mean_true_companion,
