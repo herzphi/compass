@@ -610,18 +610,16 @@ class Candidate:
         self.final_uuid = cc_true_data["final_uuid"]
 
         # Parallax projections coordinates
-        time_days = np.array(
-            range(
-                int(self.cc_true_data["t_days_since_Gaia"][0] % 365.25),
-                int(
-                    self.cc_true_data["t_days_since_Gaia"][-1]
-                    + self.cc_true_data["t_days_since_Gaia"][0] % 365.25
-                )
-                + 1,
-            )
+        time_days_from_equinox = np.arange(
+            int(self.cc_true_data["t_days_since_Gaia"][0] % 365.25),
+            int(
+                self.cc_true_data["t_days_since_Gaia"][-1]
+                + 1
+                + self.cc_true_data["t_days_since_Gaia"][0] % 365.25
+            ),
         )
         plx_proj_ra, plx_proj_dec = helperfunctions.parallax_projection(
-            time_days / 365.25, host_star
+            time_days_from_equinox / 365.25, host_star
         )
         self.plx_proj_ra = plx_proj_ra
         self.plx_proj_dec = plx_proj_dec
@@ -648,6 +646,9 @@ class Candidate:
 
         """
         cc_true_data = self.cc_true_data
+        days_since_gaia_0 = (
+            cc_true_data["t_days_since_Gaia"] - cc_true_data["t_days_since_Gaia"][0]
+        )
         days_since_gaia = cc_true_data["t_days_since_Gaia"]
 
         # Initiate Background Class Object
@@ -655,23 +656,27 @@ class Candidate:
         model = BackgroundModel(candidate_mag, host_star)
 
         # Calculate the means of the distributions
-        delta_t_years = np.diff(np.array(cc_true_data["t_days_since_Gaia"])) / 365.25
+        time_obs_days_from_gaia = np.array(self.cc_true_data["t_days_since_Gaia"])
+        time_days = np.arange(
+            self.cc_true_data["t_days_since_Gaia"][0],
+            self.cc_true_data["t_days_since_Gaia"][-1] + 1,
+        )
         candidate_position = [cc_true_data["dRA"], cc_true_data["dDEC"]]
         mean_obs, mean_tc, mean_b = ([0, 0] for i in range(3))
-        for i, time in enumerate(delta_t_years):
+        for i, time_gaia in enumerate(time_obs_days_from_gaia[1:]):
             x_tc = helperfunctions.calc_prime_1(
                 0,
                 host_star.pmra,
                 host_star.parallax,
-                time,
-                plx_proj=self.plx_proj_ra[int(days_since_gaia[i])],
+                days_since_gaia_0[i + 1] / 365.25,
+                plx_proj=self.plx_proj_ra[time_gaia],
             )
             y_tc = helperfunctions.calc_prime_1(
                 0,
                 host_star.pmdec,
                 host_star.parallax,
-                time,
-                plx_proj=self.plx_proj_dec[int(days_since_gaia[i])],
+                days_since_gaia_0[i + 1] / 365.25,
+                plx_proj=self.plx_proj_dec[time_gaia],
             )
             mean_tc.append(x_tc)
             mean_tc.append(y_tc)
@@ -679,15 +684,15 @@ class Candidate:
                 0,
                 model.pmra,
                 model.parallax,
-                time,
-                plx_proj=self.plx_proj_ra[int(days_since_gaia[i])],
+                days_since_gaia_0[i + 1] / 365.25,
+                plx_proj=self.plx_proj_ra[time_gaia],
             )
             y_b = helperfunctions.calc_prime_1(
                 0,
                 model.pmdec,
                 model.parallax,
-                time,
-                plx_proj=self.plx_proj_dec[int(days_since_gaia[i])],
+                days_since_gaia_0[i + 1] / 365.25,
+                plx_proj=self.plx_proj_dec[time_gaia],
             )
             mean_b.append(x_b)
             mean_b.append(y_b)
@@ -696,7 +701,12 @@ class Candidate:
             # that position at the second observation by the difference.
             # If the difference would be zero, the candidate would have reside at the same position
             # relative to the host star.
-            x_c, y_c = np.array([[x_tc], [y_tc]]) + np.diff(candidate_position)
+            try:
+                x_c_diff = np.diff(candidate_position[0][i : i + 2])[0]
+                y_c_diff = np.diff(candidate_position[1][i : i + 2])[0]
+            except IndexError:
+                continue
+            x_c, y_c = x_tc + x_c_diff, y_tc + y_c_diff
             mean_obs.append(x_c)
             mean_obs.append(y_c)
         mean_obs = np.array([float(i) for i in mean_obs])
@@ -715,7 +725,7 @@ class Candidate:
                     [0, cc_true_data["dDEC_err"][row] ** 2],
                 ]
             )
-        empty_matrix = np.zeros((4, 4))
+        empty_matrix = np.zeros((int(len(mean_obs)), int(len(mean_obs))))
         i = 0
         for key in cov_obs.keys():
             empty_matrix[i : 2 + i][:, i : 2 + i] = cov_obs[key]

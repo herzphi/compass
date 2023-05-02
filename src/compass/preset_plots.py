@@ -291,19 +291,14 @@ def propagation_plot(candidate_object, host_star, axs):
         )
         / 365.25
     )
-    time_days = np.array(
-        range(
-            int(candidate_object.cc_true_data["t_days_since_Gaia"][0] % 365.25),
-            int(
-                candidate_object.cc_true_data["t_days_since_Gaia"][-1]
-                + candidate_object.cc_true_data["t_days_since_Gaia"][0] % 365.25
-            ),
-        )
+    time_days = np.arange(
+        candidate_object.cc_true_data["t_days_since_Gaia"][0],
+        candidate_object.cc_true_data["t_days_since_Gaia"][-1] + 1,
     )
     # Initial position
     axs.plot(
-        host_star.parallax * candidate_object.plx_proj_ra[int(days_since_gaia[0])],
-        host_star.parallax * candidate_object.plx_proj_dec[int(days_since_gaia[0])],
+        host_star.parallax * candidate_object.plx_proj_ra[days_since_gaia[0]],
+        host_star.parallax * candidate_object.plx_proj_dec[days_since_gaia[0]],
         "s",
         color="C0",
         label=f"{years[0]:.1f}",
@@ -351,35 +346,26 @@ def propagation_plot(candidate_object, host_star, axs):
     helperfunctions.ellipse(
         candidate_object.mean_measured_positions[2],
         candidate_object.mean_measured_positions[3],
-        candidate_object.cov_measured_positions,
+        candidate_object.cov_measured_positions[2:, 2:],
         "C3",
         "-",
         axs,
     )
     # Parallax
+    track_time = time_days - candidate_object.cc_true_data["t_days_since_Gaia"][0]
     x_track = helperfunctions.calc_prime_1(
         0,
         host_star.pmra,
         host_star.parallax,
-        (
-            time_days[int(days_since_gaia[0]) : int(days_since_gaia[1])]
-            - time_days[int(days_since_gaia[0])]
-        )
-        / 365.25,
-        candidate_object.plx_proj_ra[int(days_since_gaia[0]) : int(days_since_gaia[1])],
+        track_time / 365.25,
+        candidate_object.plx_proj_ra[days_since_gaia[0] :],
     )
     y_track = helperfunctions.calc_prime_1(
         0,
         host_star.pmdec,
         host_star.parallax,
-        (
-            time_days[int(days_since_gaia[0]) : int(days_since_gaia[1])]
-            - time_days[int(days_since_gaia[0])]
-        )
-        / 365.25,
-        candidate_object.plx_proj_dec[
-            int(days_since_gaia[0]) : int(days_since_gaia[1])
-        ],
+        track_time / 365.25,
+        candidate_object.plx_proj_dec[days_since_gaia[0] :],
     )
     axs.plot(
         x_track,
