@@ -24,7 +24,8 @@ def get_p_ratio_table(
         sigma_cc_min (float): Inflating the candidate likelihood in mas/yr.
         sigma_model_min (float): Inflating the model likelihood in mas/yr.
     Returns:
-        candidates_table (pandas.DataFrame): Contains candidates_raw_data and the p_ratios.
+        candidates_table (pandas.DataFrame): Contains candidates_raw_data
+        and the p_ratios.
     """
     #  Query host star data
     host_star = HostStar(target)
@@ -1130,7 +1131,9 @@ class HostStar:
             sigma_model_min (float or int): The inflating factor for the model likelihood.
             sigma_cc_min (float or int): The inflating factor for its likelihood.
         """
-        final_uuids, p_ratios, catalogues = ([] for i in range(3))
+        final_uuids, p_ratios_2Dnmodel, p_ratios_pmmodel, catalogues = (
+            [] for i in range(4)
+        )
         for index_candidate in range(len(candidates_df)):
             for catalogue in ["tmass", "gaiacalctmass"]:
                 #  Create candidate object
@@ -1142,16 +1145,20 @@ class HostStar:
                     catalogue=catalogue,
                 )
                 # Compute liklihoods
+                candidate.calc_likelihoods_2Dnmodel(self)
                 candidate.calc_likelihoods_pmmodel(self, sigma_model_min, sigma_cc_min)
                 # Compute odds ratio
                 candidate.calc_prob_ratio_pmmodel()
+                candidate.calc_prob_ratio_2Dnmodel()
                 final_uuids.append(candidate.final_uuid)
-                p_ratios.append(candidate.p_ratio)
+                p_ratios_2Dnmodel.append(candidate.r_tcb_2Dnmodel)
+                p_ratios_pmmodel.append(candidate.r_tcb_pmmodel)
                 catalogues.append(catalogue)
         candidates_p_ratios = pd.DataFrame(
             {
                 "final_uuid": final_uuids,
-                "p_ratio": p_ratios,
+                "p_ratios_2Dnmodel": p_ratios_2Dnmodel,
+                "p_ratios_pmmodel": p_ratios_pmmodel,
                 "p_ratio_catalogue": catalogues,
             }
         )

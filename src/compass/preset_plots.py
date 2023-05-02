@@ -93,8 +93,14 @@ def p_ratio_plot(candidate_object, target, band):
     mg_list = [
         abs(candidate_object.g2d_conv.x_mean + 6 * candidate_object.g2d_conv.x_stddev),
         abs(candidate_object.g2d_conv.y_mean + 6 * candidate_object.g2d_conv.y_stddev),
-        abs(candidate_object.g2d_cc.x_mean + 6 * np.sqrt(candidate_object.g2d_cc.x_stddev**2)),
-        abs(candidate_object.g2d_cc.y_mean + 6 * np.sqrt(candidate_object.g2d_cc.y_stddev**2)),
+        abs(
+            candidate_object.g2d_cc.x_mean
+            + 6 * np.sqrt(candidate_object.g2d_cc.x_stddev**2)
+        ),
+        abs(
+            candidate_object.g2d_cc.y_mean
+            + 6 * np.sqrt(candidate_object.g2d_cc.y_stddev**2)
+        ),
     ]
     mg = max(mg_list)
     step = 100
@@ -184,7 +190,7 @@ def p_ratio_plot(candidate_object, target, band):
         0,
         1 - 6 / 6,
         r"$\log\frac{{p(\mu_{{\alpha, \delta}}|M_{tc})}}{{p(\mu_{{\alpha,\delta}}|M_b)}}$"
-        + f" = {candidate_object.p_ratio:.2f}",
+        + f" = {candidate_object.r_tcb_pmmodel:.2f}",
     )
     axs[0, 1].text(
         0,
@@ -225,7 +231,8 @@ def p_ratio_plot(candidate_object, target, band):
     # p_lim = 0.01
     mg = np.max(
         [
-            candidate_object.g2d_conv.x_mean.value + 5 * np.sqrt(candidate_object.cov_conv[0, 0]),
+            candidate_object.g2d_conv.x_mean.value
+            + 5 * np.sqrt(candidate_object.cov_conv[0, 0]),
             5 * np.sqrt(candidate_object.cov_pmuM1[0, 0]),
         ]
     )
@@ -233,7 +240,8 @@ def p_ratio_plot(candidate_object, target, band):
     axs[0, 0].set_xlim(-mg, mg)
     mg = np.max(
         [
-            candidate_object.g2d_conv.y_mean.value + 5 * np.sqrt(candidate_object.cov_conv[1, 1]),
+            candidate_object.g2d_conv.y_mean.value
+            + 5 * np.sqrt(candidate_object.cov_conv[1, 1]),
             5 * np.sqrt(candidate_object.cov_pmuM1[1, 1]),
         ]
     )
@@ -246,7 +254,7 @@ def odds_ratio_sep_mag_plot(candidates_table, target_name):
     fig, axs = plt.subplots(1, figsize=(7, 3))
     g = sns.scatterplot(
         x="sep_mean",
-        y="p_ratio",
+        y="p_ratios_2Dnmodel",
         data=candidates_table,
         hue="band",
         style="p_ratio_catalogue",
@@ -254,9 +262,17 @@ def odds_ratio_sep_mag_plot(candidates_table, target_name):
         ax=axs,
     )
     g.legend(loc="center left", bbox_to_anchor=(1, 0.5))
-
-    axs.hlines(0, candidates_table.sep_mean.min(), candidates_table.sep_mean.max(), linestyles="dotted", colors="gray")
-    axs.set_ylim(np.percentile(candidates_table.p_ratio, q=10), candidates_table.p_ratio.max()+1)
+    axs.hlines(
+        0,
+        candidates_table.sep_mean.min(),
+        candidates_table.sep_mean.max(),
+        linestyles="dotted",
+        colors="gray",
+    )
+    axs.set_ylim(
+        np.percentile(candidates_table.p_ratios_2Dnmodel, q=10),
+        candidates_table.p_ratios_2Dnmodel.max() + 10,
+    )
 
     axs.set_ylabel("Odds Ratio: " + r"$\log_{10}\frac{{P(\mu|M_{tc})}}{{P(\mu|M_b)}}$")
     axs.set_xlabel(r"Separation $[mas]$")
