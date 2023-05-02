@@ -9,14 +9,14 @@ def parallax_projection(time, host_star):
     eps = np.deg2rad(23.5)
     ra = np.deg2rad(host_star.ra)
     dec = np.deg2rad(host_star.dec)
-    s_ra_0, s_dec_0 = 0, 0
+    s_ra_0, s_dec_0  = 0, 0
     s_ra_i = s_ra_0\
         + np.sin(ra)*np.cos(2*np.pi*(t-t_eqx))\
-        - np.cos(eps)*np.cos(ra)*np.sin(2*np.pi*(t-t_eqx))
+            - np.cos(eps)*np.cos(ra)*np.sin(2*np.pi*(t-t_eqx))
     s_dec_i = s_dec_0\
         + np.cos(ra)*np.sin(dec)*np.cos(2*np.pi*(t-t_eqx))\
-        - (np.sin(eps)*np.cos(dec)-np.cos(eps)*np.sin(ra)*np.sin(dec))\
-        * np.sin(2*np.pi*(t-t_eqx))
+            - (np.sin(eps)*np.cos(dec)-np.cos(eps)*np.sin(ra)*np.sin(dec))\
+                *np.sin(2*np.pi*(t-t_eqx))
     return s_ra_i, s_dec_i
 
 
@@ -162,6 +162,11 @@ def convolution2d(a, b, A, B):
     return g2d_c, cov_c
 
 
+def calc_prime_1(prime_0, pm, plx, time, plx_proj):
+    prime_1 = prime_0 + time*pm + plx*plx_proj
+    return prime_1
+
+
 def func_exp(x, a, b, c):
     return a * np.exp(-b * x) + c
 
@@ -176,3 +181,9 @@ def func_lin(x, a, b):
 
 def func_const(x, a):
     return a
+
+
+def n_dim_gauss_evaluated(obs, mean, cov):
+    denom = (2*np.pi)**(len(mean)/4)*np.linalg.det(cov)**(1/2)
+    expo = np.dot(np.dot((obs-mean).T, np.linalg.inv(cov)), (obs-mean))
+    return np.exp(-1/2*expo)/denom

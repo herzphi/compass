@@ -109,10 +109,15 @@ def get_candidates_parameters(target, survey, host_star):
         times,
         dRAs_err,
         dDECs_err,
-    ) = ([] for i in range(16))
+        ts_days_since_Gaia,
+    ) = ([] for i in range(17))
     survey_target = survey[survey["Main_ID"] == target].copy()
     survey_target["date"] = pd.to_datetime(survey_target["date"])
-
+    survey_target.loc[:, "t_day_since_Gaia"] = (
+        pd.to_datetime(survey_target["date"]).apply(lambda x: x.to_julian_date())
+        - 2451545.0
+        - host_star.ref_epoch
+    ).astype(int)
     for final_uuid in survey_target["final_uuid"].unique():
         survey_finaluuid = survey_target[survey_target["final_uuid"] == final_uuid]
         if len(survey_finaluuid) >= 2:
@@ -145,6 +150,7 @@ def get_candidates_parameters(target, survey, host_star):
             band_error.append(survey_finaluuid["mag0_err"].mean())
             sep.append(survey_finaluuid["sep"].values)
             sep_mean.append(np.mean(survey_finaluuid["sep"].values))
+            ts_days_since_Gaia.append(survey_finaluuid["t_day_since_Gaia"].values)
     df_survey = pd.DataFrame(
         {
             "final_uuid": final_uuids,
@@ -163,6 +169,7 @@ def get_candidates_parameters(target, survey, host_star):
             "snr_list": snr_list,
             "sep": sep,
             "sep_mean": sep_mean,
+            "t_days_since_Gaia": ts_days_since_Gaia,
         }
     )
     df_survey["pmra_abs"] = df_survey["pmra_mean"] + host_star.pmra
@@ -388,10 +395,10 @@ class CovarianceMatrix:
                 key=lambda x: x[-2:],
             )
         for i, cov_list in enumerate(list(sorted_covars.keys())):
-            empty_matrix[i][i + 1:] = np.array(
+            empty_matrix[i][i + 1 :] = np.array(
                 [dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]]
             )
-            empty_matrix[:, i][i + 1:] = np.array(
+            empty_matrix[:, i][i + 1 :] = np.array(
                 [dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]]
             )
         return empty_matrix
@@ -511,10 +518,10 @@ class CovarianceMatrixPopulation:
                 key=lambda x: x[-2:],
             )
         for i, cov_list in enumerate(list(sorted_covars.keys())):
-            empty_matrix[i][i + 1:] = np.array(
+            empty_matrix[i][i + 1 :] = np.array(
                 [dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]]
             )
-            empty_matrix[:, i][i + 1:] = np.array(
+            empty_matrix[:, i][i + 1 :] = np.array(
                 [dict_var_covar[covar_key] for covar_key in sorted_covars[cov_list]]
             )
         return empty_matrix
@@ -550,6 +557,11 @@ class Candidate:
         """
         cc_true_data = df_survey.iloc[index_candidate][
             [
+                "dRA",
+                "dDEC",
+                "dRA_err",
+                "dDEC_err",
+                "t_days_since_Gaia",
                 "pmra_mean",
                 "pmdec_mean",
                 "pmra_abs",
@@ -565,29 +577,135 @@ class Candidate:
 
         pm_options = ["pmra", "pmdec"]
         y_options = ["mean", "stddev"]
-        cc_model_data = {}
+        cc_pm_background_data = {}
         for pm_value in pm_options:
             for y_option in y_options:
                 column = f"{pm_value}_{y_option}_model_coeff_{catalogue}"
-                host_star_data = host_star.__getattribute__(column)
-                if y_option == "mean" or len(host_star_data) == 2:
-                    cc_model_data[pm_value + "_" + y_option] = (
-                        host_star_data[0] * cc_true_data[band] + host_star_data[1]
+                background_model_parameters = host_star.__getattribute__(column)
+                if y_option == "mean" or len(background_model_parameters) == 2:
+                    cc_pm_background_data[pm_value + "_" + y_option] = (
+                        background_model_parameters[0] * cc_true_data[band]
+                        + background_model_parameters[1]
                     )
                 elif y_option == "stddev":
-                    cc_model_data[pm_value + "_" + y_option] = (
-                        host_star_data[0]
-                        * np.exp(-host_star_data[1] * cc_true_data[band])
-                        + host_star_data[2]
-                    )
+                    if len(background_model_parameters) == 3:
+                        cc_pm_background_data[pm_value + "_" + y_option] = (
+                            background_model_parameters[0]
+                            * np.exp(
+                                -background_model_parameters[1] * cc_true_data[band]
+                            )
+                            + background_model_parameters[2]
+                        )
+                    else:
+                        cc_pm_background_data[pm_value + "_" + y_option] = (
+                            background_model_parameters[0] * cc_true_data[band]
+                            + background_model_parameters[1]
+                        )
         column = f"pmra_pmdec_model_{catalogue}"
-        cc_model_data["rho_mean"] = host_star.__getattribute__(column)
-        cc_model_data["rho_stddev"] = host_star.__getattribute__(column)
+        cc_pm_background_data["rho_mean"] = host_star.__getattribute__(column)
+        cc_pm_background_data["rho_stddev"] = host_star.__getattribute__(column)
         self.cc_true_data = cc_true_data
-        self.cc_model_data = cc_model_data
+        self.cc_pm_background_data = cc_pm_background_data
         self.final_uuid = cc_true_data["final_uuid"]
 
-    def calc_liklihoods(self, host_star, sigma_model_min, sigma_cc_min):
+        # Parallax projections coordinates
+        days_since_gaia = cc_true_data["t_days_since_Gaia"]
+        time_days = np.linspace(0, days_since_gaia[1] + 1, int(days_since_gaia[1] + 1))
+        plx_proj_ra, plx_proj_dec = helperfunctions.parallax_projection(
+            time_days / 365.25, host_star
+        )
+        self.plx_proj_ra = plx_proj_ra
+        self.plx_proj_dec = plx_proj_dec
+
+    def calc_likelihoods_2Dnmodel(self, host_star):
+        cc_true_data = self.cc_true_data
+        days_since_gaia = cc_true_data["t_days_since_Gaia"]
+
+        # Initiate Background Class Object
+        candidate_mag = np.mean(cc_true_data["band"])
+        model = BackgroundModel(candidate_mag, host_star)
+
+        # Calculate the means of the distributions
+        delta_t_years = np.diff(np.array(cc_true_data["t_days_since_Gaia"])) / 365.25
+        candidate_position = [cc_true_data["dRA"], cc_true_data["dDEC"]]
+        mean_obs, mean_tc, mean_b = ([0, 0] for i in range(3))
+        for i, time in enumerate(delta_t_years):
+            x_tc = helperfunctions.calc_prime_1(
+                0,
+                host_star.pmra,
+                host_star.parallax,
+                time,
+                plx_proj=self.plx_proj_ra[int(days_since_gaia[i])],
+            )
+            y_tc = helperfunctions.calc_prime_1(
+                0,
+                host_star.pmdec,
+                host_star.parallax,
+                time,
+                plx_proj=self.plx_proj_dec[int(days_since_gaia[i])],
+            )
+            mean_tc.append(x_tc)
+            mean_tc.append(y_tc)
+            x_b = helperfunctions.calc_prime_1(
+                0,
+                model.pmra,
+                model.parallax,
+                time,
+                plx_proj=self.plx_proj_ra[int(days_since_gaia[i])],
+            )
+            y_b = helperfunctions.calc_prime_1(
+                0,
+                model.pmdec,
+                model.parallax,
+                time,
+                plx_proj=self.plx_proj_dec[int(days_since_gaia[i])],
+            )
+            mean_b.append(float(x_b))
+            mean_b.append(float(y_b))
+            # The second measured posiiton is the difference of both measurements
+            # Because the first position is out zero point and the candidate deviates from
+            # that position at the second observation by the difference.
+            # If the difference would be zero, the candidate would have reside at the same position
+            # relative to the host star.
+            x_c, y_c = np.array([[x_tc], [y_tc]]) + np.diff(candidate_position)
+            mean_obs.append(x_c)
+            mean_obs.append(y_c)
+        mean_obs = np.array([float(i) for i in mean_obs])
+        mean_tc = np.array([float(i) for i in mean_tc])
+        mean_b = np.array([float(i) for i in mean_b])
+        self.mean_measured_positions = mean_obs
+        self.mean_true_companion = mean_tc
+        self.mean_background_object = mean_b
+
+        # Covariance matrix for the measured position
+        cov_obs = {}
+        for row in range(len(cc_true_data["dRA_err"])):
+            cov_obs[f"cov_{row}"] = np.array(
+                [
+                    [cc_true_data["dRA_err"][row] ** 2, 0],
+                    [0, cc_true_data["dDEC_err"][row] ** 2],
+                ]
+            )
+        empty_matrix = np.zeros((4, 4))
+        i = 0
+        for key in cov_obs.keys():
+            empty_matrix[i : 2 + i][:, i : 2 + i] = cov_obs[key]
+            i += 2
+        self.cov_measured_positions = empty_matrix
+
+        # Covariance matrices for being true companion
+        sigma_prime_tc = CovarianceMatrix.covariance_matrix(
+            days_since_gaia, self.plx_proj_ra, self.plx_proj_dec, host_star
+        )
+        self.cov_true_companion = self.cov_measured_positions + sigma_prime_tc
+
+        # Covariance matrix for being backgorund object
+        sigma_prime_b = CovarianceMatrix.covariance_matrix(
+            days_since_gaia, self.plx_proj_ra, self.plx_proj_dec, model
+        )
+        self.cov_background_object = self.cov_measured_positions + sigma_prime_b
+
+    def calc_likelihoods_pmmodel(self, host_star, sigma_model_min, sigma_cc_min):
         """
         Args:
             host_star (Class object): Previously initiated class for the host star.
@@ -595,11 +713,15 @@ class Candidate:
             sigma_cc_min (float or int): The inflating factor for its likelihood.
         """
         g2d_model, cov_model = helperfunctions.get_g2d_func(
-            self.cc_model_data["pmra_mean"] - host_star.pmra,
-            self.cc_model_data["pmdec_mean"] - host_star.pmdec,
-            np.sqrt(self.cc_model_data["pmra_stddev"] ** 2 + sigma_model_min**2),
-            np.sqrt(self.cc_model_data["pmdec_stddev"] ** 2 + sigma_model_min**2),
-            self.cc_model_data["rho_mean"],
+            self.cc_pm_background_data["pmra_mean"] - host_star.pmra,
+            self.cc_pm_background_data["pmdec_mean"] - host_star.pmdec,
+            np.sqrt(
+                self.cc_pm_background_data["pmra_stddev"] ** 2 + sigma_model_min**2
+            ),
+            np.sqrt(
+                self.cc_pm_background_data["pmdec_stddev"] ** 2 + sigma_model_min**2
+            ),
+            self.cc_pm_background_data["rho_mean"],
         )
         g2d_cc, cov_cc = helperfunctions.get_g2d_func(
             self.cc_true_data["pmra_mean"],
@@ -611,8 +733,8 @@ class Candidate:
         g2d_conv, cov_conv = helperfunctions.convolution2d(
             np.array(
                 [
-                    [self.cc_model_data["pmra_mean"] - host_star.pmra],
-                    [self.cc_model_data["pmdec_mean"] - host_star.pmdec],
+                    [self.cc_pm_background_data["pmra_mean"] - host_star.pmra],
+                    [self.cc_pm_background_data["pmdec_mean"] - host_star.pmdec],
                 ]
             ),
             np.array([[0], [0]]),
@@ -635,7 +757,21 @@ class Candidate:
         self.cov_conv = cov_conv
         self.cov_pmuM1 = cov_pmuM1
 
-    def calc_prob_ratio(self):
+    def calc_prob_ratio_2Dnmodel(self):
+        P_tc = helperfunctions.n_dim_gauss_evaluated(
+            self.mean_measured_positions,
+            self.mean_true_companion,
+            self.cov_true_companion,
+        )
+        P_b = helperfunctions.n_dim_gauss_evaluated(
+            self.mean_measured_positions,
+            self.mean_background_object,
+            self.cov_background_object,
+        )
+        r_tcb = np.log10(P_tc / P_b)
+        self.r_tcb_2Dnmodel = r_tcb
+
+    def calc_prob_ratio_pmmodel(self):
         """Calculates the odds ratio based on the modelled g2d functions."""
         #  Calculate ratio and statement
         #  Adding the text to top right panel
@@ -645,14 +781,14 @@ class Candidate:
         pmuM1 = self.g2d_pmuM1(
             self.cc_true_data["pmra_mean"], self.cc_true_data["pmdec_mean"]
         )
-        p_ratio = pmuM1 / p_conv
-        if p_ratio > 1:
+        r_tcb = pmuM1 / p_conv
+        if r_tcb > 1:
             back_true = "true companion"
         else:
             back_true = "background object"
         self.p_b = p_conv
         self.p_tc = pmuM1
-        self.p_ratio = np.log10(p_ratio)
+        self.r_tcb_pmmodel = np.log10(r_tcb)
         self.back_true = back_true
 
 
@@ -802,8 +938,7 @@ class HostStar:
             try:
                 cone_objects = job.get_results().to_pandas()
                 cone_objects["phot_bp_rp_mean_mag"] = (
-                    cone_objects["phot_bp_mean_mag"]
-                    - cone_objects["phot_rp_mean_mag"]
+                    cone_objects["phot_bp_mean_mag"] - cone_objects["phot_rp_mean_mag"]
                 )
                 cone_objects["ks_m_calc"] = cone_objects["phot_g_mean_mag"]
                 +0.0981
@@ -836,8 +971,8 @@ class HostStar:
         )
         for samplesize in range(1, nofbins + 1):
             bin_width = samplesize * binsize
-            m_min = df_sorted.iloc[bin_width - binsize: bin_width].min()
-            m_max = df_sorted.iloc[bin_width - binsize: bin_width].max()
+            m_min = df_sorted.iloc[bin_width - binsize : bin_width].min()
+            m_max = df_sorted.iloc[bin_width - binsize : bin_width].max()
             df_r = df_dropna[df_dropna[band].between(m_min, m_max)]
             if len(df_r) > 1:
                 x_data, y_data = helperfunctions.convert_df_to_array(
@@ -875,14 +1010,15 @@ class HostStar:
     def concat_binning_parameters(self, df_catalogue, band):
         """Concat the binning parameters of the combinations of pmra,
         pmdec, parallax.
+
         Args:
             df_catalogue (pandas.DataFrame): Cone catalouge data.
             band (str): Bandwidth from the catalogue column
                  e.g. 'ks_m_calc' for Gaia or 'ks_m' for 2MASS.
+
         Returns:
             df_catalogue_bp (pandas.DataFrame): Binning parameters of
-            different catalogues and
-                variables parameters in a single dataframe.
+            different catalogues and variables parameters in a single dataframe.
         """
         catalogue_bp = {}
         for combination in list(
@@ -891,11 +1027,7 @@ class HostStar:
             catalogue_bp[
                 f"{combination[0]}_{combination[1]}"
             ] = self.binning_parameters(
-                df_catalogue,
-                combination[0],
-                combination[1],
-                binsize=50,
-                band=band
+                df_catalogue, combination[0], combination[1], binsize=50, band=band
             )
         df_catalogue_bp = pd.concat(
             [catalogue_bp[key] for key in catalogue_bp.keys()], axis=1
@@ -905,9 +1037,9 @@ class HostStar:
         ].copy()
         return df_catalogue_bp
 
-    def pmm_parameters(self, list_of_df_bp, band, candidates_df,
-                       include_candidates):
+    def pmm_parameters(self, list_of_df_bp, band, candidates_df, include_candidates):
         """Fit the binning parameters.
+
         Args:
             list_of_df_bp (list of pandas.DataFrame s):
             Binned 2D Gaussian Parameters.
@@ -917,6 +1049,7 @@ class HostStar:
             of this host star.
             include_candidates (Boolean): Including the data of the caniddates
               in the fitting.
+
         Attributes:
             For each catalogue and variable there are coeff and cov attributes.
             The syntax:
@@ -936,19 +1069,12 @@ class HostStar:
                     higher_clip = np.percentile(df[band], q=90)
                     #  Shorten the data
                     df_clipped = df[df[band].between(lower_clip, higher_clip)]
-                    data_g2m = df_clipped[[band,
-                                           f"{pm_value}_{y_option}"]].dropna()
+                    data_g2m = df_clipped[[band, f"{pm_value}_{y_option}"]].dropna()
                     x_data = data_g2m[band].values
                     y_data = data_g2m[f"{pm_value}_{y_option}"].values
                     if include_candidates:
-                        np.append(
-                            x_data,
-                            candidates_df[band].values
-                        )
-                        np.append(
-                            y_data,
-                            candidates_df[pm_value + "_abs"].values
-                        )
+                        np.append(x_data, candidates_df[band].values)
+                        np.append(y_data, candidates_df[pm_value + "_abs"].values)
                     if y_option == "mean" and pm_value in ["pmra", "pmdec"]:
                         fitting_func = helperfunctions.func_lin
                         boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
@@ -1016,9 +1142,9 @@ class HostStar:
                     catalogue=catalogue,
                 )
                 # Compute liklihoods
-                candidate.calc_liklihoods(self, sigma_model_min, sigma_cc_min)
+                candidate.calc_likelihoods_pmmodel(self, sigma_model_min, sigma_cc_min)
                 # Compute odds ratio
-                candidate.calc_prob_ratio()
+                candidate.calc_prob_ratio_pmmodel()
                 final_uuids.append(candidate.final_uuid)
                 p_ratios.append(candidate.p_ratio)
                 catalogues.append(catalogue)
@@ -1031,3 +1157,52 @@ class HostStar:
         )
         candidates = candidates_df.merge(candidates_p_ratios, on=["final_uuid"])
         self.candidates = candidates
+
+
+class BackgroundModel:
+    def __init__(self, candidate_mag, host_star_object):
+        self.pmra = (
+            host_star_object.pmra_mean_model_coeff_gaiacalctmass[0] * candidate_mag
+            + host_star_object.pmra_mean_model_coeff_gaiacalctmass[1]
+        )
+        if len(host_star_object.pmra_stddev_model_coeff_gaiacalctmass) == 3:
+            self.pmra_error = (
+                host_star_object.pmra_stddev_model_coeff_gaiacalctmass[0]
+                * np.exp(
+                    -host_star_object.pmra_stddev_model_coeff_gaiacalctmass[1]
+                    * candidate_mag
+                )
+                + host_star_object.pmra_stddev_model_coeff_gaiacalctmass[2]
+            )
+        else:
+            self.pmra_error = (
+                host_star_object.pmra_stddev_model_coeff_gaiacalctmass[0]
+                * candidate_mag
+                + host_star_object.pmra_stddev_model_coeff_gaiacalctmass[1]
+            )
+        self.pmdec = (
+            host_star_object.pmdec_mean_model_coeff_gaiacalctmass[0] * candidate_mag
+            + host_star_object.pmdec_mean_model_coeff_gaiacalctmass[1]
+        )
+        if len(host_star_object.pmdec_stddev_model_coeff_gaiacalctmass) == 3:
+            self.pmdec_error = (
+                host_star_object.pmdec_stddev_model_coeff_gaiacalctmass[0]
+                * np.exp(
+                    -host_star_object.pmdec_stddev_model_coeff_gaiacalctmass[1]
+                    * candidate_mag
+                )
+                + host_star_object.pmdec_stddev_model_coeff_gaiacalctmass[2]
+            )
+        else:
+            self.pmdec_error = (
+                host_star_object.pmdec_stddev_model_coeff_gaiacalctmass[0]
+                * candidate_mag
+                + host_star_object.pmdec_stddev_model_coeff_gaiacalctmass[1]
+            )
+        self.pmra_pmdec_corr = host_star_object.pmra_pmdec_model_gaiacalctmass
+        self.parallax = host_star_object.parallax_mean_model_coeff_gaiacalctmass[0]
+        self.parallax_error = (
+            host_star_object.parallax_stddev_model_coeff_gaiacalctmass[0]
+        )
+        self.parallax_pmra_corr = host_star_object.pmra_parallax_model_gaiacalctmass
+        self.parallax_pmdec_corr = host_star_object.pmdec_parallax_model_gaiacalctmass
