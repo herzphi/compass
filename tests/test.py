@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from compass.helperfunctions import get_ellipse_props, parallax_projection
 from compass.modelling import HostStar, CovarianceMatrix
