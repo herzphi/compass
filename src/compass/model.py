@@ -1131,55 +1131,58 @@ class HostStar:
         df_label = ["gaiacalc", "tmass", "gaiacalctmass"]
         concated_data = pd.concat(list_of_df_bp)
         for idx, df in enumerate([*list_of_df_bp, concated_data]):
-            for y_option in ["mean", "stddev"]:
-                for pm_value in ["pmra", "pmdec", "parallax"]:
-                    #  Fitting with robust regression
-                    lower_clip = np.percentile(df[band], q=10)
-                    higher_clip = np.percentile(df[band], q=90)
-                    #  Shorten the data
-                    df_clipped = df[df[band].between(lower_clip, higher_clip)]
-                    data_g2m = df_clipped[[band, f"{pm_value}_{y_option}"]].dropna()
-                    x_data = data_g2m[band].values
-                    y_data = data_g2m[f"{pm_value}_{y_option}"].values
-                    if include_candidates:
-                        np.append(x_data, candidates_df[band].values)
-                        np.append(y_data, candidates_df[pm_value + "_abs"].values)
-                    if y_option == "mean" and pm_value in ["pmra", "pmdec"]:
-                        fitting_func = helperfunctions.func_lin
-                        boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
-                    elif y_option == "stddev" and pm_value in ["pmra", "pmdec"]:
-                        fitting_func = helperfunctions.func_exp
-                        boundaries = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
-                    elif pm_value == "parallax" and y_option == "mean":
-                        fitting_func = helperfunctions.func_const
-                        boundaries = ([-np.inf], [np.inf])
-                    elif pm_value == "parallax" and y_option == "stddev":
-                        fitting_func = helperfunctions.func_const
-                        boundaries = ([-np.inf], [np.inf])
-                    try:
-                        popt, pcov = curve_fit(
-                            fitting_func, x_data, y_data, bounds=boundaries
-                        )
-                        attr_name = f"{pm_value}_{y_option}_model_coeff_{df_label[idx]}"
-                        setattr(self, attr_name, popt)
-                        attr_name = f"{pm_value}_{y_option}_model_cov_{df_label[idx]}"
-                        setattr(self, attr_name, pcov)
-                    except (RuntimeError, OptimizeWarning):
-                        if y_option == "stddev":
-                            try:
-                                popt, pcov = curve_fit(
-                                    helperfunctions.func_lin, x_data, y_data
-                                )
-                                attr_name = (
-                                    f"{pm_value}_{y_option}_model_coeff_{df_label[idx]}"
-                                )
-                                setattr(self, attr_name, popt)
-                                attr_name = (
-                                    f"{pm_value}_{y_option}_model_cov_{df_label[idx]}"
-                                )
-                                setattr(self, attr_name, pcov)
-                            except (RuntimeError, OptimizeWarning):
-                                print("Fitting error", y_option, pm_value)
+            for y_option_value in list(
+                itertools.product(["mean", "stddev"], ["pmra", "pmdec", "parallax"])
+            ):
+                y_option = y_option_value[0]
+                pm_value = y_option_value[1]
+                #  Fitting with robust regression
+                lower_clip = np.percentile(df[band], q=10)
+                higher_clip = np.percentile(df[band], q=90)
+                #  Shorten the data
+                df_clipped = df[df[band].between(lower_clip, higher_clip)]
+                data_g2m = df_clipped[[band, f"{pm_value}_{y_option}"]].dropna()
+                x_data = data_g2m[band].values
+                y_data = data_g2m[f"{pm_value}_{y_option}"].values
+                if include_candidates:
+                    np.append(x_data, candidates_df[band].values)
+                    np.append(y_data, candidates_df[pm_value + "_abs"].values)
+                if y_option == "mean" and pm_value in ["pmra", "pmdec"]:
+                    fitting_func = helperfunctions.func_lin
+                    boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
+                elif y_option == "stddev" and pm_value in ["pmra", "pmdec"]:
+                    fitting_func = helperfunctions.func_exp
+                    boundaries = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+                elif pm_value == "parallax" and y_option == "mean":
+                    fitting_func = helperfunctions.func_const
+                    boundaries = ([-np.inf], [np.inf])
+                elif pm_value == "parallax" and y_option == "stddev":
+                    fitting_func = helperfunctions.func_const
+                    boundaries = ([-np.inf], [np.inf])
+                try:
+                    popt, pcov = curve_fit(
+                        fitting_func, x_data, y_data, bounds=boundaries
+                    )
+                    attr_name = f"{pm_value}_{y_option}_model_coeff_{df_label[idx]}"
+                    setattr(self, attr_name, popt)
+                    attr_name = f"{pm_value}_{y_option}_model_cov_{df_label[idx]}"
+                    setattr(self, attr_name, pcov)
+                except (RuntimeError, OptimizeWarning):
+                    if y_option == "stddev":
+                        try:
+                            popt, pcov = curve_fit(
+                                helperfunctions.func_lin, x_data, y_data
+                            )
+                            attr_name = (
+                                f"{pm_value}_{y_option}_model_coeff_{df_label[idx]}"
+                            )
+                            setattr(self, attr_name, popt)
+                            attr_name = (
+                                f"{pm_value}_{y_option}_model_cov_{df_label[idx]}"
+                            )
+                            setattr(self, attr_name, pcov)
+                        except (RuntimeError, OptimizeWarning):
+                            print("Fitting error", y_option, pm_value)
             for col in df.columns:
                 if "rho" in col:
                     col1 = re.split("_", col)[1] + "_mean"
