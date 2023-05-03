@@ -1106,7 +1106,9 @@ class HostStar:
         ].copy()
         return df_catalogue_bp
 
-    def pmm_parameters(self, list_of_df_bp, band, candidates_df, include_candidates):
+    def calc_background_model_parameters(
+        self, list_of_df_bp, band, candidates_df, include_candidates
+    ):
         """Fit the binning parameters.
 
         Args:
