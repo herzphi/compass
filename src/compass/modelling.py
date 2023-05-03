@@ -313,13 +313,18 @@ class CovarianceMatrix:
 
     def covariance_matrix(times, plx_proj_ra, plx_proj_dec, host_star):
         dict_var_covar = {}
+        time_days = np.arange(
+            times[0],
+            times[-1] + 1,
+        )
+        time_indices = [time_days.tolist().index(time_index) for time_index in times]
         J = list(range(1, len(times) + 1))
         for i, time in enumerate(times):
             dict_var_covar[f"var_x{i+1}"] = CovarianceMatrix.calc_variance_x(
-                time / 365.25, plx_proj_ra[time], host_star
+                time / 365.25, plx_proj_ra[time_indices[i]], host_star
             )
             dict_var_covar[f"var_y{i+1}"] = CovarianceMatrix.calc_variance_y(
-                time / 365.25, plx_proj_dec[time], host_star
+                time / 365.25, plx_proj_dec[time_indices[i]], host_star
             )
             for j in J:
                 if i + 1 != j:
@@ -328,8 +333,8 @@ class CovarianceMatrix:
                     ] = CovarianceMatrix.calc_covariance_xixj(
                         times[i] / 365.25,
                         times[j - 1] / 365.25,
-                        plx_proj_ra[times[i]],
-                        plx_proj_ra[times[j - 1]],
+                        plx_proj_ra[time_indices[i]],
+                        plx_proj_ra[time_indices[j - 1]],
                         host_star,
                     )
                     dict_var_covar[
@@ -337,16 +342,16 @@ class CovarianceMatrix:
                     ] = CovarianceMatrix.calc_covariance_yiyj(
                         times[i] / 365.25,
                         times[j - 1] / 365.25,
-                        plx_proj_dec[times[i]],
-                        plx_proj_dec[times[j - 1]],
+                        plx_proj_dec[time_indices[i]],
+                        plx_proj_dec[time_indices[j - 1]],
                         host_star,
                     )
                 dict_var_covar[
                     f"covar_x{i+1}y{j}"
                 ] = CovarianceMatrix.calc_covariance_xiyi(
                     times[j - 1] / 365.25,
-                    plx_proj_ra[times[j - 1]],
-                    plx_proj_dec[times[j - 1]],
+                    plx_proj_ra[time_indices[j - 1]],
+                    plx_proj_dec[time_indices[j - 1]],
                     host_star,
                 )
                 if f"covar_x{i+1}y{j}" in dict_var_covar.keys() and i + 1 == j:
@@ -357,8 +362,8 @@ class CovarianceMatrix:
                     ] = CovarianceMatrix.calc_covariance_xiyj(
                         times[i] / 365.25,
                         times[j - 1] / 365.25,
-                        plx_proj_ra[times[i]],
-                        plx_proj_dec[times[j - 1]],
+                        plx_proj_ra[time_indices[i]],
+                        plx_proj_dec[time_indices[j - 1]],
                         host_star,
                     )
                     dict_var_covar[
@@ -366,8 +371,8 @@ class CovarianceMatrix:
                     ] = CovarianceMatrix.calc_covariance_yixj(
                         times[i] / 365.25,
                         times[j - 1] / 365.25,
-                        plx_proj_dec[times[i]],
-                        plx_proj_ra[times[j - 1]],
+                        plx_proj_dec[time_indices[i]],
+                        plx_proj_ra[time_indices[j - 1]],
                         host_star,
                     )
             J = J[1:]
@@ -455,30 +460,41 @@ class CovarianceMatrixPopulation:
 
     def covariance_matrix(times, plx_proj_ra, plx_proj_dec, host_star):
         dict_var_covar = {}
+        time_days = np.arange(
+            times[0],
+            times[-1] + 1,
+        )
+        time_indices = [time_days.tolist().index(time_index) for time_index in times]
         J = list(range(1, len(times) + 1))
         for i, time in enumerate(times):
             dict_var_covar[f"var_x{i+1}"] = CovarianceMatrixPopulation.calc_variance_x(
-                plx_proj_ra[time], host_star
+                plx_proj_ra[time_indices[i]], host_star
             )
             dict_var_covar[f"var_y{i+1}"] = CovarianceMatrixPopulation.calc_variance_y(
-                plx_proj_dec[time], host_star
+                plx_proj_dec[time_indices[i]], host_star
             )
             for j in J:
                 if i + 1 != j:
                     dict_var_covar[
                         f"covar_x{i+1}x{j}"
                     ] = CovarianceMatrixPopulation.calc_covariance_xixj(
-                        plx_proj_ra[times[i]], plx_proj_ra[times[j - 1]], host_star
+                        plx_proj_ra[time_indices[i]],
+                        plx_proj_ra[time_indices[j - 1]],
+                        host_star,
                     )
                     dict_var_covar[
                         f"covar_y{i+1}y{j}"
                     ] = CovarianceMatrixPopulation.calc_covariance_yiyj(
-                        plx_proj_dec[times[i]], plx_proj_dec[times[j - 1]], host_star
+                        plx_proj_dec[time_indices[i]],
+                        plx_proj_dec[time_indices[j - 1]],
+                        host_star,
                     )
                 dict_var_covar[
                     f"covar_x{i+1}y{j}"
                 ] = CovarianceMatrixPopulation.calc_covariance_xiyi(
-                    plx_proj_ra[times[j - 1]], plx_proj_dec[times[j - 1]], host_star
+                    plx_proj_ra[time_indices[j - 1]],
+                    plx_proj_dec[time_indices[j - 1]],
+                    host_star,
                 )
                 if f"covar_x{i+1}y{j}" in dict_var_covar.keys() and i + 1 == j:
                     continue
@@ -486,12 +502,16 @@ class CovarianceMatrixPopulation:
                     dict_var_covar[
                         f"covar_x{i+1}y{j}"
                     ] = CovarianceMatrixPopulation.calc_covariance_xiyj(
-                        plx_proj_ra[times[i]], plx_proj_dec[times[j - 1]], host_star
+                        plx_proj_ra[time_indices[i]],
+                        plx_proj_dec[time_indices[j - 1]],
+                        host_star,
                     )
                     dict_var_covar[
                         f"covar_y{i+1}x{j}"
                     ] = CovarianceMatrixPopulation.calc_covariance_yixj(
-                        plx_proj_dec[times[i]], plx_proj_ra[times[j - 1]], host_star
+                        plx_proj_dec[time_indices[i]],
+                        plx_proj_ra[time_indices[j - 1]],
+                        host_star,
                     )
             J = J[1:]
         var_keys = [el for el in list(dict_var_covar.keys()) if el.startswith("var")]
@@ -611,12 +631,8 @@ class Candidate:
 
         # Parallax projections coordinates
         time_days_from_equinox = np.arange(
-            int(self.cc_true_data["t_days_since_Gaia"][0] % 365.25),
-            int(
-                self.cc_true_data["t_days_since_Gaia"][-1]
-                + 1
-                + self.cc_true_data["t_days_since_Gaia"][0] % 365.25
-            ),
+            int(self.cc_true_data["t_days_since_Gaia"][0]),
+            int(self.cc_true_data["t_days_since_Gaia"][-1] + 1),
         )
         plx_proj_ra, plx_proj_dec = helperfunctions.parallax_projection(
             time_days_from_equinox / 365.25, host_star
@@ -664,19 +680,20 @@ class Candidate:
         candidate_position = [cc_true_data["dRA"], cc_true_data["dDEC"]]
         mean_obs, mean_tc, mean_b = ([0, 0] for i in range(3))
         for i, time_gaia in enumerate(time_obs_days_from_gaia[1:]):
+            time_gaia_index = time_days.tolist().index(time_gaia)
             x_tc = helperfunctions.calc_prime_1(
                 0,
                 host_star.pmra,
                 host_star.parallax,
                 days_since_gaia_0[i + 1] / 365.25,
-                plx_proj=self.plx_proj_ra[time_gaia],
+                plx_proj=self.plx_proj_ra[time_gaia_index],
             )
             y_tc = helperfunctions.calc_prime_1(
                 0,
                 host_star.pmdec,
                 host_star.parallax,
                 days_since_gaia_0[i + 1] / 365.25,
-                plx_proj=self.plx_proj_dec[time_gaia],
+                plx_proj=self.plx_proj_dec[time_gaia_index],
             )
             mean_tc.append(x_tc)
             mean_tc.append(y_tc)
@@ -685,14 +702,14 @@ class Candidate:
                 model.pmra,
                 model.parallax,
                 days_since_gaia_0[i + 1] / 365.25,
-                plx_proj=self.plx_proj_ra[time_gaia],
+                plx_proj=self.plx_proj_ra[time_gaia_index],
             )
             y_b = helperfunctions.calc_prime_1(
                 0,
                 model.pmdec,
                 model.parallax,
                 days_since_gaia_0[i + 1] / 365.25,
-                plx_proj=self.plx_proj_dec[time_gaia],
+                plx_proj=self.plx_proj_dec[time_gaia_index],
             )
             mean_b.append(x_b)
             mean_b.append(y_b)
@@ -734,13 +751,19 @@ class Candidate:
 
         # Covariance matrices for being true companion
         sigma_prime_tc = CovarianceMatrix.covariance_matrix(
-            days_since_gaia, self.plx_proj_ra, self.plx_proj_dec, host_star
+            days_since_gaia,
+            self.plx_proj_ra,
+            self.plx_proj_dec,
+            host_star,
         )
         self.cov_true_companion = self.cov_measured_positions + sigma_prime_tc
 
         # Covariance matrix for being backgorund object
         sigma_prime_b = CovarianceMatrixPopulation.covariance_matrix(
-            days_since_gaia, self.plx_proj_ra, self.plx_proj_dec, model
+            days_since_gaia,
+            self.plx_proj_ra,
+            self.plx_proj_dec,
+            model,
         )
         self.cov_background_object = self.cov_measured_positions + sigma_prime_b
 
@@ -811,9 +834,10 @@ class Candidate:
             self.mean_background_object,
             self.cov_background_object,
         )
-        if round(P_b, 10) == 0:
-            P_b = 1e-10
-        r_tcb = np.log10(P_tc / P_b)
+        if P_b > 0:
+            r_tcb = np.log10(P_tc / P_b)
+        else:
+            r_tcb = 1
         self.r_tcb_2Dnmodel = r_tcb
 
     def calc_prob_ratio_pmmodel(self):

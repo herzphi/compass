@@ -297,75 +297,83 @@ def propagation_plot(candidate_object, host_star, axs):
     )
     # Initial position
     axs.plot(
-        host_star.parallax * candidate_object.plx_proj_ra[days_since_gaia[0]],
-        host_star.parallax * candidate_object.plx_proj_dec[days_since_gaia[0]],
+        host_star.parallax * candidate_object.plx_proj_ra[0],
+        host_star.parallax * candidate_object.plx_proj_dec[0],
         "s",
         color="C0",
         label=f"{years[0]:.1f}",
     )
-    # TRUE CANDIDATE
-    axs.plot(
-        candidate_object.mean_true_companion[2],
-        candidate_object.mean_true_companion[3],
-        "o",
-        color="C1",
-        label=rf"$M_{{tc}}$: {years[1]:.1f}",
-    )
-    helperfunctions.ellipse(
-        candidate_object.mean_true_companion[2],
-        candidate_object.mean_true_companion[3],
-        candidate_object.cov_true_companion[2:, 2:],
-        "C1",
-        "-",
-        axs,
-    )
-    # BACKGROUND OBJECT
-    axs.plot(
-        candidate_object.mean_background_object[2],
-        candidate_object.mean_background_object[3],
-        "^",
-        color="C2",
-        label=rf"$M_{{b}}$: {years[1]:.1f}",
-    )
-    helperfunctions.ellipse(
-        candidate_object.mean_background_object[2],
-        candidate_object.mean_background_object[3],
-        candidate_object.cov_background_object[2:, 2:],
-        "C2",
-        "-",
-        axs,
-    )
-    # MEASURED POSITION
-    axs.plot(
-        candidate_object.mean_measured_positions[2],
-        candidate_object.mean_measured_positions[3],
-        "s",
-        color="C3",
-        label=f"c: {years[1]:.1f}",
-    )
-    helperfunctions.ellipse(
-        candidate_object.mean_measured_positions[2],
-        candidate_object.mean_measured_positions[3],
-        candidate_object.cov_measured_positions[2:, 2:],
-        "C3",
-        "-",
-        axs,
-    )
+    for i in range(int(len(candidate_object.mean_true_companion) / 2 - 1)):
+        # TRUE CANDIDATE
+        axs.plot(
+            candidate_object.mean_true_companion[2 + 2 * i],
+            candidate_object.mean_true_companion[3 + 2 * i],
+            "o",
+            color="C1",
+            label=rf"$M_{{tc}}$: {years[i+1]:.1f}",
+        )
+        helperfunctions.ellipse(
+            candidate_object.mean_true_companion[2 + 2 * i],
+            candidate_object.mean_true_companion[3 + 2 * i],
+            candidate_object.cov_true_companion[2 + 2 * i :4 + 2 * i, 2 + 2 * i :4 + 2 * i],
+            "C1",
+            "-",
+            axs,
+        )
+        # BACKGROUND OBJECT
+        axs.plot(
+            candidate_object.mean_background_object[2 + 2 * i],
+            candidate_object.mean_background_object[3 + 2 * i],
+            "^",
+            color="C2",
+            label=rf"$M_{{b}}$: {years[i+1]:.1f}",
+        )
+        helperfunctions.ellipse(
+            candidate_object.mean_background_object[2 + 2 * i],
+            candidate_object.mean_background_object[3 + 2 * i],
+            candidate_object.cov_background_object[2 + 2 * i :4 + 2 * i, 2 + 2 * i :4 + 2 * i],
+            "C2",
+            "-",
+            axs,
+        )
+        # MEASURED POSITION
+        axs.plot(
+            candidate_object.mean_measured_positions[2 + 2 * i],
+            candidate_object.mean_measured_positions[3 + 2 * i],
+            "s",
+            color="C3",
+            label=f"c: {years[i+1]:.1f}",
+        )
+        helperfunctions.ellipse(
+            candidate_object.mean_measured_positions[2 + 2 * i],
+            candidate_object.mean_measured_positions[3 + 2 * i],
+            candidate_object.cov_measured_positions[2 + 2 * i :4 + 2 * i, 2 + 2 * i :4 + 2 * i],
+            "C3",
+            "-",
+            axs,
+        )
     # Parallax
+    time_days = np.arange(
+        days_since_gaia[0],
+        days_since_gaia[-1] + 1,
+    )
+    time_indices = [
+        time_days.tolist().index(time_index) for time_index in days_since_gaia
+    ]
     track_time = time_days - candidate_object.cc_true_data["t_days_since_Gaia"][0]
     x_track = helperfunctions.calc_prime_1(
         0,
         host_star.pmra,
         host_star.parallax,
         track_time / 365.25,
-        candidate_object.plx_proj_ra[days_since_gaia[0] :],
+        candidate_object.plx_proj_ra[time_indices[0] :],
     )
     y_track = helperfunctions.calc_prime_1(
         0,
         host_star.pmdec,
         host_star.parallax,
         track_time / 365.25,
-        candidate_object.plx_proj_dec[days_since_gaia[0] :],
+        candidate_object.plx_proj_dec[time_indices[0] :],
     )
     axs.plot(
         x_track,
