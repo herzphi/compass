@@ -1,5 +1,5 @@
 # compass
-Companion Proper Motion Analysis Software System
+**Com**panion **P**roper Motion **A**nalysis **S**oftware **S**ystem
 
 ## Installation
 
