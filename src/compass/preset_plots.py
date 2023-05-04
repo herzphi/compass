@@ -8,6 +8,7 @@ import seaborn as sns
 from compass import helperfunctions
 
 
+# Mabye drop pm_mag_plot function
 def pm_mag_plot(
     catalogue, catalogue_name, target_name, host_star, candidates_df, band, sigma_min
 ):
@@ -315,7 +316,9 @@ def propagation_plot(candidate_object, host_star, axs):
         helperfunctions.ellipse(
             candidate_object.mean_true_companion[2 + 2 * i],
             candidate_object.mean_true_companion[3 + 2 * i],
-            candidate_object.cov_true_companion[2 + 2 * i :4 + 2 * i, 2 + 2 * i :4 + 2 * i],
+            candidate_object.cov_true_companion[
+                2 + 2 * i : 4 + 2 * i, 2 + 2 * i : 4 + 2 * i
+            ],
             "C1",
             "-",
             axs,
@@ -331,7 +334,9 @@ def propagation_plot(candidate_object, host_star, axs):
         helperfunctions.ellipse(
             candidate_object.mean_background_object[2 + 2 * i],
             candidate_object.mean_background_object[3 + 2 * i],
-            candidate_object.cov_background_object[2 + 2 * i :4 + 2 * i, 2 + 2 * i :4 + 2 * i],
+            candidate_object.cov_background_object[
+                2 + 2 * i : 4 + 2 * i, 2 + 2 * i : 4 + 2 * i
+            ],
             "C2",
             "-",
             axs,
@@ -347,7 +352,9 @@ def propagation_plot(candidate_object, host_star, axs):
         helperfunctions.ellipse(
             candidate_object.mean_measured_positions[2 + 2 * i],
             candidate_object.mean_measured_positions[3 + 2 * i],
-            candidate_object.cov_measured_positions[2 + 2 * i :4 + 2 * i, 2 + 2 * i :4 + 2 * i],
+            candidate_object.cov_measured_positions[
+                2 + 2 * i : 4 + 2 * i, 2 + 2 * i : 4 + 2 * i
+            ],
             "C3",
             "-",
             axs,
@@ -386,10 +393,70 @@ def propagation_plot(candidate_object, host_star, axs):
     axs.invert_xaxis()
     axs.legend()
     axs.set_title(
-        "Propagation of a candidate"
+        "Relative motion of a candidate"
         + "\n"
         + rf"with $r_{{tcb}}$={candidate_object.r_tcb_2Dnmodel:.2f}"
     )
     axs.set_xlabel("RA [mas]")
     axs.set_ylabel("DEC [mas]")
     # plt.savefig(f'./plots/{target_name}_same_cov_calc.png', dpi=300, format='png')
+
+
+def plot_pm_plx_binning_parameters(df_binning_parameters, catalogue_name, host_star):
+    mag_min = df_binning_parameters.band.min()
+    mag_max = df_binning_parameters.band.max()
+    xline = np.linspace(mag_min, mag_max)
+    fig, axs = plt.subplots(3, 3, figsize=(10, 7))
+    for ax, col in zip(
+        axs.flat,
+        df_binning_parameters.drop(
+            columns=[
+                "band",
+                "cov_pmdec_parallax",
+                "cov_pmra_parallax",
+                "cov_pmra_pmdec",
+            ]
+        ).columns,
+    ):
+        ax.plot(
+            df_binning_parameters["band"], df_binning_parameters[col], "o", alpha=0.6
+        )
+        if "rho" in col:
+            attribute_name = f"{col[4:]}_model_{catalogue_name}"
+            popt = host_star.__getattribute__(attribute_name)
+            ax.hlines(popt, mag_min, mag_max, color="C1")
+        else:
+            attribute_name = f"{col}_model_coeff_{catalogue_name}"
+            popt = host_star.__getattribute__(attribute_name)
+            attribute_name = f"{col}_model_cov_{catalogue_name}"
+            pcov = host_star.__getattribute__(attribute_name)
+            if len(popt) == 3:
+                ax.plot(xline, popt[0] * np.exp(-xline * popt[1]) + popt[2])
+                ax.fill_between(
+                    xline,
+                    (popt[0] + pcov[0, 0]) * np.exp(-xline * (popt[1] + pcov[1, 1]))
+                    + popt[2]
+                    + pcov[2, 2],
+                    (popt[0] - pcov[0, 0]) * np.exp(-xline * (popt[1] - pcov[1, 1]))
+                    + popt[2]
+                    - pcov[2, 2],
+                    alpha=0.4,
+                    color="C1",
+                )
+            elif len(popt) == 2:
+                ax.plot(xline, popt[0] * xline + popt[1], color="C1")
+                ax.fill_between(
+                    xline,
+                    (popt[0] + pcov[0, 0]) * xline + popt[1] + pcov[1, 1],
+                    (popt[0] - pcov[0, 0]) * xline + popt[1] - pcov[1, 1],
+                    alpha=0.4,
+                    color="C1",
+                )
+            elif len(popt) == 1:
+                ax.hlines(popt, mag_min, mag_max, color="C1")
+                ax.fill_between(xline, popt + pcov[0], popt - pcov[0], color="C1")
+        ax.set_xlabel("[mag]")
+        ax.set_ylabel(col)
+        ax.margins(0.1, 1)
+    fig.suptitle("Model fitting parameters")
+    plt.tight_layout()

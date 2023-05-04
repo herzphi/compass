@@ -2,6 +2,7 @@ import itertools
 import logging
 import re
 
+from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from astroquery.gaia import Gaia
@@ -914,6 +915,7 @@ class HostStar:
         Args:
             target (str): Name of the target.
         """
+        logger = logging.getLogger("astroquery")
         customSimbad = Simbad()
         customSimbad.add_votable_fields("ids")
         simbad_object_ids = customSimbad.query_object(target)["IDS"][0].split("|")
@@ -965,12 +967,12 @@ class HostStar:
                     self.object_found = True
                     if np.isnan(target_data.pmra[0]) or np.isnan(target_data.pmdec[0]):
                         self.object_found = False
-                        raise ValueError("Proper motion is missing in Gaia.")
+                        logger.info(f"{target}: Proper motion is missing in Gaia.")
                 except HTTPError as hperr:
-                    print("Received HTTPError", hperr)
+                    logger.error("Received HTTPError", hperr)
         else:
             self.object_found = False
-            print("Not found in Simbad.")
+            logger.error("Not found in Simbad.")
 
     def cone_tmasscross_objects(self, cone_radius):
         """Cone around the target star and cross match with 2MASS.
@@ -1015,10 +1017,15 @@ class HostStar:
                 cone_objects["phot_bp_rp_mean_mag"] = (
                     cone_objects["phot_bp_mean_mag"] - cone_objects["phot_rp_mean_mag"]
                 )
-                cone_objects["ks_m_calc"] = cone_objects["phot_g_mean_mag"]
-                +0.0981
-                -2.089 * cone_objects["phot_bp_rp_mean_mag"]
-                +0.1579 * (cone_objects["phot_bp_rp_mean_mag"]) ** 2
+                cone_objects["ks_m_calc"] = helperfunctions.color_trafo_2MASS_K_S(
+                    cone_objects["phot_g_mean_mag"], cone_objects["phot_bp_rp_mean_mag"]
+                )
+                cone_objects["h_m_calc"] = helperfunctions.color_trafo_2MASS_H(
+                    cone_objects["phot_g_mean_mag"], cone_objects["phot_bp_rp_mean_mag"]
+                )
+                cone_objects["j_m_calc"] = helperfunctions.color_trafo_2MASS_J(
+                    cone_objects["phot_g_mean_mag"], cone_objects["phot_bp_rp_mean_mag"]
+                )
                 self.cone_gaia = cone_objects
 
             except HTTPError as hperr:
@@ -1033,6 +1040,8 @@ class HostStar:
             binsize (float): Number of objects in each single bin.
             band (str): Bandwidth from the catalogue column
                  e.g. 'ks_m_calc' for Gaia or 'ks_m' for 2MASS.
+                    'h_m_calc' for Gaia or 'h_m' for 2MASS.
+                    'j_m_calc' for Gaia or 'j_m' for 2MASS.
         Returns:
             catalogue_bin_parameters (pandas.DataFrame): Parameters for
             each bin and each correlation.
@@ -1102,7 +1111,11 @@ class HostStar:
             catalogue_bp[
                 f"{combination[0]}_{combination[1]}"
             ] = self.binning_parameters(
-                df_catalogue, combination[0], combination[1], binsize=50, band=band
+                df_catalogue,
+                combination[0],
+                combination[1],
+                binsize=int(df_catalogue.shape[0] / 40),
+                band=band,
             )
         df_catalogue_bp = pd.concat(
             [catalogue_bp[key] for key in catalogue_bp.keys()], axis=1
@@ -1290,3 +1303,192 @@ class BackgroundModel:
         )
         self.parallax_pmra_corr = host_star_object.pmra_parallax_model_gaiacalctmass
         self.parallax_pmdec_corr = host_star_object.pmdec_parallax_model_gaiacalctmass
+
+
+# top layer
+# Inititated by passing the raw candidate data.
+# Creates for each host star the model
+# and saves the models in a list of class objects.
+
+
+class Survey:
+    """Creates odds ratio table based on the observational data of candidates
+    and the field star models."""
+
+    def __init__(self, survey) -> None:
+        """Based on the target name returns a dataframe
+                containing all the survey data to this target
+                and calculates the proper motion.
+        Args:
+                target (str): Name of the host star.
+                survey (pandas.DataFrame): Contains survey data. Necessary columns are:\n
+                                - Main_ID: Host star name.\n
+                                - final_uuid: Unique identifier of the two measurements of the same candidate.\n
+                                - dRA: Relative distance candidate-hoststar in mas.\n
+                                - dRA_err: Respective error.\n
+                                - dDEC: Relative distance candidate-hoststar in mas.\n
+                                - dDEC_err: Respective error.\n
+                                - snr0: Signal-to-noise ratio.\n
+                                - mag0: Magnitude of the candidate.\n
+                                - sep: Separation of the candidate from the host star.\n
+                Return:
+                df_survey (pandas.DataFrame): Contains the filtered survey data.
+        """
+        logger = logging.getLogger()
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            "%(asctime)s %(levelname)-8s %(message)s", "%H:%M"
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.ERROR)
+
+        logger.info("Preprocessing data starts...")
+        self.target_names = survey["Main_ID"].unique()
+        for target_name in survey["Main_ID"].unique():
+            try:
+                survey_target = survey[survey["Main_ID"] == target_name]
+                if (
+                    len(survey_target["final_uuid"].unique()) < 2
+                    or len(survey_target["date"].unique()) < 2
+                ):
+                    logger.info(
+                        f"{target_name}: Candidates were once observed or final_uuid is only once in the data."
+                    )
+                host_star = HostStar(target=target_name)
+                if host_star.object_found:
+                    (
+                        final_uuids,
+                        mean_pmras,
+                        mean_pmdecs,
+                        band,
+                        band_error,
+                        pmra_error,
+                        pmdec_error,
+                        snr_list,
+                        sep,
+                        sep_mean,
+                        pmra_pmdec_corr,
+                        dRAs,
+                        dDECs,
+                        times,
+                        dRAs_err,
+                        dDECs_err,
+                        ts_days_since_Gaia,
+                    ) = ([] for i in range(17))
+                    survey_target = survey[survey["Main_ID"] == target_name].copy()
+                    survey_target["date"] = pd.to_datetime(survey_target["date"])
+                    survey_target.loc[:, "t_day_since_Gaia"] = (
+                        pd.to_datetime(survey_target["date"]).apply(
+                            lambda x: x.to_julian_date()
+                        )
+                        - 2451545.0
+                        - (host_star.ref_epoch - 2000) * 365.25
+                    ).astype(int)
+                    for final_uuid in survey_target["final_uuid"].unique():
+                        survey_finaluuid = survey_target[
+                            survey_target["final_uuid"] == final_uuid
+                        ]
+                        if len(survey_finaluuid) >= 2:
+                            time = survey_finaluuid["date"].values
+                            dRA_dDEC = survey_finaluuid[["dRA", "dDEC"]].values
+                            dRA_dDEC_err = survey_finaluuid[
+                                ["dRA_err", "dDEC_err"]
+                            ].values
+                            deltayears = (time[1] - time[0]).astype(
+                                "timedelta64[D]"
+                            ).astype("int") / 365.25
+                            pmra, pmdec = (dRA_dDEC[1] - dRA_dDEC[0]) / deltayears
+                            bst_err1 = np.sqrt(
+                                (dRA_dDEC_err[1] / deltayears) ** 2
+                                + (dRA_dDEC_err[0] / deltayears) ** 2
+                            )
+                            pmra_err, pmdec_err = bst_err1[0], bst_err1[1]
+
+                            times.append(time)
+                            dRAs.append(survey_finaluuid["dRA"].values)
+                            dDECs.append(survey_finaluuid["dDEC"].values)
+                            dRAs_err.append(survey_finaluuid["dRA_err"].values)
+                            dDECs_err.append(survey_finaluuid["dDEC_err"].values)
+                            snr_list.append(survey_finaluuid["snr0"].mean())
+                            mean_pmras.append(pmra)
+                            mean_pmdecs.append(pmdec)
+                            pmra_pmdec_corr.append(0)
+                            pmra_error.append(pmra_err)
+                            pmdec_error.append(pmdec_err)
+                            final_uuids.append(final_uuid)
+                            band.append(survey_finaluuid["mag0"].mean())
+                            band_error.append(survey_finaluuid["mag0_err"].mean())
+                            sep.append(survey_finaluuid["sep"].values)
+                            sep_mean.append(np.mean(survey_finaluuid["sep"].values))
+                            ts_days_since_Gaia.append(
+                                survey_finaluuid["t_day_since_Gaia"].values
+                            )
+                    df_survey = pd.DataFrame(
+                        {
+                            "final_uuid": final_uuids,
+                            "dates": times,
+                            "dRA": dRAs,
+                            "dDEC": dDECs,
+                            "dRA_err": dRAs_err,
+                            "dDEC_err": dDECs_err,
+                            "pmra_mean": mean_pmras,
+                            "pmdec_mean": mean_pmdecs,
+                            "pmra_pmdec_corr": pmra_pmdec_corr,
+                            "band": band,
+                            "band_error": band_error,
+                            "pmra_error": pmra_error,
+                            "pmdec_error": pmdec_error,
+                            "snr_list": snr_list,
+                            "sep": sep,
+                            "sep_mean": sep_mean,
+                            "t_days_since_Gaia": ts_days_since_Gaia,
+                        }
+                    )
+                    df_survey["pmra_abs"] = df_survey["pmra_mean"] + host_star.pmra
+                    df_survey["pmdec_abs"] = df_survey["pmdec_mean"] + host_star.pmdec
+
+                    df_survey["pmra_abs_error"] = (
+                        df_survey["pmra_error"] ** 2 + host_star.pmra_error**2
+                    ) ** (1 / 2)
+                    df_survey["pmdec_abs_error"] = (
+                        df_survey["pmdec_error"] ** 2 + host_star.pmdec_error**2
+                    ) ** (1 / 2)
+                    self.__setattr__(f"candidates_data_{target_name}", df_survey)
+            except ValueError as error:
+                logging.error(error)
+
+    def create_fieldstar_models(self, binning_band_trafo, binning_band):
+        for target_name in tqdm(
+            [el[16:] for el in list(self.__dict__) if el[16:] in self.target_names],
+            desc="Building models",
+            ascii=" 123456789#",
+        ):
+            cone_radius = 0.1
+            #  Query host star data
+            host_star = HostStar(target_name)
+            #  Query cone data (Gaia and 2MASS)
+            #  Dataframe variables
+            host_star.cone_tmasscross_objects(cone_radius)
+            host_star.cone_gaia_objects(cone_radius)
+            df_gaia = host_star.cone_gaia
+            df_tmass = host_star.cone_tmass_cross
+            #  Gaia data without 2MASS
+            df_gaia_without_tmass = df_gaia[
+                ~df_gaia.source_id.isin(df_tmass.source_id.to_list())
+            ]
+            #  Binning parameters for 2MASS and Gaia
+            #  Merge the binning parameters to a gaia df and tmass df
+            #  And drop the duplicated columns
+            df_gaia_bp = host_star.concat_binning_parameters(
+                df_gaia_without_tmass, binning_band_trafo
+            )
+            df_tmass_bp = host_star.concat_binning_parameters(df_tmass, binning_band)
+            #  Calculate the fit coefficients
+            #  Can be accessed e.g. host_star.parallax_mean_model_coeff_gaiacalc
+            host_star.calc_background_model_parameters(
+                list_of_df_bp=[df_gaia_bp, df_tmass_bp],
+                band="band",
+                candidates_df=None,
+                include_candidates=False,
+            )

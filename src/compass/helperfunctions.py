@@ -208,3 +208,18 @@ def n_dim_gauss_evaluated(obs, mean, cov):
     denom = (2 * np.pi) ** (len(mean) / 4) * np.linalg.det(cov) ** (1 / 2)
     expo = np.dot(np.dot((obs - mean).T, np.linalg.inv(cov)), (obs - mean))
     return np.exp(-1 / 2 * expo) / denom
+
+
+def color_trafo_2MASS_K_S(g_band_mag, bp_rp_mag):
+    ks_band = g_band_mag + 0.0981 - 2.089 * bp_rp_mag + 0.1579 * (bp_rp_mag) ** 2
+    return ks_band
+
+
+def color_trafo_2MASS_H(g_band_mag, bp_rp_mag):
+    h_band = g_band_mag + 0.1048 - 2.011 * bp_rp_mag + 0.1758 * (bp_rp_mag) ** 2
+    return h_band
+
+
+def color_trafo_2MASS_J(g_band_mag, bp_rp_mag):
+    j_band = g_band_mag - 0.01798 - 1.389 * bp_rp_mag + 0.09338 * (bp_rp_mag) ** 2
+    return j_band
