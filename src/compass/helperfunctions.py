@@ -147,7 +147,10 @@ def get_g2d_parameters(x_data, y_data):
     y_stddev = np.std(y_data)
     cov = np.cov(m=[x_data, y_data])
     rho = cov[1, 0] / (x_stddev * y_stddev)
-    amplitude = 2 * np.pi * x_stddev * y_stddev * np.sqrt(1 - rho**2)
+    if rho < 1 and rho > -1:
+        amplitude = 2 * np.pi * x_stddev * y_stddev * np.sqrt(1 - rho**2)
+    else:
+        amplitude = 2 * np.pi * x_stddev * y_stddev
     return amplitude, x_mean, y_mean, x_stddev, y_stddev, cov, rho
 
 

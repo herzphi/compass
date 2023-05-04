@@ -1,4 +1,5 @@
 import itertools
+import logging
 import re
 
 import numpy as np
@@ -45,7 +46,7 @@ def get_p_ratio_table(
     df_tmass_bp = host_star.concat_binning_parameters(df_tmass, "ks_m")
     #  Calculate the fit coefficients
     #  Can be accessed e.g. host_star.parallax_mean_model_coeff_gaiacalc
-    host_star.pmm_parameters(
+    host_star.calc_background_model_parameters(
         list_of_df_bp=[df_gaia_bp, df_tmass_bp],
         band="band",
         candidates_df=None,
@@ -903,6 +904,8 @@ class HostStar:
     """
 
     object_found = False
+    logger = logging.getLogger("astroquery")
+    logger.setLevel(logging.ERROR)
 
     def __init__(self, target):
         """
@@ -960,6 +963,9 @@ class HostStar:
                     self.phot_bp_mean_mag = target_data.phot_bp_mean_mag[0]
                     self.phot_rp_mean_mag = target_data.phot_rp_mean_mag[0]
                     self.object_found = True
+                    if np.isnan(target_data.pmra[0]) or np.isnan(target_data.pmdec[0]):
+                        self.object_found = False
+                        raise ValueError("Proper motion is missing in Gaia.")
                 except HTTPError as hperr:
                     print("Received HTTPError", hperr)
         else:
