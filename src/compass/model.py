@@ -188,113 +188,178 @@ def get_candidates_parameters(target, survey, host_star):
 
 
 class CovarianceMatrix:
-    def calc_variance_x(time, plx_proj, host_star):
-        cov_plx_pm = (
+    def calc_variance_x(time, plx_proj, host_star, model):
+        cov_plx_pm_h = (
             host_star.pmra_error
             * host_star.parallax_error
             * host_star.parallax_pmra_corr
         )
-        var_prime = (
-            (time * host_star.pmra_error) ** 2
-            + (plx_proj * host_star.parallax_error) ** 2
-            + 2 * time * plx_proj * cov_plx_pm
-        )
-        return var_prime
-
-    def calc_variance_y(time, plx_proj, host_star):
-        cov_plx_pm = (
-            host_star.pmdec_error
-            * host_star.parallax_error
-            * host_star.parallax_pmdec_corr
-        )
-        var_prime = (
-            (time * host_star.pmdec_error) ** 2
-            + (plx_proj * host_star.parallax_error) ** 2
-            + 2 * time * plx_proj * cov_plx_pm
-        )
-        return var_prime
-
-    def calc_covariance_xiyi(time, plx_proj_x, plx_proj_y, host_star):
-        cov_plx_pmra = (
+        cov_plx_pm_b = (
             host_star.pmra_error
             * host_star.parallax_error
             * host_star.parallax_pmra_corr
         )
-        cov_plx_pmdec = (
+        var_prime = time**2 * (
+            model.pmra_error**2 + host_star.pmra_error**2
+        ) + plx_proj**2 * (model.parallax_error**2 + host_star.parallax_error**2)
+        +2 * time * plx_proj * (cov_plx_pm_b + cov_plx_pm_h)
+        return var_prime
+
+    def calc_variance_y(time, plx_proj, host_star, model):
+        cov_plx_pm_h = (
             host_star.pmdec_error
             * host_star.parallax_error
-            * host_star.parallax_pmdec_corr
+            * host_star.parallax_pmra_corr
         )
-        cov = (
-            time**2
-            * host_star.pmra_pmdec_corr
+        cov_plx_pm_b = (
+            host_star.pmdec_error
+            * host_star.parallax_error
+            * host_star.parallax_pmra_corr
+        )
+        var_prime = time**2 * (
+            model.pmdec_error**2 + host_star.pmdec_error**2
+        ) + plx_proj**2 * (model.parallax_error**2 + host_star.parallax_error**2)
+        +2 * time * plx_proj * (cov_plx_pm_b + cov_plx_pm_h)
+        return var_prime
+
+    def calc_covariance_xiyi(time, plx_proj_x, plx_proj_y, host_star, model):
+        cov_pmra_b_pmdec_b = (
+            model.pmra_error * model.pmdec_error * model.pmra_pmdec_corr
+        )
+        cov_pmra_h_pmdec_h = (
+            host_star.pmra_error * host_star.pmdec_error * host_star.pmra_pmdec_corr
+        )
+        cov_plx_b_pmra_b = (
+            model.parallax_error * model.pmra_error * model.parallax_pmra_corr
+        )
+        cov_plx_h_pmra_h = (
+            host_star.parallax_error
             * host_star.pmra_error
+            * host_star.parallax_pmra_corr
+        )
+        cov_plx_b_pmdec_b = (
+            model.parallax_error * model.pmdec_error * model.parallax_pmdec_corr
+        )
+        cov_plx_h_pmdec_h = (
+            host_star.parallax_error
             * host_star.pmdec_error
-        )
-        +plx_proj_x * plx_proj_y * host_star.parallax_error**2
-        +time * plx_proj_y * cov_plx_pmra
-        +time * plx_proj_x * cov_plx_pmdec
-        return cov
-
-    def calc_covariance_xixj(timei, timej, plx_proj_ra_i, plx_proj_ra_j, host_star):
-        cov_plx_pmra = (
-            host_star.pmra_error
-            * host_star.parallax_error
-            * host_star.parallax_pmra_corr
-        )
-        cov = timei * timej * host_star.pmra_error**2
-        +plx_proj_ra_i * plx_proj_ra_j * host_star.parallax_error**2
-        +(timei * plx_proj_ra_j + timej * plx_proj_ra_i) * cov_plx_pmra
-        return cov
-
-    def calc_covariance_yiyj(timei, timej, plx_proj_dec_i, plx_proj_dec_j, host_star):
-        cov_plx_pmdec = (
-            host_star.pmdec_error
-            * host_star.parallax_error
             * host_star.parallax_pmdec_corr
         )
-        cov = timei * timej * host_star.pmdec_error**2
-        +plx_proj_dec_i * plx_proj_dec_j * host_star.parallax_error**2
-        +(timei * plx_proj_dec_j + timej * plx_proj_dec_i) * cov_plx_pmdec
+        cov = time**2 * (cov_pmra_b_pmdec_b + cov_pmra_h_pmdec_h)
+        +plx_proj_x * plx_proj_y * (
+            model.parallax_error**2 + host_star.parallax_error**2
+        )
+        +time * plx_proj_y * (cov_plx_b_pmra_b + cov_plx_h_pmra_h)
+        +time * plx_proj_x * (cov_plx_b_pmdec_b + cov_plx_h_pmdec_h)
         return cov
 
-    def calc_covariance_xiyj(timei, timej, plx_proj_ra_i, plx_proj_dec_j, host_star):
-        cov_pmra_pmdec = (
+    def calc_covariance_xixj(
+        timei, timej, plx_proj_ra_i, plx_proj_ra_j, host_star, model
+    ):
+        cov_plx_b_pmra_b = (
+            model.parallax_error * model.pmra_error * model.parallax_pmra_corr
+        )
+        cov_plx_h_pmra_h = (
+            host_star.parallax_error
+            * host_star.pmra_error
+            * host_star.parallax_pmra_corr
+        )
+        cov = timei * timej * (model.pmra_error**2 + host_star.pmra_error**2)
+        +timej * plx_proj_ra_i * (cov_plx_b_pmra_b + cov_plx_h_pmra_h)
+        +timei * plx_proj_ra_j * (cov_plx_b_pmra_b + cov_plx_h_pmra_h)
+        +plx_proj_ra_j * plx_proj_ra_i * (
+            model.parallax_error**2 + host_star.parallax_error**2
+        )
+        return cov
+
+    def calc_covariance_yiyj(
+        timei, timej, plx_proj_dec_i, plx_proj_dec_j, host_star, model
+    ):
+        cov_plx_b_pmdec_b = (
+            model.parallax_error * model.pmdec_error * model.parallax_pmdec_corr
+        )
+        cov_plx_h_pmdec_h = (
+            host_star.parallax_error
+            * host_star.pmdec_error
+            * host_star.parallax_pmdec_corr
+        )
+        cov = timei * timej * (model.pmdec_error**2 + host_star.pmdec_error**2)
+        +timej * plx_proj_dec_i * (cov_plx_b_pmdec_b + cov_plx_h_pmdec_h)
+        +timei * plx_proj_dec_j * (cov_plx_b_pmdec_b + cov_plx_h_pmdec_h)
+        +plx_proj_dec_j * plx_proj_dec_i * (
+            model.parallax_error**2 + host_star.parallax_error**2
+        )
+        return cov
+
+    def calc_covariance_xiyj(
+        timei, timej, plx_proj_ra_i, plx_proj_dec_j, host_star, model
+    ):
+        cov_pmra_b_pmdec_b = (
+            model.pmra_error * model.pmdec_error * model.pmra_pmdec_corr
+        )
+        cov_pmra_h_pmdec_h = (
             host_star.pmra_error * host_star.pmdec_error * host_star.pmra_pmdec_corr
         )
-        cov_plx_pmra = (
+        cov_pmra_b_plx_b = (
+            model.pmra_error * model.parallax_error * model.parallax_pmra_corr
+        )
+        cov_pmra_h_plx_h = (
             host_star.pmra_error
             * host_star.parallax_error
             * host_star.parallax_pmra_corr
         )
-        cov_plx_pmdec = (
-            host_star.pmdec_error
-            * host_star.parallax_error
+        cov_plx_b_pmdec_b = (
+            model.parallax_error * model.pmdec_error * model.parallax_pmdec_corr
+        )
+        cov_plx_h_pmdec_h = (
+            host_star.parallax_error
+            * host_star.pmdec_error
             * host_star.parallax_pmdec_corr
         )
-        cov = timei * timej * cov_pmra_pmdec
-        +plx_proj_ra_i * plx_proj_dec_j * host_star.parallax_error**2
-        +timei * plx_proj_dec_j * cov_plx_pmra
+        cov_pm = cov_pmra_b_pmdec_b + cov_pmra_h_pmdec_h
+        cov_pmra_plx = cov_pmra_b_plx_b + cov_pmra_h_plx_h
+        cov_plx_pmdec = cov_plx_b_pmdec_b + cov_plx_h_pmdec_h
+        cov_plx = model.parallax_error**2 + host_star.parallax_error**2
+        cov = timei * timej * cov_pm
+        +timei * plx_proj_dec_j * cov_pmra_plx
         +timej * plx_proj_ra_i * cov_plx_pmdec
+        +plx_proj_ra_i * plx_proj_dec_j * cov_plx
+
         return cov
 
-    def calc_covariance_yixj(timei, timej, plx_proj_dec_i, plx_proj_ra_j, host_star):
-        cov_pmra_pmdec = (
+    def calc_covariance_yixj(
+        timei, timej, plx_proj_dec_i, plx_proj_ra_j, host_star, model
+    ):
+        cov_pmra_b_pmdec_b = (
+            model.pmra_error * model.pmdec_error * model.pmra_pmdec_corr
+        )
+        cov_pmra_h_pmdec_h = (
             host_star.pmra_error * host_star.pmdec_error * host_star.pmra_pmdec_corr
         )
-        cov_plx_pmra = (
+        cov_pmra_b_plx_b = (
+            model.pmra_error * model.parallax_error * model.parallax_pmra_corr
+        )
+        cov_pmra_h_plx_h = (
             host_star.pmra_error
             * host_star.parallax_error
             * host_star.parallax_pmra_corr
         )
-        cov_plx_pmdec = (
-            host_star.pmdec_error
-            * host_star.parallax_error
+        cov_plx_b_pmdec_b = (
+            model.parallax_error * model.pmdec_error * model.parallax_pmdec_corr
+        )
+        cov_plx_h_pmdec_h = (
+            host_star.parallax_error
+            * host_star.pmdec_error
             * host_star.parallax_pmdec_corr
         )
-        cov = timei * timej * cov_pmra_pmdec
-        +plx_proj_dec_i * plx_proj_ra_j * host_star.parallax_error**2
-        +timej * plx_proj_dec_i * cov_plx_pmra + timei * plx_proj_ra_j * cov_plx_pmdec
+        cov_pm = cov_pmra_b_pmdec_b + cov_pmra_h_pmdec_h
+        cov_pmra_plx = cov_pmra_b_plx_b + cov_pmra_h_plx_h
+        cov_plx_pmdec = cov_plx_b_pmdec_b + cov_plx_h_pmdec_h
+        cov_plx = model.parallax_error**2 + host_star.parallax_error**2
+        cov = timej * timei * cov_pm
+        +timej * plx_proj_dec_i * cov_pmra_plx
+        +timei * plx_proj_ra_j * cov_plx_pmdec
+        +plx_proj_ra_j * plx_proj_dec_i * cov_plx
         return cov
 
     def cov_propagation(C_0, days_1, days_2, plx_proj_x, plx_proj_y, host_star):
@@ -313,7 +378,7 @@ class CovarianceMatrix:
         C = C_0 + C_prime_2
         return C
 
-    def covariance_matrix(times, plx_proj_ra, plx_proj_dec, host_star):
+    def covariance_matrix(times, plx_proj_ra, plx_proj_dec, host_star, model):
         dict_var_covar = {}
         time_days = np.arange(
             times[0],
@@ -323,10 +388,10 @@ class CovarianceMatrix:
         J = list(range(1, len(times) + 1))
         for i, time in enumerate(times):
             dict_var_covar[f"var_x{i+1}"] = CovarianceMatrix.calc_variance_x(
-                time / 365.25, plx_proj_ra[time_indices[i]], host_star
+                time / 365.25, plx_proj_ra[time_indices[i]], host_star, model
             )
             dict_var_covar[f"var_y{i+1}"] = CovarianceMatrix.calc_variance_y(
-                time / 365.25, plx_proj_dec[time_indices[i]], host_star
+                time / 365.25, plx_proj_dec[time_indices[i]], host_star, model
             )
             for j in J:
                 if i + 1 != j:
@@ -338,6 +403,7 @@ class CovarianceMatrix:
                         plx_proj_ra[time_indices[i]],
                         plx_proj_ra[time_indices[j - 1]],
                         host_star,
+                        model,
                     )
                     dict_var_covar[
                         f"covar_y{i+1}y{j}"
@@ -347,6 +413,7 @@ class CovarianceMatrix:
                         plx_proj_dec[time_indices[i]],
                         plx_proj_dec[time_indices[j - 1]],
                         host_star,
+                        model,
                     )
                 dict_var_covar[
                     f"covar_x{i+1}y{j}"
@@ -355,6 +422,7 @@ class CovarianceMatrix:
                     plx_proj_ra[time_indices[j - 1]],
                     plx_proj_dec[time_indices[j - 1]],
                     host_star,
+                    model,
                 )
                 if f"covar_x{i+1}y{j}" in dict_var_covar.keys() and i + 1 == j:
                     continue
@@ -367,6 +435,7 @@ class CovarianceMatrix:
                         plx_proj_ra[time_indices[i]],
                         plx_proj_dec[time_indices[j - 1]],
                         host_star,
+                        model,
                     )
                     dict_var_covar[
                         f"covar_y{i+1}x{j}"
@@ -376,6 +445,7 @@ class CovarianceMatrix:
                         plx_proj_dec[time_indices[i]],
                         plx_proj_ra[time_indices[j - 1]],
                         host_star,
+                        model,
                     )
             J = J[1:]
         var_keys = [el for el in list(dict_var_covar.keys()) if el.startswith("var")]
@@ -648,6 +718,8 @@ class Candidate:
         Args:
             host_star (class object): Use of proper motion and parallax
                 of the star.
+            background (class object): Use of proper motion and parallax
+                of the backgorund distribution.
         Attributes:
             mean_measured_positions (numpy.darray): Measured position
                 of candidate.
@@ -671,7 +743,7 @@ class Candidate:
 
         # Initiate Background Class Object
         candidate_mag = np.mean(cc_true_data["band"])
-        model = BackgroundModel(candidate_mag, host_star)
+        background_model = BackgroundModel(candidate_mag, host_star)
 
         # Calculate the means of the distributions
         time_obs_days_from_gaia = np.array(self.cc_true_data["t_days_since_Gaia"])
@@ -680,38 +752,27 @@ class Candidate:
             self.cc_true_data["t_days_since_Gaia"][-1] + 1,
         )
         candidate_position = [cc_true_data["dRA"], cc_true_data["dDEC"]]
-        mean_obs, mean_tc, mean_b = ([0, 0] for i in range(3))
+        mean_obs, mean_tc, mean_b = (
+            [candidate_position[0][0], candidate_position[1][0]] for i in range(3)
+        )
         for i, time_gaia in enumerate(time_obs_days_from_gaia[1:]):
+            delta_time = time_gaia - time_obs_days_from_gaia[0]
             time_gaia_index = time_days.tolist().index(time_gaia)
-            x_tc = helperfunctions.calc_prime_1(
-                0,
-                host_star.pmra,
-                host_star.parallax,
-                days_since_gaia_0[i + 1] / 365.25,
-                plx_proj=self.plx_proj_ra[time_gaia_index],
-            )
-            y_tc = helperfunctions.calc_prime_1(
-                0,
-                host_star.pmdec,
-                host_star.parallax,
-                days_since_gaia_0[i + 1] / 365.25,
-                plx_proj=self.plx_proj_dec[time_gaia_index],
-            )
+            x_tc = candidate_position[0][0]
+            y_tc = candidate_position[1][0]
             mean_tc.append(x_tc)
             mean_tc.append(y_tc)
-            x_b = helperfunctions.calc_prime_1(
-                0,
-                model.pmra,
-                model.parallax,
-                days_since_gaia_0[i + 1] / 365.25,
-                plx_proj=self.plx_proj_ra[time_gaia_index],
+            x_b = (
+                x_tc
+                + (background_model.pmra - host_star.pmra) * delta_time / 365.25
+                + (background_model.parallax - host_star.parallax)
+                * self.plx_proj_ra[time_gaia_index]
             )
-            y_b = helperfunctions.calc_prime_1(
-                0,
-                model.pmdec,
-                model.parallax,
-                days_since_gaia_0[i + 1] / 365.25,
-                plx_proj=self.plx_proj_dec[time_gaia_index],
+            y_b = (
+                y_tc
+                + (background_model.pmdec - host_star.pmdec) * delta_time / 365.25
+                + (background_model.parallax - host_star.parallax)
+                * self.plx_proj_dec[time_gaia_index]
             )
             mean_b.append(x_b)
             mean_b.append(y_b)
@@ -720,12 +781,8 @@ class Candidate:
             # that position at the second observation by the difference.
             # If the difference would be zero, the candidate would have reside at the same position
             # relative to the host star.
-            try:
-                x_c_diff = np.diff(candidate_position[0][i : i + 2])[0]
-                y_c_diff = np.diff(candidate_position[1][i : i + 2])[0]
-            except IndexError:
-                continue
-            x_c, y_c = x_tc + x_c_diff, y_tc + y_c_diff
+            x_c = candidate_position[0][i + 1]
+            y_c = candidate_position[1][i + 1]
             mean_obs.append(x_c)
             mean_obs.append(y_c)
         mean_obs = np.array([float(i) for i in mean_obs])
@@ -751,21 +808,28 @@ class Candidate:
             i += 2
         self.cov_measured_positions = empty_matrix
 
-        # Covariance matrices for being true companion
-        sigma_prime_tc = CovarianceMatrix.covariance_matrix(
+        # Covariance matrix for the true companion model
+        cov_obs = {}
+        cov_obs = np.array(
+            [
+                [cc_true_data["dRA_err"][0] ** 2, 0],
+                [0, cc_true_data["dDEC_err"][0] ** 2],
+            ]
+        )
+        empty_matrix = np.zeros((int(len(mean_obs)), int(len(mean_obs))))
+        i = 0
+        for key in range(int(empty_matrix.shape[0] / 2)):
+            empty_matrix[i : 2 + i][:, i : 2 + i] = cov_obs
+            i += 2
+        self.cov_true_companion = empty_matrix
+
+        # Covariance matrix for being backgorund object
+        sigma_prime_b = CovarianceMatrix.covariance_matrix(
             days_since_gaia,
             self.plx_proj_ra,
             self.plx_proj_dec,
             host_star,
-        )
-        self.cov_true_companion = self.cov_measured_positions + sigma_prime_tc
-
-        # Covariance matrix for being backgorund object
-        sigma_prime_b = CovarianceMatrixPopulation.covariance_matrix(
-            days_since_gaia,
-            self.plx_proj_ra,
-            self.plx_proj_dec,
-            model,
+            background_model,
         )
         self.cov_background_object = self.cov_measured_positions + sigma_prime_b
 
@@ -836,10 +900,10 @@ class Candidate:
             self.mean_background_object,
             self.cov_background_object,
         )
-        if P_b > 0:
+        if P_tc / P_b > 0:
             r_tcb = np.log10(P_tc / P_b)
         else:
-            r_tcb = 1
+            r_tcb = 0
         self.r_tcb_2Dnmodel = r_tcb
 
     def calc_prob_ratio_pmmodel(self):
@@ -1315,7 +1379,7 @@ class Survey:
     """Creates odds ratio table based on the observational data of candidates
     and the field star models."""
 
-    def __init__(self, survey) -> None:
+    def __init__(self, survey, survey_bandfilter_colname) -> None:
         """Based on the target name returns a dataframe
                 containing all the survey data to this target
                 and calculates the proper motion.
@@ -1423,8 +1487,14 @@ class Survey:
                             pmra_error.append(pmra_err)
                             pmdec_error.append(pmdec_err)
                             final_uuids.append(final_uuid)
-                            band.append(survey_finaluuid["mag0"].mean())
-                            band_error.append(survey_finaluuid["mag0_err"].mean())
+                            band.append(
+                                survey_finaluuid[survey_bandfilter_colname].mean()
+                            )
+                            band_error.append(
+                                survey_finaluuid[
+                                    f"{survey_bandfilter_colname}_err"
+                                ].mean()
+                            )
                             sep.append(survey_finaluuid["sep"].values)
                             sep_mean.append(np.mean(survey_finaluuid["sep"].values))
                             ts_days_since_Gaia.append(
@@ -1501,3 +1571,39 @@ class Survey:
                 include_candidates=False,
             )
             self.__setattr__(f"fieldstar_model_{target_name}", host_star)
+
+    def evaluate_fieldstar_models(self, sigma_cc_min, sigma_model_min):
+        for target_name in tqdm(
+            [el[16:] for el in list(self.__dict__) if el[16:] in self.target_names],
+            desc="Building models",
+            ncols=100,
+            colour="green",
+            ascii=" 123456789#",
+        ):
+            # Load the model for target_name
+            field_star_model = self.__getattribute__(f"fieldstar_model_{target_name}")
+            # Evaluate the model for target_name
+            field_star_model.evaluate_candidates_table(
+                self.__getattribute__(f"candidates_data_{target_name}"),
+                sigma_cc_min=sigma_cc_min,
+                sigma_model_min=sigma_model_min,
+            )
+            # Write the results
+            candidates_table = self.__getattribute__(
+                f"fieldstar_model_{target_name}"
+            ).candidates
+            self.__setattr__(f"fieldstar_model_results_{target_name}", candidates_table)
+
+    def get_true_companions(self, threshold=0):
+        candidate_results = []
+        for target_name in self.target_names:
+            candidates_table = self.__getattribute__(
+                f"fieldstar_model_results_{target_name}"
+            )
+            candidates_table["target_name"] = target_name
+            candidates_table = candidates_table[
+                candidates_table.r_tcb_2Dnmodel > threshold
+            ]
+            candidate_results.append(candidates_table)
+        candidates_table_th = pd.concat(candidate_results).reset_index()
+        return candidates_table_th
