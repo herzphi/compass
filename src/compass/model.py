@@ -1345,7 +1345,13 @@ class Survey:
 
         logger.info("Preprocessing data starts...")
         self.target_names = survey["Main_ID"].unique()
-        for target_name in survey["Main_ID"].unique():
+        for target_name in tqdm(
+            survey["Main_ID"].unique(),
+            desc="Preparing candidates",
+            ncols=100,
+            colour="green",
+            ascii=" 123456789#",
+        ):
             try:
                 survey_target = survey[survey["Main_ID"] == target_name]
                 if (
@@ -1462,6 +1468,8 @@ class Survey:
         for target_name in tqdm(
             [el[16:] for el in list(self.__dict__) if el[16:] in self.target_names],
             desc="Building models",
+            ncols=100,
+            colour="green",
             ascii=" 123456789#",
         ):
             cone_radius = 0.1
@@ -1492,3 +1500,4 @@ class Survey:
                 candidates_df=None,
                 include_candidates=False,
             )
+            self.__setattr__(f"fieldstar_model_{target_name}", host_star)
