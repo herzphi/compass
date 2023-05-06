@@ -205,7 +205,8 @@ def func_const(x, a):
 
 
 def n_dim_gauss_evaluated(obs, mean, cov):
-    denom = (2 * np.pi) ** (len(mean) / 4) * np.linalg.det(cov) ** (1 / 2)
+    det = np.linalg.det(cov)
+    denom = (2 * np.pi) ** (len(mean) / 4) * det ** (1 / 2)
     expo = np.dot(np.dot((obs - mean).T, np.linalg.inv(cov)), (obs - mean))
     return np.exp(-1 / 2 * expo) / denom
 

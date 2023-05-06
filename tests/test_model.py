@@ -1,13 +1,13 @@
 import numpy as np
 import pytest
 
-from compass.helperfunctions import get_ellipse_props, parallax_projection
-from compass.model import HostStar, CovarianceMatrix
+from compass import helperfunctions
+from compass import model
 
 
 def test_get_ellipse_props():
     """Test example."""
-    assert get_ellipse_props(np.array([[1, 0], [0, 1]]), 0.8) == (
+    assert helperfunctions.get_ellipse_props(np.array([[1, 0], [0, 1]]), 0.8) == (
         1.7941225779941015,
         1.7941225779941015,
         0.0,
@@ -16,7 +16,7 @@ def test_get_ellipse_props():
 
 def test_host_star_object():
     """Test the host star object wether all parameters are given."""
-    host_star = HostStar(target="HIP82545")
+    host_star = model.HostStar(target="HIP82545")
     attribute_list = [
         "object_found",
         "ra",
@@ -46,21 +46,25 @@ def test_host_star_object():
 
 
 def test_covariancematrix():
-    host_star = HostStar(target="HIP82545")
+    host_star = model.HostStar(target="HIP82545")
     times_in_days = [800, 1900]
     time_days = np.linspace(0, times_in_days[1] + 1, int(times_in_days[1] + 1))
-    plx_proj_ra, plx_proj_dec = parallax_projection(time_days, host_star)
-    cov = CovarianceMatrix.covariance_matrix(
-        times_in_days, plx_proj_ra, plx_proj_dec, host_star
+    plx_proj_ra, plx_proj_dec = helperfunctions.parallax_projection(
+        time_days, host_star
+    )
+    mag0 = 16
+    backgroundmodel = model.BackgroundObject(mag0)
+    cov = model.CovarianceMatrix.covariance_matrix(
+        times_in_days, plx_proj_ra, plx_proj_dec, host_star, backgroundmodel
     ).round(2)
     assert (
         cov
         == np.array(
             [
-                [0.46, -0.03, 1.02, -0.08],
-                [-0.03, 0.32, -0.08, 0.81],
-                [1.02, -0.08, 2.43, -0.19],
-                [-0.08, 0.81, -0.19, 1.93],
+                [50.6, 34.41, 119.7, 81.73],
+                [34.41, 44.65, 81.73, 105.95],
+                [119.7, 81.73, 284.95, 194.12],
+                [81.73, 105.95, 194.12, 251.63],
             ]
         )
     ).all()
