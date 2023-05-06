@@ -13,180 +13,6 @@ from scipy.optimize import OptimizeWarning, curve_fit
 from compass import helperfunctions
 
 
-def get_p_ratio_table(
-    target, cone_radius, candidates_raw_data, sigma_cc_min, sigma_model_min
-):
-    """Calculates the odds ratio based on the target,
-    the model and the raw candidates data.
-    Args:
-        target (str): Name of the host star.
-        cone_radius (float): Radius of the cone in degrees.
-        candidates_raw_data (pandas.DataFrame): Data of the candidates.
-            Column names can be adjusted in the candidate class.
-        sigma_cc_min (float): Inflating the candidate likelihood in mas/yr.
-        sigma_model_min (float): Inflating the model likelihood in mas/yr.
-    Returns:
-        candidates_table (pandas.DataFrame): Contains candidates_raw_data
-        and the p_ratios.
-    """
-    #  Query host star data
-    host_star = HostStar(target)
-    #  Query cone data (Gaia and 2MASS)
-    #  Dataframe variables
-    host_star.cone_tmasscross_objects(cone_radius)
-    host_star.cone_gaia_objects(cone_radius)
-    df_gaia = host_star.cone_gaia
-    df_tmass = host_star.cone_tmass_cross
-    #  Gaia data without 2MASS
-    df_gaia_without_tmass = df_gaia[
-        ~df_gaia.source_id.isin(df_tmass.source_id.to_list())
-    ]
-    #  Binning parameters for 2MASS and Gaia
-    #  Merge the binning parameters to a gaia df and tmass df
-    df_gaia_bp = host_star.concat_binning_parameters(df_gaia_without_tmass, "ks_m_calc")
-    df_tmass_bp = host_star.concat_binning_parameters(df_tmass, "ks_m")
-    #  Calculate the fit coefficients
-    #  Can be accessed e.g. host_star.parallax_mean_model_coeff_gaiacalc
-    host_star.calc_background_model_parameters(
-        list_of_df_bp=[df_gaia_bp, df_tmass_bp],
-        band="band",
-        candidates_df=None,
-        include_candidates=False,
-    )
-    #  Get the candidates data
-    candidates_calc_df = get_candidates_parameters(
-        target, candidates_raw_data, host_star
-    )
-    #  Calculate p_ratios
-    host_star.evaluate_candidates_table(
-        candidates_calc_df, sigma_cc_min=sigma_cc_min, sigma_model_min=sigma_model_min
-    )
-    candidates_table = host_star.candidates
-    return candidates_table
-
-
-def get_candidates_parameters(target, survey, host_star):
-    """Based on the target name returns a dataframe
-    containing all the survey data to this target
-    and calculates the proper motion.
-
-    :param target: Name of the host star.
-    :type target: str
-    :param survey: Contains survey data. Necessary columns are:\n
-                    - Main_ID: Host star name.\n
-                    - final_uuid: Unique identifier of the two measurements of the same candidate.\n
-                    - dRA: Relative distance candidate-hoststar in mas.\n
-                    - dRA_err: Respective error.\n
-                    - dDEC: Relative distance candidate-hoststar in mas.\n
-                    - dDEC_err: Respective error.\n
-                    - snr0: Signal-to-noise ratio.\n
-                    - mag0: Magnitude of the candidate.\n
-                    - sep: Separation of the candidate from the host star.\n
-    :type survey: pandas.DataFrame
-    :return: Contains the filtered survey data.
-    :rtype: pandas.DataFrame
-
-    """
-    survey_target = survey[survey["Main_ID"] == target]
-    if len(survey_target["final_uuid"].unique()) < 2:
-        raise ValueError("There are not enough cross matches in the survey.")
-    if len(survey_target["date"].unique()) < 2:
-        raise ValueError(
-            "This object was once observed. Necessary are at least two observations."
-        )
-
-    (
-        final_uuids,
-        mean_pmras,
-        mean_pmdecs,
-        band,
-        band_error,
-        pmra_error,
-        pmdec_error,
-        snr_list,
-        sep,
-        sep_mean,
-        pmra_pmdec_corr,
-        dRAs,
-        dDECs,
-        times,
-        dRAs_err,
-        dDECs_err,
-        ts_days_since_Gaia,
-    ) = ([] for i in range(17))
-    survey_target = survey[survey["Main_ID"] == target].copy()
-    survey_target["date"] = pd.to_datetime(survey_target["date"])
-    survey_target.loc[:, "t_day_since_Gaia"] = (
-        pd.to_datetime(survey_target["date"]).apply(lambda x: x.to_julian_date())
-        - 2451545.0
-        - (host_star.ref_epoch - 2000) * 365.25
-    ).astype(int)
-    for final_uuid in survey_target["final_uuid"].unique():
-        survey_finaluuid = survey_target[survey_target["final_uuid"] == final_uuid]
-        if len(survey_finaluuid) >= 2:
-            time = survey_finaluuid["date"].values
-            dRA_dDEC = survey_finaluuid[["dRA", "dDEC"]].values
-            dRA_dDEC_err = survey_finaluuid[["dRA_err", "dDEC_err"]].values
-            deltayears = (time[1] - time[0]).astype("timedelta64[D]").astype(
-                "int"
-            ) / 365.25
-            pmra, pmdec = (dRA_dDEC[1] - dRA_dDEC[0]) / deltayears
-            bst_err1 = np.sqrt(
-                (dRA_dDEC_err[1] / deltayears) ** 2
-                + (dRA_dDEC_err[0] / deltayears) ** 2
-            )
-            pmra_err, pmdec_err = bst_err1[0], bst_err1[1]
-
-            times.append(time)
-            dRAs.append(survey_finaluuid["dRA"].values)
-            dDECs.append(survey_finaluuid["dDEC"].values)
-            dRAs_err.append(survey_finaluuid["dRA_err"].values)
-            dDECs_err.append(survey_finaluuid["dDEC_err"].values)
-            snr_list.append(survey_finaluuid["snr0"].mean())
-            mean_pmras.append(pmra)
-            mean_pmdecs.append(pmdec)
-            pmra_pmdec_corr.append(0)
-            pmra_error.append(pmra_err)
-            pmdec_error.append(pmdec_err)
-            final_uuids.append(final_uuid)
-            band.append(survey_finaluuid["mag0"].mean())
-            band_error.append(survey_finaluuid["mag0_err"].mean())
-            sep.append(survey_finaluuid["sep"].values)
-            sep_mean.append(np.mean(survey_finaluuid["sep"].values))
-            ts_days_since_Gaia.append(survey_finaluuid["t_day_since_Gaia"].values)
-    df_survey = pd.DataFrame(
-        {
-            "final_uuid": final_uuids,
-            "dates": times,
-            "dRA": dRAs,
-            "dDEC": dDECs,
-            "dRA_err": dRAs_err,
-            "dDEC_err": dDECs_err,
-            "pmra_mean": mean_pmras,
-            "pmdec_mean": mean_pmdecs,
-            "pmra_pmdec_corr": pmra_pmdec_corr,
-            "band": band,
-            "band_error": band_error,
-            "pmra_error": pmra_error,
-            "pmdec_error": pmdec_error,
-            "snr_list": snr_list,
-            "sep": sep,
-            "sep_mean": sep_mean,
-            "t_days_since_Gaia": ts_days_since_Gaia,
-        }
-    )
-    df_survey["pmra_abs"] = df_survey["pmra_mean"] + host_star.pmra
-    df_survey["pmdec_abs"] = df_survey["pmdec_mean"] + host_star.pmdec
-
-    df_survey["pmra_abs_error"] = (
-        df_survey["pmra_error"] ** 2 + host_star.pmra_error**2
-    ) ** (1 / 2)
-    df_survey["pmdec_abs_error"] = (
-        df_survey["pmdec_error"] ** 2 + host_star.pmdec_error**2
-    ) ** (1 / 2)
-    return df_survey
-
-
 class CovarianceMatrix:
     def calc_variance_x(time, plx_proj, host_star, model):
         cov_plx_pm_h = (
@@ -900,7 +726,9 @@ class Candidate:
             self.mean_background_object,
             self.cov_background_object,
         )
-        if P_tc / P_b > 0:
+        if P_b == 0:
+            r_tcb = 1
+        elif P_tc / P_b > 0:
             r_tcb = np.log10(P_tc / P_b)
         else:
             r_tcb = 0
@@ -1369,12 +1197,6 @@ class BackgroundModel:
         self.parallax_pmdec_corr = host_star_object.pmdec_parallax_model_gaiacalctmass
 
 
-# top layer
-# Inititated by passing the raw candidate data.
-# Creates for each host star the model
-# and saves the models in a list of class objects.
-
-
 class Survey:
     """Creates odds ratio table based on the observational data of candidates
     and the field star models."""
@@ -1575,7 +1397,7 @@ class Survey:
     def evaluate_fieldstar_models(self, sigma_cc_min, sigma_model_min):
         for target_name in tqdm(
             [el[16:] for el in list(self.__dict__) if el[16:] in self.target_names],
-            desc="Building models",
+            desc="Evaluate candidates",
             ncols=100,
             colour="green",
             ascii=" 123456789#",
@@ -1596,7 +1418,10 @@ class Survey:
 
     def get_true_companions(self, threshold=0):
         candidate_results = []
-        for target_name in self.target_names:
+        target_names = [
+            el[24:] for el in list(self.__dict__) if "fieldstar_model_results_" in el
+        ]
+        for target_name in target_names:
             candidates_table = self.__getattribute__(
                 f"fieldstar_model_results_{target_name}"
             )
