@@ -355,7 +355,6 @@ class Candidate:
                 "pmra_pmdec_corr",
                 "pmra_error",
                 "pmdec_error",
-                "sep",
                 "final_uuid",
                 band,
             ]
@@ -1144,9 +1143,7 @@ class Survey:
                                 - dRA_err: Respective error.\n
                                 - dDEC: Relative distance candidate-hoststar in mas.\n
                                 - dDEC_err: Respective error.\n
-                                - snr0: Signal-to-noise ratio.\n
                                 - mag0: Magnitude of the candidate.\n
-                                - sep: Separation of the candidate from the host star.\n
                 Return:
                 df_survey (pandas.DataFrame): Contains the filtered survey data.
         """
@@ -1188,9 +1185,6 @@ class Survey:
                         band_error,
                         pmra_error,
                         pmdec_error,
-                        snr_list,
-                        sep,
-                        sep_mean,
                         pmra_pmdec_corr,
                         dRAs,
                         dDECs,
@@ -1198,7 +1192,7 @@ class Survey:
                         dRAs_err,
                         dDECs_err,
                         ts_days_since_Gaia,
-                    ) = ([] for i in range(17))
+                    ) = ([] for i in range(14))
                     survey_target = survey[survey["Main_ID"] == target_name].copy()
                     survey_target["date"] = pd.to_datetime(survey_target["date"])
                     survey_target.loc[:, "t_day_since_Gaia"] = (
@@ -1233,7 +1227,6 @@ class Survey:
                             dDECs.append(survey_finaluuid["dDEC"].values)
                             dRAs_err.append(survey_finaluuid["dRA_err"].values)
                             dDECs_err.append(survey_finaluuid["dDEC_err"].values)
-                            snr_list.append(survey_finaluuid["snr0"].mean())
                             mean_pmras.append(pmra)
                             mean_pmdecs.append(pmdec)
                             pmra_pmdec_corr.append(0)
@@ -1248,8 +1241,6 @@ class Survey:
                                     f"{survey_bandfilter_colname}_err"
                                 ].mean()
                             )
-                            sep.append(survey_finaluuid["sep"].values)
-                            sep_mean.append(np.mean(survey_finaluuid["sep"].values))
                             ts_days_since_Gaia.append(
                                 survey_finaluuid["t_day_since_Gaia"].values
                             )
@@ -1268,9 +1259,6 @@ class Survey:
                             "band_error": band_error,
                             "pmra_error": pmra_error,
                             "pmdec_error": pmdec_error,
-                            "snr_list": snr_list,
-                            "sep": sep,
-                            "sep_mean": sep_mean,
                             "t_days_since_Gaia": ts_days_since_Gaia,
                         }
                     )
