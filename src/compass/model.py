@@ -208,7 +208,9 @@ class CovarianceMatrix:
         C = C_0 + C_prime_2
         return C
 
-    def covariance_matrix(times, plx_proj_ra, plx_proj_dec, host_star, backgroundmodel):
+    def covariance_matrix(
+        times, plx_proj_ra, plx_proj_dec, host_star, backgroundmodel, return_dict=False
+    ):
         dict_var_covar = {}
         time_days = np.arange(
             times[0],
@@ -306,6 +308,8 @@ class CovarianceMatrix:
                 {k: v for k, v in sorted_data.items() if k.startswith(key)}.values()
             )
         sym_matrix = empty_matrix + empty_matrix.T - np.diag(empty_matrix.diagonal())
+        if return_dict:
+            return dict_var_covar, sym_matrix
         return sym_matrix
 
 

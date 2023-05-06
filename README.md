@@ -12,31 +12,24 @@ pip install git+https://github.com/herzphi/compass.git
 ## Usage
 To calculate odds ratios of all candidates use this example:
 ### Example
+For a given set of observational data of candidates the script can be executed by the following commands:
 ```python
-from compass.modelling import get_p_ratio_table
-from compass.preset_plots import odds_ratio_sep_mag_plot
-import pandas as pd
+from compass import model
+from compass import helperfunctions
 
-target_name = 'HIP82545'
-cone_radius = .1 # degrees
-# Raw Candidates Data
-candidates = pd.read_csv('data/your_candidates_data.csv')
-# Calculate the p_ratios and append to the modified Candidates Data
-candidates_table = get_p_ratio_table(
-    target_name, 
-    cone_radius, 
-    candidates, 
-    sigma_cc_min=0,
-    sigma_model_min=0
-)
-# Save the table
-candidates_table.to_csv(
-    'data/candidates_p_ratio_table.csv', 
-    index=False
-)
-# Show results as a odds ratio vs. seperation plot
-odds_ratio_sep_mag_plot(candidates_table, target_name)
+observation = pd.read_csv('observation.csv')
+survey_object = model.Survey(observation, magnitudes_column_name)
+# magnitudes_column_name_2MASS = column name of the corresponding magnitude in 2MASS.
+# magnitudes_column_name_CALC = Color transformed column name from Gaias G-Band.
+survey_object.set_fieldstar_models(magnitudes_column_name_CALC, magnitudes_column_name_2MASS)
+# Inflating parameters to adjust the sharp dropoff of the Gaussians.
+survey_object.set_evaluated_fieldstar_models(sigma_cc_min=0, sigma_model_min=0)
 ```
+Return a pandas DataFrame containing the results by determining the threshold of an odds ratio by which a candidate is acccepted as true companion:
+```python 
+survey_object.get_true_companions(threshold=0)
+```
+
 ![Flow Diagram](diagram.png)
 ## Contributing
 
