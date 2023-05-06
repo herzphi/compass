@@ -11,8 +11,7 @@ pip install git+https://github.com/herzphi/compass.git
 
 ## Usage
 To calculate odds ratios of all candidates use this example:
-### Example
-#### Candidates Table
+### Candidates Table
 | column name | unit |
 | ----------- | ----------- |
 | Main_ID | host star ID accessable by Simbad  |
@@ -25,6 +24,7 @@ To calculate odds ratios of all candidates use this example:
 | magnitudes_column_name | mag |
 | magnitudes_column_name_err | mag |
 | final_uuid | ID used to link observations of the same candidate |
+### Example
 For a given set of observational data of candidates the script can be executed by the following commands:
 ```python
 import pandas as pd
@@ -33,10 +33,10 @@ from compass import helperfunctions
 
 observation = pd.read_csv('observation.csv')
 survey_object = model.Survey(observation, magnitudes_column_name)
-# magnitudes_column_name_2MASS = column name of the corresponding magnitude in 2MASS.
-# magnitudes_column_name_CALC = Color transformed column name from Gaias G-Band.
 survey_object.set_fieldstar_models(
-   magnitudes_column_name_CALC, 
+   # Color transformed column name from Gaias G-Band.
+   magnitudes_column_name_CALC,
+   # Column name of the corresponding magnitude in 2MASS.
    magnitudes_column_name_2MASS
 )
 # Inflating parameters to adjust the sharp dropoff of the Gaussians.
