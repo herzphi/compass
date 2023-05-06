@@ -46,25 +46,37 @@ def test_host_star_object():
 
 
 def test_covariancematrix():
-    host_star = model.HostStar(target="HIP82545")
-    times_in_days = [800, 1900]
-    time_days = np.linspace(0, times_in_days[1] + 1, int(times_in_days[1] + 1))
-    plx_proj_ra, plx_proj_dec = helperfunctions.parallax_projection(
-        time_days, host_star
+    target = "HIP82545"
+    cone_radius = 0.04
+    host_star = model.HostStar(target)
+    host_star.cone_gaia_objects(cone_radius)
+    df_gaia = host_star.cone_gaia
+    df_gaia_bp = host_star.concat_binning_parameters(df_gaia, "ks_m_calc")
+    #  Calculate the fit coefficients
+    #  Can be accessed e.g. host_star.parallax_mean_model_coeff_gaiacalc
+    host_star.calc_background_model_parameters(
+        list_of_df_bp=[df_gaia_bp],
+        band="band",
+        candidates_df=None,
+        include_candidates=False,
     )
-    mag0 = 16
-    backgroundmodel = model.BackgroundObject(mag0)
     cov = model.CovarianceMatrix.covariance_matrix(
-        times_in_days, plx_proj_ra, plx_proj_dec, host_star, backgroundmodel
+        [800, 1900],
+        [0 for i in range(1900)],
+        [0 for i in range(1900)],
+        host_star,
+        model.BackgroundModel(
+            16, host_star_object=host_star, catalogue_name="gaiacalc"
+        ),
     ).round(2)
     assert (
         cov
         == np.array(
             [
-                [50.6, 34.41, 119.7, 81.73],
-                [34.41, 44.65, 81.73, 105.95],
-                [119.7, 81.73, 284.95, 194.12],
-                [81.73, 105.95, 194.12, 251.63],
+                [42.66, 23.76, 101.31, 56.42],
+                [23.76, 35.62, 56.42, 84.59],
+                [101.31, 56.42, 240.62, 134.0],
+                [56.42, 84.59, 134.0, 200.9],
             ]
         )
     ).all()

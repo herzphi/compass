@@ -1283,7 +1283,7 @@ class Survey:
                 except ValueError as error:
                     logging.error(error)
 
-    def set_fieldstar_models(self, binning_band_trafo, binning_band):
+    def set_fieldstar_models(self, binning_band_trafo, binning_band, cone_radius=0.1):
         for target_name in tqdm(
             [el[16:] for el in list(self.__dict__) if el[16:] in self.target_names],
             desc="Building models",
@@ -1291,7 +1291,6 @@ class Survey:
             colour="green",
             ascii=" 123456789#",
         ):
-            cone_radius = 0.1
             #  Query host star data
             host_star = HostStar(target_name)
             #  Query cone data (Gaia and 2MASS)
