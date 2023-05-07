@@ -190,7 +190,7 @@ def p_ratio_plot(candidate_object, target, band):
     axs[0, 1].text(
         0,
         1 - 6 / 6,
-        r"$\log\frac{{p(\mu_{{\alpha, \delta}}|M_{tc})}}{{p(\mu_{{\alpha,\delta}}|M_b)}}$"
+        r"$\log_{10}\frac{{p(\mu_{{\alpha, \delta}}|M_{tc})}}{{p(\mu_{{\alpha,\delta}}|M_b)}}$"
         + f" = {candidate_object.r_tcb_pmmodel:.2f}",
     )
     axs[0, 1].text(
@@ -248,13 +248,12 @@ def p_ratio_plot(candidate_object, target, band):
     )
     axs[1, 1].set_ylim(-mg, mg)
     plt.tight_layout()
-    plt.show()
 
 
 def odds_ratio_sep_mag_plot(candidates_table, target_name, p_ratio_name):
     fig, axs = plt.subplots(1, figsize=(7, 3))
     g = sns.scatterplot(
-        x="sep_mean",
+        x="sep",
         y=p_ratio_name,
         data=candidates_table,
         hue="band",
@@ -265,21 +264,20 @@ def odds_ratio_sep_mag_plot(candidates_table, target_name, p_ratio_name):
     g.legend(loc="center left", bbox_to_anchor=(1, 0.5))
     axs.hlines(
         0,
-        candidates_table.sep_mean.min(),
-        candidates_table.sep_mean.max(),
+        candidates_table.sep.min(),
+        candidates_table.sep.max(),
         linestyles="dotted",
         colors="gray",
     )
     axs.set_ylim(
-        np.percentile(candidates_table[p_ratio_name], q=10),
-        candidates_table[p_ratio_name].max() + 10,
+        np.percentile(candidates_table[p_ratio_name], q=20),
+        candidates_table[p_ratio_name].max() + 1,
     )
 
     axs.set_ylabel("Odds Ratio: " + r"$\log_{10}\frac{{P(\mu|M_{tc})}}{{P(\mu|M_b)}}$")
     axs.set_xlabel(r"Separation $[mas]$")
     axs.set_title(f"Odds ratios of all candidates of {target_name}")
     plt.tight_layout()
-    plt.show()
 
 
 def propagation_plot(candidate_object, host_star, axs):

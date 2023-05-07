@@ -356,6 +356,7 @@ class Candidate:
                 "pmra_error",
                 "pmdec_error",
                 "final_uuid",
+                "sep",
                 band,
             ]
         ].to_dict()
@@ -1191,8 +1192,9 @@ class Survey:
                         times,
                         dRAs_err,
                         dDECs_err,
+                        seps,
                         ts_days_since_Gaia,
-                    ) = ([] for i in range(14))
+                    ) = ([] for i in range(15))
                     survey_target = survey[survey["Main_ID"] == target_name].copy()
                     survey_target["date"] = pd.to_datetime(survey_target["date"])
                     survey_target.loc[:, "t_day_since_Gaia"] = (
@@ -1221,7 +1223,10 @@ class Survey:
                                 + (dRA_dDEC_err[0] / deltayears) ** 2
                             )
                             pmra_err, pmdec_err = bst_err1[0], bst_err1[1]
-
+                            sep = (
+                                np.mean(survey_finaluuid["dRA"].values) ** 2
+                                + np.mean(survey_finaluuid["dDEC"].values) ** 2
+                            ) ** (1 / 2)
                             times.append(time)
                             dRAs.append(survey_finaluuid["dRA"].values)
                             dDECs.append(survey_finaluuid["dDEC"].values)
@@ -1233,6 +1238,7 @@ class Survey:
                             pmra_error.append(pmra_err)
                             pmdec_error.append(pmdec_err)
                             final_uuids.append(final_uuid)
+                            seps.append(sep)
                             band.append(
                                 survey_finaluuid[survey_bandfilter_colname].mean()
                             )
@@ -1259,6 +1265,7 @@ class Survey:
                             "band_error": band_error,
                             "pmra_error": pmra_error,
                             "pmdec_error": pmdec_error,
+                            "sep": seps,
                             "t_days_since_Gaia": ts_days_since_Gaia,
                         }
                     )
