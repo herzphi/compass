@@ -742,7 +742,28 @@ class HostStar:
         """
         if self.object_found:
             job = Gaia.launch_job_async(
-                f"""SELECT *
+                f"""SELECT 
+                gaia.source_id as source_id,
+                gaia.ra as ra ,
+                gaia.ra_error as ra_error,
+                gaia.dec as dec,
+                gaia.dec_error as dec_error,
+                gaia.ref_epoch as ref_epoch,
+                gaia.parallax as parallax,
+                gaia.parallax_error as parallax_error,
+                gaia.pmra as pmra,
+                gaia.pmdec as pmdec,
+                gaia.pmra_error as pmra_error,
+                gaia.pmdec_error as pmdec_error,
+                gaia.pmra_pmdec_corr as pmra_pmdec_corr,
+                gaia.parallax_pmra_corr as parallax_pmra_corr,
+                gaia.parallax_pmdec_corr as parallax_pmdec_corr,
+                gaia.phot_g_mean_mag as phot_g_mean_mag,
+                gaia.phot_bp_mean_mag as phot_bp_mean_mag,
+                gaia.phot_rp_mean_mag as phot_rp_mean_mag,
+                tmass.j_m,
+                tmass.h_m,
+                tmass.ks_m
             FROM gaiadr3.gaia_source AS gaia
             JOIN gaiaedr3.tmass_psc_xsc_best_neighbour
             AS xmatch USING (source_id)
@@ -767,7 +788,7 @@ class HostStar:
         """
         if self.object_found:
             job = Gaia.launch_job_async(
-                f"""SELECT *
+                f"""SELECT source_id, ra, ra_error, dec, dec_error, ref_epoch, parallax, parallax_error, pmra, pmdec, pmra_error, pmdec_error, pmra_pmdec_corr, parallax_pmra_corr, parallax_pmdec_corr, phot_g_mean_mag, phot_bp_mean_mag, phot_rp_mean_mag
             FROM gaiadr3.gaia_source AS gaia
             WHERE 1 = CONTAINS(
                 POINT({self.ra}, {self.dec}),
@@ -884,6 +905,7 @@ class HostStar:
         df_catalogue_bp = df_catalogue_bp.loc[
             :, ~df_catalogue_bp.columns.duplicated()
         ].copy()
+        self.__setattr__(f"binning_parameters_table_{band}", df_catalogue_bp)
         return df_catalogue_bp
 
     def calc_background_model_parameters(
@@ -967,14 +989,8 @@ class HostStar:
                             print("Fitting error", y_option, pm_value)
             for col in df.columns:
                 if "rho" in col:
-                    col1 = re.split("_", col)[1] + "_mean"
-                    col2 = re.split("_", col)[2] + "_mean"
-                    data_g2m = df[[col1, col2]].dropna()
-                    x_data = data_g2m[col1].values
-                    y_data = data_g2m[col2].values
-                    corr = np.corrcoef(np.array([x_data, y_data]))[0, 1]
                     attr_name = f"{col[4:]}_model_{df_label[idx]}"
-                    setattr(self, attr_name, corr)
+                    setattr(self, attr_name, df[col].mean())
 
     def evaluate_candidates_table(self, candidates_df, sigma_model_min, sigma_cc_min):
         """
@@ -1282,7 +1298,12 @@ class Survey:
                 except ValueError as error:
                     logging.error(error)
 
-    def set_fieldstar_models(self, binning_band_trafo, binning_band, cone_radius=0.1):
+    def set_fieldstar_models(
+        self,
+        binning_band_trafo,
+        binning_band,
+        cone_radius=0.1,
+    ):
         for target_name in tqdm(
             [el[16:] for el in list(self.__dict__) if el[16:] in self.target_names],
             desc="Building models",
@@ -1305,6 +1326,7 @@ class Survey:
             #  Binning parameters for 2MASS and Gaia
             #  Merge the binning parameters to a gaia df and tmass df
             #  And drop the duplicated columns
+            #  Binning parameters
             df_gaia_bp = host_star.concat_binning_parameters(
                 df_gaia_without_tmass, binning_band_trafo
             )
