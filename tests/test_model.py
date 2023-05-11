@@ -20,7 +20,9 @@ def test_host_star_object():
     attribute_list = [
         "object_found",
         "ra",
+        "ra_error",
         "dec",
+        "dec_error",
         "ref_epoch",
         "parallax",
         "parallax_error",
@@ -42,7 +44,7 @@ def test_host_star_object():
         host_star.cone_gaia, "ks_m_calc", binsize=100
     )
     host_star.calc_background_model_parameters([df_bp], "band", None, False)
-    assert len(list(host_star.__dict__)) == 49
+    assert len(list(host_star.__dict__)) == 50
 
 
 def test_covariancematrix():
