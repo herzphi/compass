@@ -40,7 +40,7 @@ def test_host_star_object():
     assert list(host_star.__dict__) == attribute_list
     host_star.cone_gaia_objects(0.1)
     assert len(host_star.cone_gaia) == 9257
-    df_bp = host_star.concat_binning_parameters(host_star.cone_gaia, "ks_m_calc")
+    df_bp = host_star.concat_binning_parameters(host_star.cone_gaia, "ks_m_calc", binsize=100)
     host_star.calc_background_model_parameters([df_bp], "band", None, False)
     assert len(list(host_star.__dict__)) == 49
 
@@ -51,7 +51,7 @@ def test_covariancematrix():
     host_star = model.HostStar(target)
     host_star.cone_gaia_objects(cone_radius)
     df_gaia = host_star.cone_gaia
-    df_gaia_bp = host_star.concat_binning_parameters(df_gaia, "ks_m_calc")
+    df_gaia_bp = host_star.concat_binning_parameters(df_gaia, "ks_m_calc", binsize=100)
     #  Calculate the fit coefficients
     #  Can be accessed e.g. host_star.parallax_mean_model_coeff_gaiacalc
     host_star.calc_background_model_parameters(
