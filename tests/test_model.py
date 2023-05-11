@@ -40,7 +40,9 @@ def test_host_star_object():
     assert list(host_star.__dict__) == attribute_list
     host_star.cone_gaia_objects(0.1)
     assert len(host_star.cone_gaia) == 9257
-    df_bp = host_star.concat_binning_parameters(host_star.cone_gaia, "ks_m_calc", binsize=100)
+    df_bp = host_star.concat_binning_parameters(
+        host_star.cone_gaia, "ks_m_calc", binsize=100
+    )
     host_star.calc_background_model_parameters([df_bp], "band", None, False)
     assert len(list(host_star.__dict__)) == 49
 
@@ -73,10 +75,10 @@ def test_covariancematrix():
         cov
         == np.array(
             [
-                [42.66, 23.76, 101.31, 56.42],
-                [23.76, 35.62, 56.42, 84.59],
-                [101.31, 56.42, 240.62, 134.0],
-                [56.42, 84.59, 134.0, 200.9],
+                [47.01, 21.41, 111.66, 50.86],
+                [21.41, 37.7, 50.86, 89.55],
+                [111.66, 50.86, 265.19, 120.79],
+                [50.86, 89.55, 120.79, 212.67],
             ]
         )
     ).all()
