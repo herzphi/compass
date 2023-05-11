@@ -47,7 +47,7 @@ def get_ellipse_props(cov, confidence):
     return major_axis, minor_axis, angle
 
 
-def ellipse(x_mean, y_mean, cov, color, linestyle, axis):
+def ellipse(x_mean, y_mean, cov, color, linestyle, linewidth, alpha, axis, zorder=1):
     for confd in [0.5, 0.9, 0.99]:
         major, minor, angle = get_ellipse_props(cov, confidence=confd)
         add_ellp_patch2(
@@ -58,7 +58,10 @@ def ellipse(x_mean, y_mean, cov, color, linestyle, axis):
             angle,
             color=color,
             linestyle=linestyle,
+            linewidth=linewidth,
+            alpha=alpha,
             axis=axis,
+            zorder=zorder,
         )
 
 
@@ -88,7 +91,19 @@ def add_ellp_patch(pdf, major, minor, angle, color, axis):
     )
 
 
-def add_ellp_patch2(x_mean, y_mean, major, minor, angle, color, linestyle, axis):
+def add_ellp_patch2(
+    x_mean,
+    y_mean,
+    major,
+    minor,
+    angle,
+    color,
+    linestyle,
+    axis,
+    linewidth=1,
+    alpha=1,
+    zorder=1,
+):
     """
     Adds a patch to a figure. The patch includes a
     ellipse at the means of a pdf with a scalable
@@ -108,11 +123,12 @@ def add_ellp_patch2(x_mean, y_mean, major, minor, angle, color, linestyle, axis)
             angle=360 * angle / (2 * np.pi),
             facecolor="none",
             edgecolor=color,
-            linewidth=1,
+            linewidth=linewidth,
             linestyle=linestyle,
-            alpha=0.6
-            # label=f'{i*100:.0f}'
-        )
+            alpha=alpha,
+            # label=f'{i*100:.0f}',
+            zorder=zorder,
+        ),
     )
 
 

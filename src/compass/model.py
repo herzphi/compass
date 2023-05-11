@@ -595,9 +595,11 @@ class Candidate:
             self.mean_background_object,
             self.cov_background_object,
         )
-        if P_b == 0:
+        if P_b == 0 and P_tc > 0:
             r_tcb = 1
-        elif P_tc / P_b > 0:
+        elif P_b == 0 and P_tc == 0:
+            r_tcb = 0
+        elif P_tc > 0 and P_b > 0:
             r_tcb = np.log10(P_tc / P_b)
         else:
             r_tcb = 0
@@ -613,14 +615,19 @@ class Candidate:
         pmuM1 = self.g2d_pmuM1(
             self.cc_true_data["pmra_mean"], self.cc_true_data["pmdec_mean"]
         )
-        r_tcb = pmuM1 / p_conv
-        if r_tcb > 1:
+        if p_conv == 0:
+            r_tcb = 1
+        elif pmuM1 > 0 and p_conv > 0:
+            r_tcb = np.log10(pmuM1 / p_conv)
+        else:
+            r_tcb = 0
+        if r_tcb > 0:
             back_true = "true companion"
         else:
             back_true = "background object"
         self.p_b = p_conv
         self.p_tc = pmuM1
-        self.r_tcb_pmmodel = np.log10(r_tcb)
+        self.r_tcb_pmmodel = r_tcb
         self.back_true = back_true
 
 
@@ -788,7 +795,7 @@ class HostStar:
         """
         if self.object_found:
             job = Gaia.launch_job_async(
-                f"""SELECT source_id, ra, ra_error, dec, dec_error, ref_epoch, parallax, parallax_error, pmra, pmdec, pmra_error, pmdec_error, pmra_pmdec_corr, parallax_pmra_corr, parallax_pmdec_corr, phot_g_mean_mag, phot_bp_mean_mag, phot_rp_mean_mag
+                f"""SELECT source_id, ra, dec, parallax, parallax_error, pmra, pmdec, pmra_error, pmdec_error, phot_g_mean_mag, phot_bp_mean_mag, phot_rp_mean_mag
             FROM gaiadr3.gaia_source AS gaia
             WHERE 1 = CONTAINS(
                 POINT({self.ra}, {self.dec}),
@@ -873,7 +880,7 @@ class HostStar:
         )
         return catalogue_bin_parameters
 
-    def concat_binning_parameters(self, df_catalogue, band):
+    def concat_binning_parameters(self, df_catalogue, band, binsize):
         """Concat the binning parameters of the combinations of pmra,
         pmdec, parallax.
 
@@ -896,7 +903,7 @@ class HostStar:
                 df_catalogue,
                 combination[0],
                 combination[1],
-                binsize=int(df_catalogue.shape[0] / 40),
+                binsize=binsize,  # int(df_catalogue.shape[0] / 40),
                 band=band,
             )
         df_catalogue_bp = pd.concat(
@@ -1185,127 +1192,113 @@ class Survey:
             survey_target = survey[survey["Main_ID"] == target_name]
             host_star = HostStar(target=target_name)
             if (
-                len(survey_target["final_uuid"].unique()) < 2
-                or len(survey_target["date"].unique()) < 2
-                or host_star.object_found == False
-            ):
-                logger.info(
+                survey_target["final_uuid"].value_counts() < 2
+            ).all() or host_star.object_found == False:
+                logger.error(
                     f"{target_name}: Candidates were once observed or final_uuid is only once in the data or star not found."
                 )
             else:
-                try:
-                    (
-                        final_uuids,
-                        mean_pmras,
-                        mean_pmdecs,
-                        band,
-                        band_error,
-                        pmra_error,
-                        pmdec_error,
-                        pmra_pmdec_corr,
-                        dRAs,
-                        dDECs,
-                        times,
-                        dRAs_err,
-                        dDECs_err,
-                        seps,
-                        ts_days_since_Gaia,
-                    ) = ([] for i in range(15))
-                    survey_target = survey[survey["Main_ID"] == target_name].copy()
-                    survey_target["date"] = pd.to_datetime(survey_target["date"])
-                    survey_target.loc[:, "t_day_since_Gaia"] = (
-                        pd.to_datetime(survey_target["date"]).apply(
-                            lambda x: x.to_julian_date()
-                        )
-                        - 2451545.0
-                        - (host_star.ref_epoch - 2000) * 365.25
-                    ).astype(int)
-                    for final_uuid in survey_target["final_uuid"].unique():
-                        survey_finaluuid = survey_target[
-                            survey_target["final_uuid"] == final_uuid
-                        ]
-                        if len(survey_finaluuid) >= 2:
-                            time = survey_finaluuid["date"].values
-                            dRA_dDEC = survey_finaluuid[["dRA", "dDEC"]].values
-                            dRA_dDEC_err = survey_finaluuid[
-                                ["dRA_err", "dDEC_err"]
-                            ].values
-                            deltayears = (time[1] - time[0]).astype(
-                                "timedelta64[D]"
-                            ).astype("int") / 365.25
-                            pmra, pmdec = (dRA_dDEC[1] - dRA_dDEC[0]) / deltayears
-                            bst_err1 = np.sqrt(
-                                (dRA_dDEC_err[1] / deltayears) ** 2
-                                + (dRA_dDEC_err[0] / deltayears) ** 2
-                            )
-                            pmra_err, pmdec_err = bst_err1[0], bst_err1[1]
-                            sep = (
-                                np.mean(survey_finaluuid["dRA"].values) ** 2
-                                + np.mean(survey_finaluuid["dDEC"].values) ** 2
-                            ) ** (1 / 2)
-                            times.append(time)
-                            dRAs.append(survey_finaluuid["dRA"].values)
-                            dDECs.append(survey_finaluuid["dDEC"].values)
-                            dRAs_err.append(survey_finaluuid["dRA_err"].values)
-                            dDECs_err.append(survey_finaluuid["dDEC_err"].values)
-                            mean_pmras.append(pmra)
-                            mean_pmdecs.append(pmdec)
-                            pmra_pmdec_corr.append(0)
-                            pmra_error.append(pmra_err)
-                            pmdec_error.append(pmdec_err)
-                            final_uuids.append(final_uuid)
-                            seps.append(sep)
-                            band.append(
-                                survey_finaluuid[survey_bandfilter_colname].mean()
-                            )
-                            band_error.append(
-                                survey_finaluuid[
-                                    f"{survey_bandfilter_colname}_err"
-                                ].mean()
-                            )
-                            ts_days_since_Gaia.append(
-                                survey_finaluuid["t_day_since_Gaia"].values
-                            )
-                    df_survey = pd.DataFrame(
-                        {
-                            "final_uuid": final_uuids,
-                            "dates": times,
-                            "dRA": dRAs,
-                            "dDEC": dDECs,
-                            "dRA_err": dRAs_err,
-                            "dDEC_err": dDECs_err,
-                            "pmra_mean": mean_pmras,
-                            "pmdec_mean": mean_pmdecs,
-                            "pmra_pmdec_corr": pmra_pmdec_corr,
-                            "band": band,
-                            "band_error": band_error,
-                            "pmra_error": pmra_error,
-                            "pmdec_error": pmdec_error,
-                            "sep": seps,
-                            "t_days_since_Gaia": ts_days_since_Gaia,
-                        }
+                (
+                    final_uuids,
+                    mean_pmras,
+                    mean_pmdecs,
+                    band,
+                    band_error,
+                    pmra_error,
+                    pmdec_error,
+                    pmra_pmdec_corr,
+                    dRAs,
+                    dDECs,
+                    times,
+                    dRAs_err,
+                    dDECs_err,
+                    seps,
+                    ts_days_since_Gaia,
+                ) = ([] for i in range(15))
+                survey_target = survey[survey["Main_ID"] == target_name].copy()
+                survey_target["date"] = pd.to_datetime(survey_target["date"])
+                survey_target.loc[:, "t_day_since_Gaia"] = (
+                    pd.to_datetime(survey_target["date"]).apply(
+                        lambda x: x.to_julian_date()
                     )
-                    df_survey["pmra_abs"] = df_survey["pmra_mean"] + host_star.pmra
-                    df_survey["pmdec_abs"] = df_survey["pmdec_mean"] + host_star.pmdec
+                    - 2451545.0
+                    - (host_star.ref_epoch - 2000) * 365.25
+                ).astype(int)
+                for final_uuid in survey_target["final_uuid"].unique():
+                    survey_finaluuid = survey_target[
+                        survey_target["final_uuid"] == final_uuid
+                    ]
+                    if len(survey_finaluuid) >= 2:
+                        time = survey_finaluuid["date"].values
+                        dRA_dDEC = survey_finaluuid[["dRA", "dDEC"]].values
+                        dRA_dDEC_err = survey_finaluuid[["dRA_err", "dDEC_err"]].values
+                        deltayears = (time[-1] - time[0]).astype(
+                            "timedelta64[D]"
+                        ).astype("int") / 365.25
+                        pmra, pmdec = (dRA_dDEC[-1] - dRA_dDEC[0]) / deltayears
+                        bst_err1 = np.sqrt(
+                            (dRA_dDEC_err[-1] / deltayears) ** 2
+                            + (dRA_dDEC_err[0] / deltayears) ** 2
+                        )
+                        pmra_err, pmdec_err = bst_err1[0], bst_err1[1]
+                        sep = (
+                            np.mean(survey_finaluuid["dRA"].values) ** 2
+                            + np.mean(survey_finaluuid["dDEC"].values) ** 2
+                        ) ** (1 / 2)
+                        times.append(time)
+                        dRAs.append(survey_finaluuid["dRA"].values)
+                        dDECs.append(survey_finaluuid["dDEC"].values)
+                        dRAs_err.append(survey_finaluuid["dRA_err"].values)
+                        dDECs_err.append(survey_finaluuid["dDEC_err"].values)
+                        mean_pmras.append(pmra)
+                        mean_pmdecs.append(pmdec)
+                        pmra_pmdec_corr.append(0)
+                        pmra_error.append(pmra_err)
+                        pmdec_error.append(pmdec_err)
+                        final_uuids.append(final_uuid)
+                        seps.append(sep)
+                        band.append(survey_finaluuid[survey_bandfilter_colname].mean())
+                        band_error.append(
+                            survey_finaluuid[f"{survey_bandfilter_colname}_err"].mean()
+                        )
+                        ts_days_since_Gaia.append(
+                            survey_finaluuid["t_day_since_Gaia"].values
+                        )
+                df_survey = pd.DataFrame(
+                    {
+                        "final_uuid": final_uuids,
+                        "dates": times,
+                        "dRA": dRAs,
+                        "dDEC": dDECs,
+                        "dRA_err": dRAs_err,
+                        "dDEC_err": dDECs_err,
+                        "pmra_mean": mean_pmras,
+                        "pmdec_mean": mean_pmdecs,
+                        "pmra_pmdec_corr": pmra_pmdec_corr,
+                        "band": band,
+                        "band_error": band_error,
+                        "pmra_error": pmra_error,
+                        "pmdec_error": pmdec_error,
+                        "sep": seps,
+                        "t_days_since_Gaia": ts_days_since_Gaia,
+                    }
+                )
+                df_survey["pmra_abs"] = df_survey["pmra_mean"] + host_star.pmra
+                df_survey["pmdec_abs"] = df_survey["pmdec_mean"] + host_star.pmdec
 
-                    df_survey["pmra_abs_error"] = (
-                        df_survey["pmra_error"] ** 2 + host_star.pmra_error**2
-                    ) ** (1 / 2)
-                    df_survey["pmdec_abs_error"] = (
-                        df_survey["pmdec_error"] ** 2 + host_star.pmdec_error**2
-                    ) ** (1 / 2)
-                    self.__setattr__(f"candidates_data_{target_name}", df_survey)
-                except ValueError as error:
-                    logging.error(error)
+                df_survey["pmra_abs_error"] = (
+                    df_survey["pmra_error"] ** 2 + host_star.pmra_error**2
+                ) ** (1 / 2)
+                df_survey["pmdec_abs_error"] = (
+                    df_survey["pmdec_error"] ** 2 + host_star.pmdec_error**2
+                ) ** (1 / 2)
+                self.__setattr__(f"candidates_data_{target_name}", df_survey)
 
     def set_fieldstar_models(
-        self,
-        binning_band_trafo,
-        binning_band,
-        cone_radius=0.1,
+        self, binning_band_trafo, binning_band, cone_radius=0.1, binsize=50
     ):
         for target_name in tqdm(
-            [el[16:] for el in list(self.__dict__) if el[16:] in self.target_names],
+            [el for el in self.target_names],
             desc="Building models",
             ncols=100,
             colour="green",
@@ -1328,9 +1321,11 @@ class Survey:
             #  And drop the duplicated columns
             #  Binning parameters
             df_gaia_bp = host_star.concat_binning_parameters(
-                df_gaia_without_tmass, binning_band_trafo
+                df_gaia_without_tmass, binning_band_trafo, binsize
             )
-            df_tmass_bp = host_star.concat_binning_parameters(df_tmass, binning_band)
+            df_tmass_bp = host_star.concat_binning_parameters(
+                df_tmass, binning_band, binsize
+            )
             #  Calculate the fit coefficients
             #  Can be accessed e.g. host_star.parallax_mean_model_coeff_gaiacalc
             host_star.calc_background_model_parameters(
