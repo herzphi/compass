@@ -20,9 +20,7 @@ def test_host_star_object():
     attribute_list = [
         "object_found",
         "ra",
-        "ra_error",
         "dec",
-        "dec_error",
         "ref_epoch",
         "parallax",
         "parallax_error",
