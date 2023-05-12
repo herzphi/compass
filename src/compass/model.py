@@ -518,7 +518,7 @@ class Candidate:
             i += 2
         self.cov_true_companion = empty_matrix
 
-        # Covariance matrix for being backgorund object
+        # Covariance matrix for being background object
         sigma_prime_b = CovarianceMatrix.covariance_matrix(
             days_since_gaia,
             self.plx_proj_ra,
@@ -1007,9 +1007,20 @@ class HostStar:
             sigma_model_min (float or int): The inflating factor for the model likelihood.
             sigma_cc_min (float or int): The inflating factor for its likelihood.
         """
-        final_uuids, r_tcb_2Dnmodel, r_tcb_pmmodel, catalogues, candidate_objects = (
-            [] for i in range(5)
-        )
+        (
+            final_uuids,
+            r_tcb_2Dnmodel,
+            r_tcb_pmmodel,
+            catalogues,
+            mean_background_objects,
+            mean_measured_positions,
+            mean_true_companion,
+            cov_background_objects,
+            cov_measured_positions,
+            cov_true_companion,
+            candidate_objects,
+            ref_epochs,
+        ) = ([] for i in range(12))
         for index_candidate in range(len(candidates_df)):
             for catalogue in ["tmass", "gaiacalctmass"]:
                 #  Create candidate object
@@ -1019,6 +1030,13 @@ class HostStar:
                     host_star=self,
                     band="band",
                     catalogue=catalogue,
+                )
+                epochs = list(
+                    np.around(
+                        candidate.cc_true_data["t_days_since_Gaia"] / 365.25
+                        + self.ref_epoch,
+                        1,
+                    )
                 )
                 # Compute liklihoods
                 candidate.calc_likelihoods_2Dnmodel(self)
@@ -1030,13 +1048,27 @@ class HostStar:
                 r_tcb_2Dnmodel.append(candidate.r_tcb_2Dnmodel)
                 r_tcb_pmmodel.append(candidate.r_tcb_pmmodel)
                 catalogues.append(catalogue)
+                mean_background_objects.append(candidate.mean_background_object)
+                mean_measured_positions.append(candidate.mean_measured_positions)
+                mean_true_companion.append(candidate.mean_true_companion)
+                cov_background_objects.append(candidate.cov_background_object)
+                cov_measured_positions.append(candidate.cov_measured_positions)
+                cov_true_companion.append(candidate.cov_true_companion)
+                ref_epochs.append(epochs)
             candidate_objects.append(candidate)
         candidates_r_tcb = pd.DataFrame(
             {
                 "final_uuid": final_uuids,
+                "mean_background_object": mean_background_objects,
+                "mean_measured_positions": mean_measured_positions,
+                "mean_true_companion": mean_true_companion,
+                "cov_background_object": cov_background_objects,
+                "cov_measured_positions": cov_measured_positions,
+                "cov_true_companion": cov_true_companion,
                 "r_tcb_2Dnmodel": r_tcb_2Dnmodel,
                 "r_tcb_pmmodel": r_tcb_pmmodel,
                 "r_tcb_catalogue": catalogues,
+                "ref_epochs": ref_epochs,
             }
         )
         candidates = candidates_df.merge(candidates_r_tcb, on=["final_uuid"])
@@ -1181,7 +1213,7 @@ class Survey:
         logger.setLevel(logging.ERROR)
 
         logger.info("Preprocessing data starts...")
-        self.target_names = survey["Main_ID"].unique()
+        targets = []
         for target_name in tqdm(
             survey["Main_ID"].unique(),
             desc="Preparing candidates",
@@ -1193,11 +1225,12 @@ class Survey:
             host_star = HostStar(target=target_name)
             if (
                 survey_target["final_uuid"].value_counts() < 2
-            ).all() or host_star.object_found == False:
-                logger.error(
+            ).all() or host_star.object_found is False:
+                logger.info(
                     f"{target_name}: Candidates were once observed or final_uuid is only once in the data or star not found."
                 )
             else:
+                targets.append(target_name)
                 (
                     final_uuids,
                     mean_pmras,
@@ -1293,12 +1326,13 @@ class Survey:
                     df_survey["pmdec_error"] ** 2 + host_star.pmdec_error**2
                 ) ** (1 / 2)
                 self.__setattr__(f"candidates_data_{target_name}", df_survey)
+        self.target_names = targets
 
     def set_fieldstar_models(
-        self, binning_band_trafo, binning_band, cone_radius=0.1, binsize=50
+        self, binning_band_trafo, binning_band, cone_radius=0.3, binsize=200
     ):
         for target_name in tqdm(
-            [el for el in self.target_names],
+            self.target_names,
             desc="Building models",
             ncols=100,
             colour="green",
