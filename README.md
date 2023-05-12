@@ -16,13 +16,11 @@ To calculate odds ratios of all candidates use this example:
 | ----------- | ----------- |
 | Main_ID | host star ID accessable by Simbad  |
 | date | Gregorian date |
-| mjd | Modified Julian Date |
 | dRA | mas |
 | dRA_err | mas |
 | dDEC | mas |
 | dDEC_err | mas |
 | magnitudes_column_name | mag |
-| magnitudes_column_name_err | mag |
 | final_uuid | ID used to link observations of the same candidate |
 ### Example
 For a given set of observational data of candidates the script can be executed by the following commands:
@@ -37,13 +35,13 @@ survey_object.set_fieldstar_models(
    # Color transformed column name from Gaias G-Band.
    magnitudes_column_name_CALC,
    # Column name of the corresponding magnitude in 2MASS.
-   magnitudes_column_name_2MASS
+   magnitudes_column_name_2MASS,
+   cone_radius=0.05, # in degree
+   binsize=20
 )
 # Inflating parameters to adjust the sharp dropoff of the Gaussians.
-survey_object.set_evaluated_fieldstar_models(
-   sigma_cc_min=0,
-   sigma_model_min=0
-)
+
+survey_object.set_evaluated_fieldstar_models(sigma_cc_min = 0, sigma_model_min=0)
 ```
 Return a pandas DataFrame containing the results by determining the threshold of an odds ratio by which a candidate is acccepted as true companion:
 ```python 
