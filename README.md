@@ -22,6 +22,14 @@ To calculate odds ratios of all candidates use this example:
 | dDEC_err | mas |
 | magnitudes_column_name | mag |
 | final_uuid | ID used to link observations of the same candidate |
+
+Example table:
+|final_uuid|Main_ID|date|dRA|dDEC|dRA_err|dDEC_err|mag0|
+| - | - | - | - | - | - | - | - |
+|to1_0|HIP82545|2017-05-05|-1625.0|1897.0|6|6|17|
+|to1_0|HIP82545|2018-05-05|-1624.4|1891.8|6|6|17|
+|to1_0|HIP82545|2019-05-05|-1631.4|1891.4|6|6|17|
+|to1_0|HIP82545|2020-05-05|-1606.7|1893.1|6|6|17|
 ### Example
 For a given set of observational data of candidates the script can be executed by the following commands:
 ```python

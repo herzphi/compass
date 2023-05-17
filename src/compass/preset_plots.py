@@ -251,12 +251,20 @@ def p_ratio_plot(candidate_object, target, band):
 
 
 def odds_ratio_sep_mag_plot(candidates_table, target_name, p_ratio_name):
+    """Creates a odds ratio vs. separation plot by magnitude and catalogue
+    Args:
+        candidates_table (pandas.DataFrame): Table with the candidates data.
+        target_name (str): Name of the host star.
+        p_ratio_name (str): r_tcb_pmmodel or r_tcb_2Dnmodel.
+    """
+    candidates_table = candidates_table.rename(columns={"band": "K-band"})
+    candidates_table["K-band"] = candidates_table["K-band"].round(0)
     fig, axs = plt.subplots(1, figsize=(7, 3))
     g = sns.scatterplot(
         x="sep",
         y=p_ratio_name,
         data=candidates_table,
-        hue="band",
+        hue="K-band",
         style="r_tcb_catalogue",
         s=60,
         ax=axs,
@@ -269,14 +277,11 @@ def odds_ratio_sep_mag_plot(candidates_table, target_name, p_ratio_name):
         linestyles="dotted",
         colors="gray",
     )
-    axs.set_ylim(
-        np.percentile(candidates_table[p_ratio_name], q=20),
-        candidates_table[p_ratio_name].max() + 1,
-    )
 
     axs.set_ylabel("Odds Ratio: " + r"$\log_{10}\frac{{P(\mu|M_{tc})}}{{P(\mu|M_b)}}$")
     axs.set_xlabel(r"Separation $[mas]$")
     axs.set_title(f"Odds ratios of all candidates of {target_name}")
+    axs.margins(0.15, 0.2)
     plt.tight_layout()
 
 
