@@ -23,13 +23,15 @@ To calculate odds ratios of all candidates use this example:
 | magnitudes_column_name | mag |
 | final_uuid | ID used to link observations of the same candidate |
 
-Example table:
+Example candidates table:
 |final_uuid|Main_ID|date|dRA|dDEC|dRA_err|dDEC_err|mag0|
 | - | - | - | - | - | - | - | - |
 |to1_0|HIP82545|2017-05-05|-1625.0|1897.0|6|6|17|
 |to1_0|HIP82545|2018-05-05|-1624.4|1891.8|6|6|17|
 |to1_0|HIP82545|2019-05-05|-1631.4|1891.4|6|6|17|
 |to1_0|HIP82545|2020-05-05|-1606.7|1893.1|6|6|17|
+
+
 ### Example
 For a given set of observational data of candidates the script can be executed by the following commands:
 ```python
@@ -44,14 +46,17 @@ survey_object.set_fieldstar_models(
    magnitudes_column_name_CALC,
    # Column name of the corresponding magnitude in 2MASS.
    magnitudes_column_name_2MASS,
-   cone_radius=0.05, # in degree
-   binsize=20
+   cone_radius = 0.3, # in degree
+   binsize = 200 # Number of objects in a single magnitude bin
 )
 # Inflating parameters to adjust the sharp dropoff of the Gaussians.
 
-survey_object.set_evaluated_fieldstar_models(sigma_cc_min = 0, sigma_model_min=0)
+survey_object.set_evaluated_fieldstar_models(
+   sigma_cc_min = 0,
+   sigma_model_min = 0
+)
 ```
-Return a pandas DataFrame containing the results by determining the threshold of an odds ratio by which a candidate is acccepted as true companion:
+Return a pandas DataFrame containing the results by determining the `threshold` of an odds ratio by which a candidate is acccepted as true companion:
 ```python 
 survey_object.get_true_companions(threshold=0)
 ```
