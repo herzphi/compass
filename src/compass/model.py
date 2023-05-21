@@ -659,10 +659,6 @@ class HostStar:
         candidates (pandas.DataFrame): Containing id, p_ratio and p_ratio_catalogue.
     """
 
-    object_found = False
-    logger = logging.getLogger("astroquery")
-    logger.setLevel(logging.ERROR)
-
     def __init__(self, target):
         """
         Searches for the given target id in the Simbad database
@@ -671,6 +667,9 @@ class HostStar:
         Args:
             target (str): Name of the target.
         """
+        object_found = False
+        logger = logging.getLogger("astroquery")
+        logger.setLevel(logging.ERROR)
         logger = logging.getLogger("astroquery")
         customSimbad = Simbad()
         customSimbad.add_votable_fields("ids")
