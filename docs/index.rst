@@ -7,7 +7,7 @@ Welcome to compass's documentation!
 ======================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
 
@@ -65,3 +65,5 @@ Indices and tables
  their docstrings.
 
 .. automodapi:: compass.model
+.. automodapi:: compass.helperfunctions
+.. automodapi:: compass.preset_plots

@@ -1191,17 +1191,17 @@ class Survey:
                 containing all the survey data to this target
                 and calculates the proper motion.
         Args:
-                target (str): Name of the host star.
-                survey (pandas.DataFrame): Contains survey data. Necessary columns are:\n
-                                - Main_ID: Host star name.\n
-                                - final_uuid: Unique identifier of the two measurements of the same candidate.\n
-                                - dRA: Relative distance candidate-hoststar in mas.\n
-                                - dRA_err: Respective error.\n
-                                - dDEC: Relative distance candidate-hoststar in mas.\n
-                                - dDEC_err: Respective error.\n
-                                - mag0: Magnitude of the candidate.\n
-                Return:
-                df_survey (pandas.DataFrame): Contains the filtered survey data.
+            target (str): Name of the host star.
+            survey (pandas.DataFrame): Contains survey data. Necessary columns are:\n
+                            - Main_ID: Host star name.\n
+                            - final_uuid: Unique identifier of the two measurements of the same candidate.\n
+                            - dRA: Relative distance candidate-hoststar in mas.\n
+                            - dRA_err: Respective error.\n
+                            - dDEC: Relative distance candidate-hoststar in mas.\n
+                            - dDEC_err: Respective error.\n
+                            - mag0: Magnitude of the candidate.\n
+        Returns:
+            df_survey (pandas.DataFrame): Contains the filtered survey data.
         """
         logger = logging.getLogger()
         handler = logging.StreamHandler()
@@ -1331,6 +1331,14 @@ class Survey:
     def set_fieldstar_models(
         self, binning_band_trafo, binning_band, cone_radius=0.3, binsize=200
     ):
+        """Build for each host star given in survey a field star model.
+
+        Args:
+            binning_band_trafo (str): Color transformed bandwidth, e.g. ks_m_calc.
+            binning_band (str): Color bandwidth, e.g. ks_m.
+            cone_radius (float): Default=0.3 in degrees.
+            binsize (int): Default=200 in number of field stars per magnitude bin.
+        """
         for target_name in tqdm(
             self.target_names,
             desc="Building models",
@@ -1371,6 +1379,11 @@ class Survey:
             self.__setattr__(f"fieldstar_model_{target_name}", host_star)
 
     def set_evaluated_fieldstar_models(self, sigma_cc_min, sigma_model_min):
+        """Evaluate the field star models with candidate data.
+        Args:
+            sigma_cc_min (float): Minimum sigma for the candidates likelihoods.
+            sigma_model_min (float): Minimum sigma for the field star model likelihoods.
+        """
         for target_name in tqdm(
             [el[16:] for el in list(self.__dict__) if "candidates_data" in el],
             desc="Evaluate candidates",
@@ -1393,6 +1406,11 @@ class Survey:
             self.__setattr__(f"fieldstar_model_results_{target_name}", candidates_table)
 
     def get_true_companions(self, threshold=0):
+        """Return all candidates with a odds ratio greater than the threshold.
+        Args:
+            threshold (float): Odds ratio greater than the threshold will be returned.
+        Returns:
+            candidates_table_th (pandas.DataFrame): Candidates with r_tcb>threshold."""
         candidate_results = []
         target_names = [
             el[24:] for el in list(self.__dict__) if "fieldstar_model_results_" in el
