@@ -14,21 +14,21 @@ from compass import helperfunctions
 
 
 class CovarianceMatrix:
-    def cov_pmra_pmdec(self, model_object):
+    def cov_pmra_pmdec(model_object):
         return (
             model_object.pmra_error
             * model_object.pmdec_error
             * model_object.pmra_pmdec_corr
         )
 
-    def cov_pmdirection_plx(self, model_object, pmdirection):
+    def cov_pmdirection_plx(model_object, pmdirection):
         return (
             model_object.__getattribute__(pmdirection)
             * model_object.parallax_error
             * model_object.parallax_pmra_corr
         )
 
-    def calc_variance_x(self, time, plx_proj, host_star, backgroundmodel):
+    def calc_variance_x(time, plx_proj, host_star, backgroundmodel):
         cov_plx_pm_h = (
             host_star.pmra_error
             * host_star.parallax_error
@@ -47,7 +47,7 @@ class CovarianceMatrix:
         )
         return var_prime
 
-    def calc_variance_y(self, time, plx_proj, host_star, backgroundmodel):
+    def calc_variance_y(time, plx_proj, host_star, backgroundmodel):
         cov_plx_pm_h = (
             host_star.pmdec_error
             * host_star.parallax_error
@@ -66,9 +66,7 @@ class CovarianceMatrix:
         )
         return var_prime
 
-    def calc_covariance_xiyi(
-        self, time, plx_proj_x, plx_proj_y, host_star, backgroundmodel
-    ):
+    def calc_covariance_xiyi(time, plx_proj_x, plx_proj_y, host_star, backgroundmodel):
         cov_pmra_b_pmdec_b = (
             backgroundmodel.pmra_error
             * backgroundmodel.pmdec_error
@@ -108,7 +106,7 @@ class CovarianceMatrix:
         return cov
 
     def calc_covariance_xixj(
-        self, timei, timej, plx_proj_ra_i, plx_proj_ra_j, host_star, backgroundmodel
+        timei, timej, plx_proj_ra_i, plx_proj_ra_j, host_star, backgroundmodel
     ):
         cov_plx_b_pmra_b = (
             backgroundmodel.parallax_error
@@ -133,7 +131,7 @@ class CovarianceMatrix:
         return cov
 
     def calc_covariance_yiyj(
-        self, timei, timej, plx_proj_dec_i, plx_proj_dec_j, host_star, backgroundmodel
+        timei, timej, plx_proj_dec_i, plx_proj_dec_j, host_star, backgroundmodel
     ):
         cov_plx_b_pmdec_b = (
             backgroundmodel.parallax_error
@@ -158,7 +156,7 @@ class CovarianceMatrix:
         return cov
 
     def calc_covariance_xiyj(
-        self, timei, timej, plx_proj_ra_i, plx_proj_dec_j, host_star, backgroundmodel
+        timei, timej, plx_proj_ra_i, plx_proj_dec_j, host_star, backgroundmodel
     ):
         cov_pm = CovarianceMatrix.cov_pmra_pmdec(
             backgroundmodel
@@ -180,7 +178,7 @@ class CovarianceMatrix:
         return cov
 
     def calc_covariance_yixj(
-        self, timei, timej, plx_proj_dec_i, plx_proj_ra_j, host_star, backgroundmodel
+        timei, timej, plx_proj_dec_i, plx_proj_ra_j, host_star, backgroundmodel
     ):
         cov_pm = CovarianceMatrix.cov_pmra_pmdec(
             backgroundmodel
@@ -200,7 +198,7 @@ class CovarianceMatrix:
         )
         return cov
 
-    def cov_propagation(self, C_0, days_1, days_2, plx_proj_x, plx_proj_y, host_star):
+    def cov_propagation(C_0, days_1, days_2, plx_proj_x, plx_proj_y, host_star):
         time = (days_2 - days_1) / 365.35
         var_x_prime_2 = CovarianceMatrix.calc_variance_x(time, plx_proj_x, host_star)
         var_y_prime_2 = CovarianceMatrix.calc_variance_y(time, plx_proj_y, host_star)
@@ -217,7 +215,6 @@ class CovarianceMatrix:
         return C
 
     def covariance_matrix(
-        self,
         times,
         plx_proj_ra,
         plx_proj_dec,
