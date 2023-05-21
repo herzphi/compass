@@ -29,8 +29,6 @@ author = "Philipp Herz"
 # ones.
 extensions = ["sphinx_automodapi.automodapi"]
 numpydoc_show_class_members = False
-# Add any Sphinx extension module names here, as strings
-extensions = ["sphinx.ext.napoleon"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -51,4 +49,4 @@ html_theme = "alabaster"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path = ["_static"]
