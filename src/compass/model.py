@@ -667,9 +667,6 @@ class HostStar:
         Args:
             target (str): Name of the target.
         """
-        object_found = False
-        logger = logging.getLogger("astroquery")
-        logger.setLevel(logging.ERROR)
         logger = logging.getLogger("astroquery")
         customSimbad = Simbad()
         customSimbad.add_votable_fields("ids")
