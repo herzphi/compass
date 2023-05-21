@@ -71,5 +71,6 @@ Indices and tables
  their docstrings.
 
 .. automodapi:: compass.model
+   :no-inheritance-diagram:
 .. automodapi:: compass.helperfunctions
 .. automodapi:: compass.preset_plots

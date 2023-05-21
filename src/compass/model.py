@@ -2,13 +2,13 @@ import itertools
 import logging
 import re
 
-from tqdm import tqdm
+import tqdm
 import numpy as np
 import pandas as pd
 from astroquery.gaia import Gaia
 from astroquery.simbad import Simbad
-from requests.exceptions import HTTPError
-from scipy.optimize import OptimizeWarning, curve_fit
+from requests import exceptions
+from scipy import optimize
 
 from compass import helperfunctions
 
@@ -736,8 +736,8 @@ class HostStar:
                     if np.isnan(target_data.pmra[0]) or np.isnan(target_data.pmdec[0]):
                         self.object_found = False
                         logger.info(f"{target}: Proper motion is missing in Gaia.")
-                except HTTPError as hperr:
-                    logger.error("Received HTTPError", hperr)
+                except exceptions.HTTPError as hperr:
+                    logger.error("Received exceptions.HTTPError", hperr)
         else:
             self.object_found = False
             logger.error("Not found in Simbad.")
@@ -785,8 +785,8 @@ class HostStar:
             try:
                 cone_objects = job.get_results().to_pandas()
                 self.cone_tmass_cross = cone_objects
-            except HTTPError as hperr:
-                print("Received HTTPError", hperr)
+            except exceptions.HTTPError as hperr:
+                print("Received exceptions.HTTPError", hperr)
 
     def cone_gaia_objects(self, cone_radius):
         """Cone around the target star and colour transform G-Band to K_S-Band.
@@ -817,8 +817,8 @@ class HostStar:
                 )
                 self.cone_gaia = cone_objects
 
-            except HTTPError as hperr:
-                print("Received HTTPError", hperr)
+            except exceptions.HTTPError as hperr:
+                print("Received exceptions.HTTPError", hperr)
 
     def binning_parameters(self, df, x_col_name, y_col_name, binsize, band):
         """Gaussian 2D fits to each bin.
@@ -971,17 +971,17 @@ class HostStar:
                     fitting_func = helperfunctions.func_const
                     boundaries = ([-np.inf], [np.inf])
                 try:
-                    popt, pcov = curve_fit(
+                    popt, pcov = optimize.curve_fit(
                         fitting_func, x_data, y_data, bounds=boundaries
                     )
                     attr_name = f"{pm_value}_{y_option}_model_coeff_{df_label[idx]}"
                     setattr(self, attr_name, popt)
                     attr_name = f"{pm_value}_{y_option}_model_cov_{df_label[idx]}"
                     setattr(self, attr_name, pcov)
-                except (RuntimeError, OptimizeWarning):
+                except (RuntimeError, optimize.OptimizeWarning):
                     if y_option == "stddev":
                         try:
-                            popt, pcov = curve_fit(
+                            popt, pcov = optimize.curve_fit(
                                 helperfunctions.func_lin, x_data, y_data
                             )
                             attr_name = (
@@ -992,7 +992,7 @@ class HostStar:
                                 f"{pm_value}_{y_option}_model_cov_{df_label[idx]}"
                             )
                             setattr(self, attr_name, pcov)
-                        except (RuntimeError, OptimizeWarning):
+                        except (RuntimeError, optimize.OptimizeWarning):
                             print("Fitting error", y_option, pm_value)
             for col in df.columns:
                 if "rho" in col:
@@ -1186,10 +1186,11 @@ class Survey:
     """Creates odds ratio table based on the observational data of candidates
     and the field star models."""
 
-    def __init__(self, survey, survey_bandfilter_colname) -> None:
-        """Based on the target name returns a dataframe
-                containing all the survey data to this target
-                and calculates the proper motion.
+    def __init__(self, survey, survey_bandfilter_colname):
+        """
+        Based on the target name returns a dataframe
+        containing all the survey data to this target
+        and calculates the proper motion.
         Args:
             target (str): Name of the host star.
             survey (pandas.DataFrame): Contains survey data. Necessary columns are:\n
@@ -1214,7 +1215,7 @@ class Survey:
 
         logger.info("Preprocessing data starts...")
         targets = []
-        for target_name in tqdm(
+        for target_name in tqdm.tqdm(
             survey["Main_ID"].unique(),
             desc="Preparing candidates",
             ncols=100,
@@ -1339,7 +1340,7 @@ class Survey:
             cone_radius (float): Default=0.3 in degrees.
             binsize (int): Default=200 in number of field stars per magnitude bin.
         """
-        for target_name in tqdm(
+        for target_name in tqdm.tqdm(
             self.target_names,
             desc="Building models",
             ncols=100,
@@ -1384,7 +1385,7 @@ class Survey:
             sigma_cc_min (float): Minimum sigma for the candidates likelihoods.
             sigma_model_min (float): Minimum sigma for the field star model likelihoods.
         """
-        for target_name in tqdm(
+        for target_name in tqdm.tqdm(
             [el[16:] for el in list(self.__dict__) if "candidates_data" in el],
             desc="Evaluate candidates",
             ncols=100,
