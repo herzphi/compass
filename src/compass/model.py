@@ -14,21 +14,21 @@ from compass import helperfunctions
 
 
 class CovarianceMatrix:
-    def cov_pmra_pmdec(model_object):
+    def cov_pmra_pmdec(self, model_object):
         return (
             model_object.pmra_error
             * model_object.pmdec_error
             * model_object.pmra_pmdec_corr
         )
 
-    def cov_pmdirection_plx(model_object, pmdirection):
+    def cov_pmdirection_plx(self, model_object, pmdirection):
         return (
             model_object.__getattribute__(pmdirection)
             * model_object.parallax_error
             * model_object.parallax_pmra_corr
         )
 
-    def calc_variance_x(time, plx_proj, host_star, backgroundmodel):
+    def calc_variance_x(self, time, plx_proj, host_star, backgroundmodel):
         cov_plx_pm_h = (
             host_star.pmra_error
             * host_star.parallax_error
@@ -39,15 +39,15 @@ class CovarianceMatrix:
             * backgroundmodel.parallax_error
             * backgroundmodel.parallax_pmra_corr
         )
-        var_prime = time**2 * (
-            backgroundmodel.pmra_error**2 + host_star.pmra_error**2
-        ) + plx_proj**2 * (
-            backgroundmodel.parallax_error**2 + host_star.parallax_error**2
+        var_prime = (
+            time**2 * (backgroundmodel.pmra_error**2 + host_star.pmra_error**2)
+            + plx_proj**2
+            * (backgroundmodel.parallax_error**2 + host_star.parallax_error**2)
+            + 2 * time * plx_proj * (cov_plx_pm_b + cov_plx_pm_h)
         )
-        +2 * time * plx_proj * (cov_plx_pm_b + cov_plx_pm_h)
         return var_prime
 
-    def calc_variance_y(time, plx_proj, host_star, backgroundmodel):
+    def calc_variance_y(self, time, plx_proj, host_star, backgroundmodel):
         cov_plx_pm_h = (
             host_star.pmdec_error
             * host_star.parallax_error
@@ -58,15 +58,17 @@ class CovarianceMatrix:
             * backgroundmodel.parallax_error
             * backgroundmodel.parallax_pmra_corr
         )
-        var_prime = time**2 * (
-            backgroundmodel.pmdec_error**2 + host_star.pmdec_error**2
-        ) + plx_proj**2 * (
-            backgroundmodel.parallax_error**2 + host_star.parallax_error**2
+        var_prime = (
+            time**2 * (backgroundmodel.pmdec_error**2 + host_star.pmdec_error**2)
+            + plx_proj**2
+            * (backgroundmodel.parallax_error**2 + host_star.parallax_error**2)
+            + 2 * time * plx_proj * (cov_plx_pm_b + cov_plx_pm_h)
         )
-        +2 * time * plx_proj * (cov_plx_pm_b + cov_plx_pm_h)
         return var_prime
 
-    def calc_covariance_xiyi(time, plx_proj_x, plx_proj_y, host_star, backgroundmodel):
+    def calc_covariance_xiyi(
+        self, time, plx_proj_x, plx_proj_y, host_star, backgroundmodel
+    ):
         cov_pmra_b_pmdec_b = (
             backgroundmodel.pmra_error
             * backgroundmodel.pmdec_error
@@ -95,16 +97,18 @@ class CovarianceMatrix:
             * host_star.pmdec_error
             * host_star.parallax_pmdec_corr
         )
-        cov = time**2 * (cov_pmra_b_pmdec_b + cov_pmra_h_pmdec_h)
-        +plx_proj_x * plx_proj_y * (
-            backgroundmodel.parallax_error**2 + host_star.parallax_error**2
+        cov = (
+            time**2 * (cov_pmra_b_pmdec_b + cov_pmra_h_pmdec_h)
+            + plx_proj_x
+            * plx_proj_y
+            * (backgroundmodel.parallax_error**2 + host_star.parallax_error**2)
+            + time * plx_proj_y * (cov_plx_b_pmra_b + cov_plx_h_pmra_h)
+            + time * plx_proj_x * (cov_plx_b_pmdec_b + cov_plx_h_pmdec_h)
         )
-        +time * plx_proj_y * (cov_plx_b_pmra_b + cov_plx_h_pmra_h)
-        +time * plx_proj_x * (cov_plx_b_pmdec_b + cov_plx_h_pmdec_h)
         return cov
 
     def calc_covariance_xixj(
-        timei, timej, plx_proj_ra_i, plx_proj_ra_j, host_star, backgroundmodel
+        self, timei, timej, plx_proj_ra_i, plx_proj_ra_j, host_star, backgroundmodel
     ):
         cov_plx_b_pmra_b = (
             backgroundmodel.parallax_error
@@ -120,16 +124,16 @@ class CovarianceMatrix:
             timei
             * timej
             * (backgroundmodel.pmra_error**2 + host_star.pmra_error**2)
-        )
-        +timej * plx_proj_ra_i * (cov_plx_b_pmra_b + cov_plx_h_pmra_h)
-        +timei * plx_proj_ra_j * (cov_plx_b_pmra_b + cov_plx_h_pmra_h)
-        +plx_proj_ra_j * plx_proj_ra_i * (
-            backgroundmodel.parallax_error**2 + host_star.parallax_error**2
+            + timej * plx_proj_ra_i * (cov_plx_b_pmra_b + cov_plx_h_pmra_h)
+            + timei * plx_proj_ra_j * (cov_plx_b_pmra_b + cov_plx_h_pmra_h)
+            + plx_proj_ra_j
+            * plx_proj_ra_i
+            * (backgroundmodel.parallax_error**2 + host_star.parallax_error**2)
         )
         return cov
 
     def calc_covariance_yiyj(
-        timei, timej, plx_proj_dec_i, plx_proj_dec_j, host_star, backgroundmodel
+        self, timei, timej, plx_proj_dec_i, plx_proj_dec_j, host_star, backgroundmodel
     ):
         cov_plx_b_pmdec_b = (
             backgroundmodel.parallax_error
@@ -145,16 +149,16 @@ class CovarianceMatrix:
             timei
             * timej
             * (backgroundmodel.pmdec_error**2 + host_star.pmdec_error**2)
-        )
-        +timej * plx_proj_dec_i * (cov_plx_b_pmdec_b + cov_plx_h_pmdec_h)
-        +timei * plx_proj_dec_j * (cov_plx_b_pmdec_b + cov_plx_h_pmdec_h)
-        +plx_proj_dec_j * plx_proj_dec_i * (
-            backgroundmodel.parallax_error**2 + host_star.parallax_error**2
+            + timej * plx_proj_dec_i * (cov_plx_b_pmdec_b + cov_plx_h_pmdec_h)
+            + timei * plx_proj_dec_j * (cov_plx_b_pmdec_b + cov_plx_h_pmdec_h)
+            + plx_proj_dec_j
+            * plx_proj_dec_i
+            * (backgroundmodel.parallax_error**2 + host_star.parallax_error**2)
         )
         return cov
 
     def calc_covariance_xiyj(
-        timei, timej, plx_proj_ra_i, plx_proj_dec_j, host_star, backgroundmodel
+        self, timei, timej, plx_proj_ra_i, plx_proj_dec_j, host_star, backgroundmodel
     ):
         cov_pm = CovarianceMatrix.cov_pmra_pmdec(
             backgroundmodel
@@ -166,15 +170,17 @@ class CovarianceMatrix:
             backgroundmodel, "pmdec"
         ) + CovarianceMatrix.cov_pmdirection_plx(host_star, "pmdec")
         cov_plx = backgroundmodel.parallax_error**2 + host_star.parallax_error**2
-        cov = timei * timej * cov_pm
-        +timei * plx_proj_dec_j * cov_pmra_plx
-        +timej * plx_proj_ra_i * cov_plx_pmdec
-        +plx_proj_ra_i * plx_proj_dec_j * cov_plx
+        cov = (
+            timei * timej * cov_pm
+            + timei * plx_proj_dec_j * cov_pmra_plx
+            + timej * plx_proj_ra_i * cov_plx_pmdec
+            + plx_proj_ra_i * plx_proj_dec_j * cov_plx
+        )
 
         return cov
 
     def calc_covariance_yixj(
-        timei, timej, plx_proj_dec_i, plx_proj_ra_j, host_star, backgroundmodel
+        self, timei, timej, plx_proj_dec_i, plx_proj_ra_j, host_star, backgroundmodel
     ):
         cov_pm = CovarianceMatrix.cov_pmra_pmdec(
             backgroundmodel
@@ -186,13 +192,15 @@ class CovarianceMatrix:
             backgroundmodel, "pmdec"
         ) + CovarianceMatrix.cov_pmdirection_plx(host_star, "pmdec")
         cov_plx = backgroundmodel.parallax_error**2 + host_star.parallax_error**2
-        cov = timej * timei * cov_pm
-        +timej * plx_proj_dec_i * cov_pmra_plx
-        +timei * plx_proj_ra_j * cov_plx_pmdec
-        +plx_proj_ra_j * plx_proj_dec_i * cov_plx
+        cov = (
+            timej * timei * cov_pm
+            + timej * plx_proj_dec_i * cov_pmra_plx
+            + timei * plx_proj_ra_j * cov_plx_pmdec
+            + plx_proj_ra_j * plx_proj_dec_i * cov_plx
+        )
         return cov
 
-    def cov_propagation(C_0, days_1, days_2, plx_proj_x, plx_proj_y, host_star):
+    def cov_propagation(self, C_0, days_1, days_2, plx_proj_x, plx_proj_y, host_star):
         time = (days_2 - days_1) / 365.35
         var_x_prime_2 = CovarianceMatrix.calc_variance_x(time, plx_proj_x, host_star)
         var_y_prime_2 = CovarianceMatrix.calc_variance_y(time, plx_proj_y, host_star)
@@ -209,7 +217,13 @@ class CovarianceMatrix:
         return C
 
     def covariance_matrix(
-        times, plx_proj_ra, plx_proj_dec, host_star, backgroundmodel, return_dict=False
+        self,
+        times,
+        plx_proj_ra,
+        plx_proj_dec,
+        host_star,
+        backgroundmodel,
+        return_dict=False,
     ):
         dict_var_covar = {}
         time_days = np.arange(
@@ -315,25 +329,35 @@ class CovarianceMatrix:
 
 class Candidate:
     """Model, true data and likelihoods, p_ratios of one candidate.
-    Attributes:\n
-        - cc_true_data: True data from df_survey.\n
-        - cc_true_data: Model data based on host star fits.\n
-        - g2d_model (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the model.\n
-        - g2d_conv (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the convolution.\n
-        - g2d_cc (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the candidate.\n
-        - g2d_pmuM1 (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the candidate at (0,0).\n
-        - cov_model (numpy.array): 2x2 covariance matrix.\n
-        - cov_cc (numpy.array): 2x2 covariance matrix.\n
-        - cov_conv (numpy.array): 2x2 covariance matrix.\n
-        - cov_pmuM1 (numpy.array): 2x2 covariance matrix.\n
-        - p_b (float): Odd for being a background object.\n
-        - p_ratio (float): Odds ratio.\n
-        - p_tc (float): Odd for being a true companion.\n
-        - back_true (str): true companion or background object\n
+
+    Attributes:
+        cc_true_data (dict): True data from df_survey.
+        cc_true_data (dict): Model data based on host star fits.
+        g2d_model (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the model.
+        g2d_conv (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the convolution.
+        g2d_cc (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the candidate.
+        g2d_pmuM1 (astropy.modeling.functional_models.Gaussian2D): 2D Gaussian of the candidate at (0,0).
+        cov_model (numpy.array): 2x2 covariance matrix.
+        cov_cc (numpy.array): 2x2 covariance matrix.
+        cov_conv (numpy.array): 2x2 covariance matrix.
+        cov_pmuM1 (numpy.array): 2x2 covariance matrix.
+        p_b (float): Odd for being a background object.
+        p_ratio (float): Odds ratio.
+        p_tc (float): Odd for being a true companion.
+        back_true (str): true companion or background object.
+        mean_measured_positions (numpy.darray): Measured position of candidate.
+        mean_true_companion (numpy.darray): Calculated position of candidate by pm and plx of star.
+        mean_background_object (numpy.darray): Calculated position of candidate by pm and plx of backgorund model.
+        cov_measured_positions (numpy.darray): Covariance matrix of measured position of candidate
+        cov_true_companion (numpy.darray): Covariance matrix of candidate by pm and plx of star.
+        cov_background_object (numpy.darray): Covariance matrix of candidate by pm and plx of backgorund model.
+        r_tcb_2Dnmodel (float): log10(P_tc / P_b).
+        r_tcb_pmmodel (float): log10(P_tc / P_b).
     """
 
     def __init__(self, df_survey, index_candidate, host_star, band, catalogue):
-        """
+        """Init candidates.
+
         Args:
             df_survey (pandas.DataFrame): Data of the candidates of a single host star.
             index_candidate (int): index integer of the candidate in df_survey.
@@ -406,32 +430,13 @@ class Candidate:
         self.plx_proj_dec = plx_proj_dec
 
     def calc_likelihoods_2Dnmodel(self, host_star):
-        """Attributes the likelihoods to the candidate object in terms
-            of the means and covariance matrices.
-        Args:
-            host_star (class object): Use of proper motion and parallax
-                of the star.
-            background (class object): Use of proper motion and parallax
-                of the backgorund distribution.
-        Attributes:
-            mean_measured_positions (numpy.darray): Measured position
-                of candidate.
-            mean_true_companion (numpy.darray): Calculated position
-                of candidate by pm and plx of star.
-            mean_background_object (numpy.darray): Calculated position
-                of candidate by pm and plx of backgorund model.
-            cov_measured_positions (numpy.darray): Covariance matrix
-                of measured position of candidate
-            cov_true_companion (numpy.darray): Covariance matrix
-                of candidate by pm and plx of star.
-            cov_background_object (numpy.darray): Covariance matrix
-                of candidate by pm and plx of backgorund model.
+        """Attributes the likelihoods to the candidate object in terms of the means and covariance matrices.
 
+        Args:
+            host_star (class object): Use of proper motion and parallax of the star.
+            background (class object): Use of proper motion and parallax of the backgorund distribution.
         """
         cc_true_data = self.cc_true_data
-        days_since_gaia_0 = (
-            cc_true_data["t_days_since_Gaia"] - cc_true_data["t_days_since_Gaia"][0]
-        )
         days_since_gaia = cc_true_data["t_days_since_Gaia"]
 
         # Initiate Background Class Object
@@ -529,11 +534,13 @@ class Candidate:
         self.cov_background_object = self.cov_measured_positions + sigma_prime_b
 
     def calc_likelihoods_pmmodel(self, host_star, sigma_model_min, sigma_cc_min):
-        """
+        """Attributes the likelihoods to the candidate object in terms
+        of the means and covariance matrices.
+
         Args:
-            host_star (Class object): Previously initiated class for the host star.
-            sigma_model_min (float or int): The inflating factor for the model likelihood.
-            sigma_cc_min (float or int): The inflating factor for its likelihood.
+            host_star (class): Previously initiated class for the host star.
+            sigma_model_min (float): The inflating factor for the model likelihood.
+            sigma_cc_min (float): The inflating factor for its likelihood.
         """
         g2d_model, cov_model = helperfunctions.get_g2d_func(
             self.cc_pm_background_data["pmra_mean"] - host_star.pmra,
@@ -581,10 +588,7 @@ class Candidate:
         self.cov_pmuM1 = cov_pmuM1
 
     def calc_prob_ratio_2Dnmodel(self):
-        """Calculates the odds ratio based on the pm and plx model.
-        Attributes:
-            r_tcb_2Dnmodel (float): log10(P_tc / P_b)
-        """
+        """Calculates the odds ratio based on the pm and plx model."""
         P_tc = helperfunctions.n_dim_gauss_evaluated(
             self.mean_measured_positions,
             self.mean_true_companion,
@@ -609,31 +613,30 @@ class Candidate:
         """Calculates the odds ratio based on the modelled g2d functions."""
         #  Calculate ratio and statement
         #  Adding the text to top right panel
-        p_conv = self.g2d_conv(
+        P_b = self.g2d_conv(
             self.cc_true_data["pmra_mean"], self.cc_true_data["pmdec_mean"]
         )[0]
-        pmuM1 = self.g2d_pmuM1(
+        P_tc = self.g2d_pmuM1(
             self.cc_true_data["pmra_mean"], self.cc_true_data["pmdec_mean"]
         )
-        if p_conv == 0:
+        if P_b == 0:
             r_tcb = 1
-        elif pmuM1 > 0 and p_conv > 0:
-            r_tcb = np.log10(pmuM1 / p_conv)
+        elif P_tc > 0 and P_b > 0:
+            r_tcb = np.log10(P_tc / P_b)
         else:
             r_tcb = 0
         if r_tcb > 0:
             back_true = "true companion"
         else:
             back_true = "background object"
-        self.p_b = p_conv
-        self.p_tc = pmuM1
+        self.p_b = P_b
+        self.p_tc = P_tc
         self.r_tcb_pmmodel = r_tcb
         self.back_true = back_true
 
 
 class HostStar:
-    """Host star of the candidates.
-    Properties of the host star have the units given in gaiadr3.gaia_source.
+    """Host star of the candidates. Properties of the host star have the units given in gaiadr3.gaia_source.
 
     Attributes:
         ra (float): Properties of the host star.
@@ -653,23 +656,10 @@ class HostStar:
         phot_g_mean_mag (float): Properties of the host star.
         phot_bp_mean_mag (float): Properties of the host star.
         phot_rp_mean_mag (float): Properties of the host star.
-        object_found (Boolean):
+        object_found (Boolean): Boolean whether the object was found.
         cone_tmass_cross (pandas.DataFrame): Containing the cone cross matched objects.
         cone_tmass_cross (pandas.DataFrame): containing the cone Gaia objects.
         candidates (pandas.DataFrame): Containing id, p_ratio and p_ratio_catalogue.
-
-        Fitted parameters:
-        Syntax:
-            variable_{mean or stddev}_{coeff or cov}_{catalogue name}
-        Coeff attributes contain the fitting coefficients:
-            len(coeff)=3: Fitted with helperfunctions.func_exp.
-            len(coeff)=2: Fitted with helperfunctions.func_lin.
-            len(coeff)=1: Fitted with helperfunctions.const.
-        E.g.:
-            parallax_stddev_model_coeff_gaiacalctmass (numpy.array): Model parameters.
-            pmra_mean_model_coeff_gaiacalc (numpy.array): Model parameters.
-            Or print all the attributes print(dir(class_name)).
-
     """
 
     object_found = False
@@ -680,6 +670,7 @@ class HostStar:
         """
         Searches for the given target id in the Simbad database
         for the Gaia source id and returns the data on the star.
+
         Args:
             target (str): Name of the target.
         """
@@ -744,6 +735,7 @@ class HostStar:
 
     def cone_tmasscross_objects(self, cone_radius):
         """Cone around the target star and cross match with 2MASS.
+
         Args:
             cone_radius (float): Search cone radius in degree.
         """
@@ -790,6 +782,7 @@ class HostStar:
 
     def cone_gaia_objects(self, cone_radius):
         """Cone around the target star and colour transform G-Band to K_S-Band.
+
         Args:
             cone_radius (float): Search cone radius in degree.
         """
@@ -822,6 +815,7 @@ class HostStar:
 
     def binning_parameters(self, df, x_col_name, y_col_name, binsize, band):
         """Gaussian 2D fits to each bin.
+
         Args:
             df (pandas.DataFrame): Cone catalouge data.
             x_col_name (str): pmra, pmdec or parallax.
@@ -831,9 +825,9 @@ class HostStar:
                  e.g. 'ks_m_calc' for Gaia or 'ks_m' for 2MASS.
                     'h_m_calc' for Gaia or 'h_m' for 2MASS.
                     'j_m_calc' for Gaia or 'j_m' for 2MASS.
+
         Returns:
-            catalogue_bin_parameters (pandas.DataFrame): Parameters for
-            each bin and each correlation.
+            pandas.DataFrame: Parameters for each bin and each correlation.
         """
         nofbins = int(len(df[band].dropna()) / binsize)
 
@@ -890,8 +884,7 @@ class HostStar:
                  e.g. 'ks_m_calc' for Gaia or 'ks_m' for 2MASS.
 
         Returns:
-            df_catalogue_bp (pandas.DataFrame): Binning parameters of
-            different catalogues and variables parameters in a single dataframe.
+            pandas.DataFrame: Binning parameters of different catalogues and variables parameters in a single dataframe.
         """
         catalogue_bp = {}
         for combination in list(
@@ -918,7 +911,14 @@ class HostStar:
     def calc_background_model_parameters(
         self, list_of_df_bp, band, candidates_df, include_candidates
     ):
-        """Fit the binning parameters.
+        """Fit the binning parameters. For each catalogue and variable there are coeff and cov attributes.
+            The syntax:
+                variable _ mean or stddev _ coeff or cov _ catalogue name
+            The coeff attributes contain the fitting coefficients:
+                len(coeff)=3: Fitted with helperfunctions.func_exp.
+                len(coeff)=2: Fitted with helperfunctions.func_lin.
+                len(coeff)=1: Fitted with helperfunctions.const.
+
 
         Args:
             list_of_df_bp (list of pandas.DataFrame s):
@@ -929,15 +929,6 @@ class HostStar:
             of this host star.
             include_candidates (Boolean): Including the data of the caniddates
               in the fitting.
-
-        Attributes:
-            For each catalogue and variable there are coeff and cov attributes.
-            The syntax:
-                variable _ mean or stddev _ coeff or cov _ catalogue name
-            The coeff attributes contain the fitting coefficients:
-                len(coeff)=3: Fitted with helperfunctions.func_exp.
-                len(coeff)=2: Fitted with helperfunctions.func_lin.
-                len(coeff)=1: Fitted with helperfunctions.const.
         """
         df_label = ["gaiacalc", "tmass", "gaiacalctmass"]
         concated_data = pd.concat(list_of_df_bp)
@@ -1002,6 +993,7 @@ class HostStar:
     def evaluate_candidates_table(self, candidates_df, sigma_model_min, sigma_cc_min):
         """
         Returns all the candidates data of this host star for both catalogues.
+
         Args:
             candidates_df (pandas.DataFrame): Data on all candidates of this host star.
             sigma_model_min (float or int): The inflating factor for the model likelihood.
@@ -1191,6 +1183,7 @@ class Survey:
         Based on the target name returns a dataframe
         containing all the survey data to this target
         and calculates the proper motion.
+
         Args:
             target (str): Name of the host star.
             survey (pandas.DataFrame): Contains survey data. Necessary columns are:\n
@@ -1201,8 +1194,9 @@ class Survey:
                             - dDEC: Relative distance candidate-hoststar in mas.\n
                             - dDEC_err: Respective error.\n
                             - mag0: Magnitude of the candidate.\n
+
         Returns:
-            df_survey (pandas.DataFrame): Contains the filtered survey data.
+            pandas.DataFrame: Contains the filtered survey data.
         """
         logger = logging.getLogger()
         handler = logging.StreamHandler()
@@ -1381,6 +1375,7 @@ class Survey:
 
     def set_evaluated_fieldstar_models(self, sigma_cc_min, sigma_model_min):
         """Evaluate the field star models with candidate data.
+
         Args:
             sigma_cc_min (float): Minimum sigma for the candidates likelihoods.
             sigma_model_min (float): Minimum sigma for the field star model likelihoods.
@@ -1408,10 +1403,13 @@ class Survey:
 
     def get_true_companions(self, threshold=0):
         """Return all candidates with a odds ratio greater than the threshold.
+
         Args:
             threshold (float): Odds ratio greater than the threshold will be returned.
+
         Returns:
-            candidates_table_th (pandas.DataFrame): Candidates with r_tcb>threshold."""
+            pandas.DataFrame: Candidates with r_tcb>threshold.
+        """
         candidate_results = []
         target_names = [
             el[24:] for el in list(self.__dict__) if "fieldstar_model_results_" in el
