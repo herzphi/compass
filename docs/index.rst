@@ -32,28 +32,28 @@ Code
 ----
 To get the odds ratios of all candidates use the ``Survey`` class:
 
-```python
-import pandas as pd
-from compass import model
-from compass import helperfunctions
+.. code-block:: python
 
-observation = pd.read_csv('observation.csv')
-survey_object = model.Survey(observation, magnitudes_column_name)
-survey_object.set_fieldstar_models(
-   # Color transformed column name from Gaias G-Band.
-   magnitudes_column_name_CALC,
-   # Column name of the corresponding magnitude in 2MASS.
-   magnitudes_column_name_2MASS,
-   cone_radius = 0.3, # in degree
-   binsize = 200 # Number of objects in a single magnitude bin
-)
-# Inflating parameters to adjust the sharp dropoff of the Gaussians.
-
-survey_object.set_evaluated_fieldstar_models(
-   sigma_cc_min = 0,
-   sigma_model_min = 0
-)
-```
+   import pandas as pd
+   from compass import model
+   from compass import helperfunctions
+   
+   observation = pd.read_csv('observation.csv')
+   survey_object = model.Survey(observation, magnitudes_column_name)
+   survey_object.set_fieldstar_models(
+       # Color transformed column name from Gaias G-Band.
+       magnitudes_column_name_CALC,
+       # Column name of the corresponding magnitude in 2MASS.
+       magnitudes_column_name_2MASS,
+       cone_radius=0.3,  # in degree
+       binsize=200  # Number of objects in a single magnitude bin
+   )
+   # Inflating parameters to adjust the sharp drop-off of the Gaussians.
+   
+   survey_object.set_evaluated_fieldstar_models(
+       sigma_cc_min=0,
+       sigma_model_min=0
+   )
 
 ..
   The following section creates an index, a list of modules and a 
