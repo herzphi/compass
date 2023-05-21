@@ -30,24 +30,30 @@ You can install `compass` by installing this repo:
 
 Code
 ----
-To get the odds ratios of all caniddates use the ``get_p_ratio_table`` function:
+To get the odds ratios of all candidates use the ``Survey`` class:
 
-.. py:function:: compass.get_p_ratio_table(target_name, cone_radius, candidates, sigma_cc_min, sigma_model_min)
-   
-   Return a dataframe containing the data of all caniddates and the odds ratios.
-   
-   :param target_name: Name of the host star.
-   :type target_name: str
-   :param cone_radius: Radius in degrees of the queried cone centered at the host stars position.
-   :type cone_radius: float
-   :param candidates: Astrometric data on the candidates.
-   :type candidates: pandas.DataFrame
-   :param sigma_cc_min: Inflating parameter for the caniddates likelihood in mas/yr.
-   :type sigma_cc_min: float
-   :param sigma_model_min: Inflating parameter for the model likelihood in mas/yr.
-   :type sigma_model_min: float
-   :return: Table containing the data and odds ratios of the candidates.
-   :rtype: pandas.DataFrame
+```python
+import pandas as pd
+from compass import model
+from compass import helperfunctions
+
+observation = pd.read_csv('observation.csv')
+survey_object = model.Survey(observation, magnitudes_column_name)
+survey_object.set_fieldstar_models(
+   # Color transformed column name from Gaias G-Band.
+   magnitudes_column_name_CALC,
+   # Column name of the corresponding magnitude in 2MASS.
+   magnitudes_column_name_2MASS,
+   cone_radius = 0.3, # in degree
+   binsize = 200 # Number of objects in a single magnitude bin
+)
+# Inflating parameters to adjust the sharp dropoff of the Gaussians.
+
+survey_object.set_evaluated_fieldstar_models(
+   sigma_cc_min = 0,
+   sigma_model_min = 0
+)
+```
 
 ..
   The following section creates an index, a list of modules and a 
