@@ -10,7 +10,7 @@ Welcome to compass's documentation!
    :maxdepth: 4
    :caption: Contents:
 
-
+The code described by this documentation is available on https://github.com/herzphi/compass.
 This package presents a method to evaluate the likelihood of a candidate being a true companion to a host star using a proper motion model based on stochastic models.
 
 
