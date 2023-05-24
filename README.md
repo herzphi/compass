@@ -10,7 +10,8 @@ pip install git+https://github.com/herzphi/compass.git
 ```
 
 ## Usage
-To calculate odds ratios of all candidates use this example:
+The candidates which you want to evaluate need to be prepared in the following format:
+
 ### Candidates Table
 | column name | unit |
 | ----------- | ----------- |
@@ -23,7 +24,7 @@ To calculate odds ratios of all candidates use this example:
 | magnitudes_column_name | mag |
 | final_uuid | ID used to link observations of the same candidate |
 
-Example table of a single candidate with the identifier to1_0:
+An example table of a single candidate with the identifier to1_0 can look like:
 |final_uuid|Main_ID|date|dRA|dDEC|dRA_err|dDEC_err|mag0|
 | - | - | - | - | - | - | - | - |
 |to1_0|HIP82545|2017-05-05|-1625.0|1897.0|6|6|17|
@@ -31,15 +32,26 @@ Example table of a single candidate with the identifier to1_0:
 |to1_0|HIP82545|2019-05-05|-1631.4|1891.4|6|6|17|
 |to1_0|HIP82545|2020-05-05|-1606.7|1893.1|6|6|17|
 
+### Analysis
+1. Using the prepared candidates table as mentioned a step prior, you can read the observational data.
+2. Initialize the models by calling the `Survey` class and passing the observation data and the name of the magnitudes column.
+3. Build the fieldstar models by defining which filter was used by the survey. Currently the supported filters are the K-, H- and J-band.
+   - magnitudes_column_name_CALC = 'ks_m_calc'
+   - magnitudes_column_name_2MASS has to be a 2MASS column: ks_m, j_m or h_m.
+   - cone_radius: Radius in degree of the queried cone of field stars the model is build upon.
+   - binsize: Number of objects in a single magnitude bin.
+4. Evaluate the fieldstar models with the candidates position measurements.
+   - sigma_cc_min: Set a $\sigma_{min}$ for the Gaussian distribution of the candidate.
+   - sigma_model_min: Set a $\sigma_{min}$ for the Gaussian distribution of the model for the candidates magnitude.
 
-### Example
-For a given set of observational data of candidates the script can be executed by the following commands:
 ```python
 import pandas as pd
 from compass import model
 from compass import helperfunctions
 
+
 observation = pd.read_csv('observation.csv')
+
 survey_object = model.Survey(observation, magnitudes_column_name)
 survey_object.set_fieldstar_models(
    # Color transformed column name from Gaias G-Band.
@@ -47,10 +59,10 @@ survey_object.set_fieldstar_models(
    # Column name of the corresponding magnitude in 2MASS.
    magnitudes_column_name_2MASS,
    cone_radius = 0.3, # in degree
-   binsize = 200 # Number of objects in a single magnitude bin
+   binsize = 200
 )
-# Inflating parameters to adjust the sharp dropoff of the Gaussians.
 
+# Inflating parameters to adjust the sharp dropoff of the Gaussians.
 survey_object.set_evaluated_fieldstar_models(
    sigma_cc_min = 0,
    sigma_model_min = 0
@@ -61,6 +73,7 @@ Return a pandas DataFrame containing the results by determining the `threshold` 
 survey_object.get_true_companions(threshold=0)
 ```
 
+### Visualization
 The package contains a module `preset_plots`, which contains a couple of intereseting plots like:
 ```python
 import pandas as pd
