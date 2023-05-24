@@ -659,6 +659,9 @@ class HostStar:
         candidates (pandas.DataFrame): Containing id, p_ratio and p_ratio_catalogue.
     """
 
+    logger = logging.getLogger("astroquery")
+    logger.setLevel(logging.ERROR)
+
     def __init__(self, target):
         """
         Searches for the given target id in the Simbad database

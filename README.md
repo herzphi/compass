@@ -80,15 +80,15 @@ import pandas as pd
 from compass import model, preset_plots
 
 df_test = pd.DataFrame({
-    'Main_ID': ['HIP82545', 'HIP82545'],
-    'final_uuid':['id0', 'id0'],
-    'date': ['2018-04-24', '2021-06-04'],
-    'dRA': [-1386, -1394],
-    'dRA_err': [1,1],
-    'dDEC': [-989, -995],
-    'dDEC_err':  [1,1],
-    'mag0':[16,16],
-    'mag0_err':[1,1]
+    'Main_ID': ['HIP82545', 'HIP82545', 'HIP82545'],
+    'final_uuid':['id0', 'id0', 'id0'],
+    'date': ['2016-04-24', '2018-04-24', '2021-06-04'],
+    'dRA': [-1390, -1386, -1394],
+    'dRA_err': [5,5,5],
+    'dDEC': [-990, -989, -995],
+    'dDEC_err':  [5, 5, 5],
+    'mag0':[16,16,16],
+    'mag0_err':[1,1,1]
 })
 
 survey_object = model.Survey(df_test, "mag0")
@@ -102,6 +102,23 @@ preset_plots.p_ratio_plot(
 )
 ```
 <img src="plots_example/p_ratio.png" alt="Image" width="500">
+
+Another preset plot is a visualization of the proper motion and parallax covariance model.
+The method `p_ratio_relative_position` takes the pandas.DataFrame of a single candidate.
+In this example it uses `df_test` from above which is already implemented in the `Survey` class object.
+```python
+preset_plots.p_ratio_relative_position(
+    survey_object.fieldstar_model_HIP82545.candidates,
+    'HIP82545'
+)
+```
+<img src="plots_example/pm_plx_cov_plot.png" alt="Image" width="500">
+
+This plot shows the relative position of a candidate to the host star. The symbols change with each epoch of observation. The colors show the different models:
+- Black shows the candidate in the background model.
+- Blue shows the candidate in the true companion model (Assuming a true companion has not relative motion to the host star).
+- Yellow shows the position measurements of the candidate.
+The curves on the axes show the integrated two dimenionsal gaussian distributions of each epoch, model and position measurement. The covariances between different epochs of observation are not shown in this plot, but they are considered in the calculation for the logarithmic odds ratio (given in the header).
 
 <img src="plots_example/diagram.png" alt="Image" width="500">
 

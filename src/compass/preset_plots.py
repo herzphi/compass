@@ -4,6 +4,7 @@ from decimal import Decimal
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import matplotlib.markers as mmarkers
 
 from compass import helperfunctions
 
@@ -463,3 +464,141 @@ def plot_pm_plx_binning_parameters(df_binning_parameters, catalogue_name, host_s
         ax.margins(0.1, 1)
     fig.suptitle("Model fitting parameters")
     plt.tight_layout()
+
+
+def p_ratio_relative_position(
+    candidate_df,
+    target_name,
+    markers=list(mmarkers.MarkerStyle.markers.keys())[2:],
+    colors=[
+        "#000000",
+        "#E69F00",
+        "#56B4E9",
+        "#009E73",
+        "#F0E442",
+        "#0072B2",
+        "#D55E00",
+        "#CC79A7",
+    ],
+):
+    epochs = candidate_df["ref_epochs"].to_list()[0]
+    fig, axs = plt.subplots(
+        2,
+        2,
+        figsize=(5, 5),
+        gridspec_kw={"width_ratios": [3, 1], "height_ratios": [1, 3]},
+    )
+    # Ellipses
+    # need to be plotet by epochs
+    # TRUE COMPANION
+    # First epoch equals all following epochs of the true companion
+    # Only one epoch is displayed
+    means = candidate_df["mean_true_companion"].to_list()[0]  # [2:]
+    cov = np.array(candidate_df["cov_true_companion"].to_list()[0])
+    dras = means[::2]
+    ddecs = means[1::2]
+    axs[1, 0].plot(
+        dras[0],
+        ddecs[0],
+        markers[0],
+        color=colors[2],
+        alpha=1,
+    )
+    helperfunctions.ellipse(
+        dras[0],
+        ddecs[0],
+        cov[:2, :2],
+        color=colors[2],
+        linestyle="-",
+        linewidth=1,
+        alpha=0.6,
+        axis=axs[1, 0],
+        zorder=0,
+    )
+
+    for no_obs in range(1, len(epochs)):
+        for i, colordirection in enumerate(
+            zip(colors, ["background_object", "measured_positions"])
+        ):
+            color, direction = colordirection
+            means = candidate_df[f"mean_{direction}"].to_list()[0]  # [2:]
+            cov = np.array(candidate_df[f"cov_{direction}"].to_list()[0])
+            dras = means[::2]
+            ddecs = means[1::2]
+            axs[1, 0].plot(
+                dras[no_obs],
+                ddecs[no_obs],
+                markers[no_obs],
+                color=color,
+                alpha=1,
+            )
+            helperfunctions.ellipse(
+                dras[no_obs],
+                ddecs[no_obs],
+                cov[2 * no_obs : 2 + 2 * no_obs, 2 * no_obs : 2 + 2 * no_obs],
+                color=color,
+                linestyle="-",
+                linewidth=1,
+                alpha=0.6,
+                axis=axs[1, 0],
+                zorder=0,
+            )
+    for no_obs in range(1, len(epochs)):
+        for i, colordirection in enumerate(
+            zip(colors, ["background_object", "measured_positions", "true_companion"])
+        ):
+            color, direction = colordirection
+            means = candidate_df[f"mean_{direction}"].to_list()[0]  # [2:]
+            cov = np.array(candidate_df[f"cov_{direction}"].to_list()[0])
+            dras = means[::2]
+            ddecs = means[1::2]
+            g2d_bg = helperfunctions.Gaussian2D(
+                x_mean=dras[no_obs],
+                y_mean=ddecs[no_obs],
+                cov_matrix=cov[
+                    2 * no_obs : 2 + 2 * no_obs, 2 * no_obs : 2 + 2 * no_obs
+                ],
+            )
+            g1d = helperfunctions.gaussian1D(g2d_bg, "x")
+            xline = np.linspace(axs[1, 0].get_xlim()[0], axs[1, 0].get_xlim()[1], 200)
+            axs[0, 0].plot(
+                xline,
+                g1d(xline),
+                color=color,
+                alpha=0.8,
+            )
+            g1d = helperfunctions.gaussian1D(g2d_bg, "y")
+            xline = np.linspace(axs[1, 0].get_ylim()[0], axs[1, 0].get_ylim()[1], 200)
+            axs[1, 1].plot(
+                g1d(xline),
+                xline,
+                color=color,
+                alpha=0.8,
+            )
+    axs[1, 0].set_xlabel(r"$\Delta RA$ [mas]")
+    axs[1, 0].set_ylabel(r"$\Delta DEC$ [mas]")
+    axs[0, 0].axis("off")
+    axs[1, 1].axis("off")
+    axs[0, 1].axis("off")
+
+    axs[1, 0].spines["top"].set_visible(False)
+    axs[1, 0].spines["right"].set_visible(False)
+    fig.subplots_adjust(hspace=0)
+    fig.subplots_adjust(wspace=0)
+
+    legend_elements = [
+        plt.Line2D([0], [0], marker=marker, color="black", label=label, linestyle="")
+        for marker, label in zip(markers, epochs)
+    ]
+    axs[1, 0].legend(
+        handles=legend_elements, loc="lower right", title="Epochs", fontsize=8
+    )
+    legend_elements = [
+        plt.Line2D([0], [0], color=color, label=label, linestyle="-")
+        for color, label in zip(colors, ["Background", "Measured", "Companion"])
+    ]
+    axs[0, 1].legend(handles=legend_elements, loc="right", title="Type", fontsize=8)
+    fig.suptitle(
+        f"Relative Position: Candidate ({candidate_df['final_uuid'].unique()[0]}) - {target_name} \n  $\log_{{10}} r_{{tcb}}={candidate_df['r_tcb_2Dnmodel'].unique()[0]:.1f}$"
+    )
+    return fig, axs
