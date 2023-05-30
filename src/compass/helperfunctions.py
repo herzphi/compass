@@ -47,7 +47,9 @@ def get_ellipse_props(cov, confidence):
     return major_axis, minor_axis, angle
 
 
-def ellipse(x_mean, y_mean, cov, color, linestyle, linewidth, alpha, axis, zorder=1):
+def ellipse(
+    x_mean, y_mean, cov, color, axis, linestyle="-", linewidth=1, alpha=1, zorder=1
+):
     for i, confd in enumerate([0.5, 0.9, 0.99]):
         major, minor, angle = get_ellipse_props(cov, confidence=confd)
         add_ellp_patch2(

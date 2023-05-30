@@ -1,3 +1,5 @@
+<img src="plots_example/logo.png" alt="Image" width="600">
+
 # compass
 **Com**panion **P**roper Motion **A**nalysis **S**oftware **S**ystem
 

@@ -949,8 +949,8 @@ class HostStar:
                     fitting_func = helperfunctions.func_lin
                     boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
                 elif y_option == "stddev" and pm_value in ["pmra", "pmdec"]:
-                    fitting_func = helperfunctions.func_exp
-                    boundaries = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+                    fitting_func = helperfunctions.func_lin
+                    boundaries = ([-np.inf, -np.inf], [np.inf, np.inf]) #([0, 0, -np.inf], [np.inf, np.inf, np.inf])
                 elif pm_value == "parallax" and y_option == "mean":
                     fitting_func = helperfunctions.func_const
                     boundaries = ([-np.inf], [np.inf])

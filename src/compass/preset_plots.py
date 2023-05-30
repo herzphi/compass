@@ -247,7 +247,8 @@ def p_ratio_plot(candidate_object, target, band):
             5 * np.sqrt(candidate_object.cov_pmuM1[1, 1]),
         ]
     )
-    axs[1, 1].set_ylim(-mg, mg)
+    axs00_ylim = axs[1,0].get_ylim()
+    axs[1, 1].set_ylim(axs00_ylim)
     plt.tight_layout()
 
 
@@ -324,7 +325,6 @@ def propagation_plot(candidate_object, host_star, axs):
                 2 + 2 * i : 4 + 2 * i, 2 + 2 * i : 4 + 2 * i
             ],
             "C1",
-            "-",
             axs,
         )
         # BACKGROUND OBJECT
@@ -342,7 +342,6 @@ def propagation_plot(candidate_object, host_star, axs):
                 2 + 2 * i : 4 + 2 * i, 2 + 2 * i : 4 + 2 * i
             ],
             "C2",
-            "-",
             axs,
         )
         # MEASURED POSITION
@@ -360,7 +359,6 @@ def propagation_plot(candidate_object, host_star, axs):
                 2 + 2 * i : 4 + 2 * i, 2 + 2 * i : 4 + 2 * i
             ],
             "C3",
-            "-",
             axs,
         )
     # Parallax
