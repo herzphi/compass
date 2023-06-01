@@ -597,6 +597,6 @@ def p_ratio_relative_position(
     ]
     axs[0, 1].legend(handles=legend_elements, loc="right", title="Type", fontsize=8)
     fig.suptitle(
-        f"Relative Position: Candidate ({candidate_df['final_uuid'].unique()[0]}) - {target_name} \n  $\log_{{10}} r_{{tcb}}={candidate_df['r_tcb_2Dnmodel'].unique()[0]:.1f}$"
+        f"Relative Position: Candidate ({candidate_df['final_uuid'].unique()[0]}) - {target_name} \n  $\log_{{10}} r_{{tcb}}={candidate_df['r_tcb_2Dnmodel'].unique()[0]:.2f}$"
     )
     return fig, axs

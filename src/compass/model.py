@@ -426,7 +426,7 @@ class Candidate:
         self.plx_proj_ra = plx_proj_ra
         self.plx_proj_dec = plx_proj_dec
 
-    def calc_likelihoods_2Dnmodel(self, host_star):
+    def calc_likelihoods_2Dnmodel(self, host_star, catalogue_name="gaiacalctmass"):
         """Attributes the likelihoods to the candidate object in terms of the means and covariance matrices.
 
         Args:
@@ -439,7 +439,7 @@ class Candidate:
         # Initiate Background Class Object
         candidate_mag = cc_true_data["band"]
         background_model = BackgroundModel(
-            candidate_mag, host_star, catalogue_name="gaiacalctmass"
+            candidate_mag, host_star, catalogue_name=catalogue_name
         )
 
         # Calculate the means of the distributions
@@ -597,7 +597,7 @@ class Candidate:
             self.cov_background_object,
         )
         if P_b == 0 and P_tc > 0:
-            r_tcb = 1
+            r_tcb = 300
         elif P_b == 0 and P_tc == 0:
             r_tcb = 0
         elif P_tc > 0 and P_b > 0:
@@ -950,7 +950,10 @@ class HostStar:
                     boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
                 elif y_option == "stddev" and pm_value in ["pmra", "pmdec"]:
                     fitting_func = helperfunctions.func_lin
-                    boundaries = ([-np.inf, -np.inf], [np.inf, np.inf]) #([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+                    boundaries = (
+                        [-np.inf, -np.inf],
+                        [np.inf, np.inf],
+                    )  # ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
                 elif pm_value == "parallax" and y_option == "mean":
                     fitting_func = helperfunctions.func_const
                     boundaries = ([-np.inf], [np.inf])
@@ -1181,7 +1184,6 @@ class Survey:
         and calculates the proper motion.
 
         Args:
-            target (str): Name of the host star.
             survey (pandas.DataFrame): Contains survey data. Necessary columns are:\n
                             - Main_ID: Host star name.\n
                             - final_uuid: Unique identifier of the two measurements of the same candidate.\n
@@ -1190,6 +1192,7 @@ class Survey:
                             - dDEC: Relative distance candidate-hoststar in mas.\n
                             - dDEC_err: Respective error.\n
                             - mag0: Magnitude of the candidate.\n
+            survey_bandfilter_colname (str): Column name of survey magnitudes, e.g. 'mag0'
 
         Returns:
             pandas.DataFrame: Contains the filtered survey data.
