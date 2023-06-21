@@ -521,16 +521,16 @@ class Candidate:
         cov_obs = np.array(
             [
                 [
-                    cc_true_data["dRA_err"][row] ** 2,
-                    cc_true_data["dRA_dDEC_corr"][row]
-                    * cc_true_data["dRA_err"][row]
-                    * cc_true_data["dDEC_err"][row],
+                    cc_true_data["dRA_err"][0] ** 2,
+                    cc_true_data["dRA_dDEC_corr"][0]
+                    * cc_true_data["dRA_err"][0]
+                    * cc_true_data["dDEC_err"][0],
                 ],
                 [
-                    cc_true_data["dRA_dDEC_corr"][row]
-                    * cc_true_data["dRA_err"][row]
-                    * cc_true_data["dDEC_err"][row],
-                    cc_true_data["dDEC_err"][row] ** 2,
+                    cc_true_data["dRA_dDEC_corr"][0]
+                    * cc_true_data["dRA_err"][0]
+                    * cc_true_data["dDEC_err"][0],
+                    cc_true_data["dDEC_err"][0] ** 2,
                 ],
             ]
         )
