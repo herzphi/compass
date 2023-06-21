@@ -29,7 +29,7 @@ The candidates which you want to evaluate need to be prepared in the following f
 
 An example table of a single candidate with the identifier to1_0 can look like:
 |final_uuid|Main_ID|date|dRA|dDEC|dRA_err|dDEC_err|dRA_dDEC_corr|mag0|mag0_err|
-| - | - | - | - | - | - | - | - |
+| - | - | - | - | - | - | - | - | - | - |
 |to1_0|HIP82545|2017-05-05|-1625.0|1897.0|6|6|0|17|1
 |to1_0|HIP82545|2018-05-05|-1624.4|1891.8|6|6|0|17|1
 |to1_0|HIP82545|2019-05-05|-1631.4|1891.4|6|6|0|17|1
