@@ -520,8 +520,18 @@ class Candidate:
         cov_obs = {}
         cov_obs = np.array(
             [
-                [cc_true_data["dRA_err"][0] ** 2, 0],
-                [0, cc_true_data["dDEC_err"][0] ** 2],
+                [
+                    cc_true_data["dRA_err"][row] ** 2,
+                    cc_true_data["dRA_dDEC_corr"][row]
+                    * cc_true_data["dRA_err"][row]
+                    * cc_true_data["dDEC_err"][row],
+                ],
+                [
+                    cc_true_data["dRA_dDEC_corr"][row]
+                    * cc_true_data["dRA_err"][row]
+                    * cc_true_data["dDEC_err"][row],
+                    cc_true_data["dDEC_err"][row] ** 2,
+                ],
             ]
         )
         empty_matrix = np.zeros((int(len(mean_obs)), int(len(mean_obs))))
