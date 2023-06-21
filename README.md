@@ -23,16 +23,17 @@ The candidates which you want to evaluate need to be prepared in the following f
 | dRA_err | mas |
 | dDEC | mas |
 | dDEC_err | mas |
+| dRA_dDEC_corr | Correlation coefficient |
 | magnitudes_column_name | mag |
 | final_uuid | ID used to link observations of the same candidate |
 
 An example table of a single candidate with the identifier to1_0 can look like:
-|final_uuid|Main_ID|date|dRA|dDEC|dRA_err|dDEC_err|mag0|
+|final_uuid|Main_ID|date|dRA|dDEC|dRA_err|dDEC_err|dRA_dDEC_corr|mag0|mag0_err|
 | - | - | - | - | - | - | - | - |
-|to1_0|HIP82545|2017-05-05|-1625.0|1897.0|6|6|17|
-|to1_0|HIP82545|2018-05-05|-1624.4|1891.8|6|6|17|
-|to1_0|HIP82545|2019-05-05|-1631.4|1891.4|6|6|17|
-|to1_0|HIP82545|2020-05-05|-1606.7|1893.1|6|6|17|
+|to1_0|HIP82545|2017-05-05|-1625.0|1897.0|6|6|0|17|1
+|to1_0|HIP82545|2018-05-05|-1624.4|1891.8|6|6|0|17|1
+|to1_0|HIP82545|2019-05-05|-1631.4|1891.4|6|6|0|17|1
+|to1_0|HIP82545|2020-05-05|-1606.7|1893.1|6|6|0|17|1
 
 ### Analysis
 1. Using the prepared candidates table as mentioned a step prior, you can read the observational data.

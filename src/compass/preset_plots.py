@@ -113,7 +113,7 @@ def p_ratio_plot(candidate_object, target, band):
             candidate_object.cov_conv, confidence=confd
         )
         helperfunctions.add_ellp_patch(
-            candidate_object.g2d_conv, major_axis, minor_axis, angle, "C0", axs[1, 0]
+            candidate_object.g2d_conv, major_axis, minor_axis, angle, "black", axs[1, 0]
         )
 
     for confd in [0.5, 0.9, 0.99]:
@@ -121,13 +121,13 @@ def p_ratio_plot(candidate_object, target, band):
             candidate_object.cov_pmuM1, confidence=confd
         )
         helperfunctions.add_ellp_patch(
-            candidate_object.g2d_pmuM1, major_axis, minor_axis, angle, "C1", axs[1, 0]
+            candidate_object.g2d_pmuM1, major_axis, minor_axis, angle, "#56B4E9", axs[1, 0]
         )
 
     axs[1, 0].plot(
         candidate_object.g2d_cc.x_mean,
         candidate_object.g2d_cc.y_mean,
-        color="red",
+        color="#E69F00",
         marker="x",
         label="candidate",
     )
@@ -136,11 +136,13 @@ def p_ratio_plot(candidate_object, target, band):
         xline,
         helperfunctions.gaussian1D(candidate_object.g2d_conv, "x")(xline),
         label=r"$p(\mu_{\alpha}|M_b)$",
+        color="black"
     )
     axs[0, 0].plot(
         xline,
         helperfunctions.gaussian1D(candidate_object.g2d_pmuM1, "x")(xline),
         label=r"$p(\mu_{\alpha}|M_{tc})$",
+        color="#56B4E9",
     )
     axs[0, 0].set_ylabel("Probability")
     #  mu_dec plot
@@ -148,11 +150,13 @@ def p_ratio_plot(candidate_object, target, band):
         helperfunctions.gaussian1D(candidate_object.g2d_conv, "y")(xline),
         xline,
         label=r"$p(\mu_{\delta}|M_b)$",
+        color="black"
     )
     axs[1, 1].plot(
         helperfunctions.gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
         xline,
         label=r"$p(\mu_{\delta}|M_{tc})$",
+        color="#56B4E9",
     )
     axs[1, 1].set_xlabel("Probability")
 
@@ -175,7 +179,7 @@ def p_ratio_plot(candidate_object, target, band):
         candidate_object.g2d_cc.x_mean,
         0,
         textyaxis,
-        color="red",
+        color="#E69F00",
         linestyles="dashed",
         label=r"$\mu_{true}$",
     )
@@ -183,7 +187,7 @@ def p_ratio_plot(candidate_object, target, band):
         candidate_object.g2d_cc.y_mean,
         0,
         max_xaxis,
-        color="red",
+        color="#E69F00",
         linestyles="dashed",
         label=r"$\mu_{true}$",
     )

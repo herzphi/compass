@@ -368,6 +368,7 @@ class Candidate:
                 "dDEC",
                 "dRA_err",
                 "dDEC_err",
+                "dRA_dDEC_corr",
                 "t_days_since_Gaia",
                 "pmra_mean",
                 "pmdec_mean",
@@ -494,8 +495,18 @@ class Candidate:
         for row in range(len(cc_true_data["dRA_err"])):
             cov_obs[f"cov_{row}"] = np.array(
                 [
-                    [cc_true_data["dRA_err"][row] ** 2, 0],
-                    [0, cc_true_data["dDEC_err"][row] ** 2],
+                    [
+                        cc_true_data["dRA_err"][row] ** 2,
+                        cc_true_data["dRA_dDEC_corr"][row]
+                        * cc_true_data["dRA_err"][row]
+                        * cc_true_data["dDEC_err"][row],
+                    ],
+                    [
+                        cc_true_data["dRA_dDEC_corr"][row]
+                        * cc_true_data["dRA_err"][row]
+                        * cc_true_data["dDEC_err"][row],
+                        cc_true_data["dDEC_err"][row] ** 2,
+                    ],
                 ]
             )
         empty_matrix = np.zeros((int(len(mean_obs)), int(len(mean_obs))))
@@ -1239,9 +1250,10 @@ class Survey:
                     times,
                     dRAs_err,
                     dDECs_err,
+                    dRA_dDEC_corrs,
                     seps,
                     ts_days_since_Gaia,
-                ) = ([] for i in range(15))
+                ) = ([] for i in range(16))
                 survey_target = survey[survey["Main_ID"] == target_name].copy()
                 survey_target["date"] = pd.to_datetime(survey_target["date"])
                 survey_target.loc[:, "t_day_since_Gaia"] = (
@@ -1277,6 +1289,7 @@ class Survey:
                         dDECs.append(survey_finaluuid["dDEC"].values)
                         dRAs_err.append(survey_finaluuid["dRA_err"].values)
                         dDECs_err.append(survey_finaluuid["dDEC_err"].values)
+                        dRA_dDEC_corrs.append(survey_finaluuid["dRA_dDEC_corr"].values)
                         mean_pmras.append(pmra)
                         mean_pmdecs.append(pmdec)
                         pmra_pmdec_corr.append(0)
@@ -1299,6 +1312,7 @@ class Survey:
                         "dDEC": dDECs,
                         "dRA_err": dRAs_err,
                         "dDEC_err": dDECs_err,
+                        "dRA_dDEC_corr": dRA_dDEC_corrs,
                         "pmra_mean": mean_pmras,
                         "pmdec_mean": mean_pmdecs,
                         "pmra_pmdec_corr": pmra_pmdec_corr,
