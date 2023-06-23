@@ -23,9 +23,9 @@ class CovarianceMatrix:
 
     def cov_pmdirection_plx(model_object, pmdirection):
         return (
-            model_object.__getattribute__(pmdirection)
+            model_object.__getattribute__(f'{pmdirection}_error')
             * model_object.parallax_error
-            * model_object.parallax_pmra_corr
+            * model_object.__getattribute__(f'parallax_{pmdirection}_corr')
         )
 
     def calc_variance_x(time, plx_proj, host_star, backgroundmodel):
@@ -970,11 +970,11 @@ class HostStar:
                     fitting_func = helperfunctions.func_lin
                     boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
                 elif y_option == "stddev" and pm_value in ["pmra", "pmdec"]:
-                    fitting_func = helperfunctions.func_lin
+                    fitting_func = helperfunctions.func_exp
                     boundaries = (
-                        [-np.inf, -np.inf],
-                        [np.inf, np.inf],
-                    )  # ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+                        [0, 0, -np.inf],
+                        [np.inf, np.inf, np.inf],
+                    )  # ([-np.inf, -np.inf],[np.inf, np.inf],)
                 elif pm_value == "parallax" and y_option == "mean":
                     fitting_func = helperfunctions.func_const
                     boundaries = ([-np.inf], [np.inf])
