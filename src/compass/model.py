@@ -23,9 +23,9 @@ class CovarianceMatrix:
 
     def cov_pmdirection_plx(model_object, pmdirection):
         return (
-            model_object.__getattribute__(f'{pmdirection}_error')
+            model_object.__getattribute__(f"{pmdirection}_error")
             * model_object.parallax_error
-            * model_object.__getattribute__(f'parallax_{pmdirection}_corr')
+            * model_object.__getattribute__(f"parallax_{pmdirection}_corr")
         )
 
     def calc_variance_x(time, plx_proj, host_star, backgroundmodel):
@@ -615,7 +615,7 @@ class Candidate:
         P_b = helperfunctions.n_dim_gauss_evaluated(
             self.mean_measured_positions,
             self.mean_background_object,
-            self.cov_background_object,
+            self.cov_background_object + self.cov_measured_positions,
         )
         if P_b == 0 and P_tc > 0:
             r_tcb = 300
