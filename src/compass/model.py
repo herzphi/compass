@@ -410,8 +410,19 @@ class Candidate:
                             + background_model_parameters[1]
                         )
         column = f"pmra_pmdec_model_{catalogue}"
-        cc_pm_background_data["rho_mean"] = host_star.__getattribute__(column)
-        cc_pm_background_data["rho_stddev"] = host_star.__getattribute__(column)
+        cc_pm_background_data["pmra_pmdec_corr"] = host_star.__getattribute__(column)
+        column = f"parallax_mean_model_coeff_{catalogue}"
+        cc_pm_background_data["parallax_mean"] = host_star.__getattribute__(column)
+        column = f"parallax_stddev_model_coeff_{catalogue}"
+        cc_pm_background_data["parallax_stddev"] = host_star.__getattribute__(column)
+        # pmra_parallax_model_gaiacalc
+        column = f"pmra_parallax_model_{catalogue}"
+        cc_pm_background_data["parallax_pmra_corr"] = host_star.__getattribute__(column)
+        column = f"pmdec_parallax_model_{catalogue}"
+        cc_pm_background_data["parallax_pmdec_corr"] = host_star.__getattribute__(
+            column
+        )
+
         self.cc_true_data = cc_true_data
         self.cc_pm_background_data = cc_pm_background_data
         self.final_uuid = cc_true_data["final_uuid"]
@@ -549,7 +560,7 @@ class Candidate:
             host_star,
             background_model,
         )
-        self.cov_background_object = self.cov_measured_positions + sigma_prime_b
+        self.cov_background_object = sigma_prime_b
 
     def calc_likelihoods_pmmodel(self, host_star, sigma_model_min, sigma_cc_min):
         """Attributes the likelihoods to the candidate object in terms
@@ -569,7 +580,7 @@ class Candidate:
             np.sqrt(
                 self.cc_pm_background_data["pmdec_stddev"] ** 2 + sigma_model_min**2
             ),
-            self.cc_pm_background_data["rho_mean"],
+            self.cc_pm_background_data["pmra_pmdec_corr"],
         )
         g2d_cc, cov_cc = helperfunctions.get_g2d_func(
             self.cc_true_data["pmra_mean"],
@@ -1299,7 +1310,12 @@ class Survey:
                         dDECs.append(survey_finaluuid["dDEC"].values)
                         dRAs_err.append(survey_finaluuid["dRA_err"].values)
                         dDECs_err.append(survey_finaluuid["dDEC_err"].values)
-                        dRA_dDEC_corrs.append(survey_finaluuid["dRA_dDEC_corr"].values)
+                        if "dRA_dDEC_corr" in survey_finaluuid.columns:
+                            dRA_dDEC_corrs.append(
+                                survey_finaluuid["dRA_dDEC_corr"].values
+                            )
+                        else:
+                            dRA_dDEC_corrs.append([0 for i in range(len(time))])
                         mean_pmras.append(pmra)
                         mean_pmdecs.append(pmdec)
                         pmra_pmdec_corr.append(0)
@@ -1396,7 +1412,7 @@ class Survey:
             )
             self.__setattr__(f"fieldstar_model_{target_name}", host_star)
 
-    def set_evaluated_fieldstar_models(self, sigma_cc_min, sigma_model_min):
+    def set_evaluated_fieldstar_models(self, sigma_cc_min=0, sigma_model_min=0):
         """Evaluate the field star models with candidate data.
 
         Args:
