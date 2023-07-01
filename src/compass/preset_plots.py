@@ -121,7 +121,12 @@ def p_ratio_plot(candidate_object, target, band):
             candidate_object.cov_pmuM1, confidence=confd
         )
         helperfunctions.add_ellp_patch(
-            candidate_object.g2d_pmuM1, major_axis, minor_axis, angle, "#56B4E9", axs[1, 0]
+            candidate_object.g2d_pmuM1,
+            major_axis,
+            minor_axis,
+            angle,
+            "#56B4E9",
+            axs[1, 0],
         )
 
     axs[1, 0].plot(
@@ -136,7 +141,7 @@ def p_ratio_plot(candidate_object, target, band):
         xline,
         helperfunctions.gaussian1D(candidate_object.g2d_conv, "x")(xline),
         label=r"$p(\mu_{\alpha}|M_b)$",
-        color="black"
+        color="black",
     )
     axs[0, 0].plot(
         xline,
@@ -150,7 +155,7 @@ def p_ratio_plot(candidate_object, target, band):
         helperfunctions.gaussian1D(candidate_object.g2d_conv, "y")(xline),
         xline,
         label=r"$p(\mu_{\delta}|M_b)$",
-        color="black"
+        color="black",
     )
     axs[1, 1].plot(
         helperfunctions.gaussian1D(candidate_object.g2d_pmuM1, "y")(xline),
@@ -251,7 +256,7 @@ def p_ratio_plot(candidate_object, target, band):
             5 * np.sqrt(candidate_object.cov_pmuM1[1, 1]),
         ]
     )
-    axs00_ylim = axs[1,0].get_ylim()
+    axs00_ylim = axs[1, 0].get_ylim()
     axs[1, 1].set_ylim(axs00_ylim)
     plt.tight_layout()
 
@@ -483,6 +488,7 @@ def p_ratio_relative_position(
         "#CC79A7",
     ],
 ):
+    candidate_df = candidate_df[candidate_df["r_tcb_catalogue"] == "gaiacalctmass"]
     epochs = candidate_df["ref_epochs"].to_list()[0]
     fig, axs = plt.subplots(
         2,
@@ -495,7 +501,7 @@ def p_ratio_relative_position(
     # TRUE COMPANION
     # First epoch equals all following epochs of the true companion
     # Only one epoch is displayed
-    means = candidate_df["mean_true_companion"].to_list()[0]  # [2:]
+    means = candidate_df["mean_true_companion"].to_list()[0]
     cov = np.array(candidate_df["cov_true_companion"].to_list()[0])
     dras = means[::2]
     ddecs = means[1::2]
@@ -523,7 +529,7 @@ def p_ratio_relative_position(
             zip(colors, ["background_object", "measured_positions"])
         ):
             color, direction = colordirection
-            means = candidate_df[f"mean_{direction}"].to_list()[0]  # [2:]
+            means = candidate_df[f"mean_{direction}"].values[0]  # [2:]
             cov = np.array(candidate_df[f"cov_{direction}"].to_list()[0])
             dras = means[::2]
             ddecs = means[1::2]
@@ -550,31 +556,33 @@ def p_ratio_relative_position(
             zip(colors, ["background_object", "measured_positions", "true_companion"])
         ):
             color, direction = colordirection
-            means = candidate_df[f"mean_{direction}"].to_list()[0]  # [2:]
+            means = candidate_df[f"mean_{direction}"].values[0]  # [2:]
             cov = np.array(candidate_df[f"cov_{direction}"].to_list()[0])
             dras = means[::2]
             ddecs = means[1::2]
-            g2d_bg = helperfunctions.Gaussian2D(
+            g2d = helperfunctions.Gaussian2D(
                 x_mean=dras[no_obs],
                 y_mean=ddecs[no_obs],
                 cov_matrix=cov[
                     2 * no_obs : 2 + 2 * no_obs, 2 * no_obs : 2 + 2 * no_obs
                 ],
             )
-            g1d = helperfunctions.gaussian1D(g2d_bg, "x")
-            xline = np.linspace(axs[1, 0].get_xlim()[0], axs[1, 0].get_xlim()[1], 200)
+            g1d = helperfunctions.gaussian1D(g2d, "x")
+            xline = np.linspace(axs[1, 0].get_xlim()[0], axs[1, 0].get_xlim()[1], 1000)
             axs[0, 0].plot(
                 xline,
                 g1d(xline),
                 color=color,
+                linewidth=1,
                 alpha=0.8,
             )
-            g1d = helperfunctions.gaussian1D(g2d_bg, "y")
-            xline = np.linspace(axs[1, 0].get_ylim()[0], axs[1, 0].get_ylim()[1], 200)
+            g1d = helperfunctions.gaussian1D(g2d, "y")
+            xline = np.linspace(axs[1, 0].get_ylim()[0], axs[1, 0].get_ylim()[1], 1000)
             axs[1, 1].plot(
                 g1d(xline),
                 xline,
                 color=color,
+                linewidth=1,
                 alpha=0.8,
             )
     axs[1, 0].set_xlabel(r"$\Delta RA$ [mas]")

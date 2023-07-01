@@ -1062,7 +1062,7 @@ class HostStar:
                     )
                 )
                 # Compute liklihoods
-                candidate.calc_likelihoods_2Dnmodel(self)
+                candidate.calc_likelihoods_2Dnmodel(self, catalogue_name=catalogue)
                 candidate.calc_likelihoods_pmmodel(self, sigma_model_min, sigma_cc_min)
                 # Compute odds ratio
                 candidate.calc_prob_ratio_pmmodel()
