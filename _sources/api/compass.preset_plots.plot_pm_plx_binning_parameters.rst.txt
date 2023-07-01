@@ -1,0 +1,6 @@
+plot_pm_plx_binning_parameters
+==============================
+
+.. currentmodule:: compass.preset_plots
+
+.. autofunction:: plot_pm_plx_binning_parameters

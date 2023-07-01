@@ -1,0 +1,6 @@
+func_lin
+========
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: func_lin

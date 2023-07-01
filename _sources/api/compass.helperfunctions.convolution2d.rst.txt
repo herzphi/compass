@@ -1,0 +1,6 @@
+convolution2d
+=============
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: convolution2d

@@ -1,0 +1,6 @@
+func_exp_inc
+============
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: func_exp_inc

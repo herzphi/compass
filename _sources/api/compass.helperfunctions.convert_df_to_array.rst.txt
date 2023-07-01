@@ -1,0 +1,6 @@
+convert_df_to_array
+===================
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: convert_df_to_array
