@@ -1,0 +1,6 @@
+calc_prime_1
+============
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: calc_prime_1

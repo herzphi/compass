@@ -1,0 +1,6 @@
+add_ellp_patch2
+===============
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: add_ellp_patch2

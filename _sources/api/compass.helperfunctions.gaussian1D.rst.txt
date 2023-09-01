@@ -1,0 +1,6 @@
+gaussian1D
+==========
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: gaussian1D

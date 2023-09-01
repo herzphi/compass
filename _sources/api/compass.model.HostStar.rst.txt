@@ -1,0 +1,37 @@
+HostStar
+========
+
+.. currentmodule:: compass.model
+
+.. autoclass:: HostStar
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~HostStar.logger
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~HostStar.binning_parameters
+      ~HostStar.calc_background_model_parameters
+      ~HostStar.concat_binning_parameters
+      ~HostStar.cone_gaia_objects
+      ~HostStar.cone_tmasscross_objects
+      ~HostStar.evaluate_candidates_table
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: logger
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: binning_parameters
+   .. automethod:: calc_background_model_parameters
+   .. automethod:: concat_binning_parameters
+   .. automethod:: cone_gaia_objects
+   .. automethod:: cone_tmasscross_objects
+   .. automethod:: evaluate_candidates_table

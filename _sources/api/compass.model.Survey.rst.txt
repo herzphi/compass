@@ -1,0 +1,21 @@
+Survey
+======
+
+.. currentmodule:: compass.model
+
+.. autoclass:: Survey
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Survey.get_true_companions
+      ~Survey.set_evaluated_fieldstar_models
+      ~Survey.set_fieldstar_models
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_true_companions
+   .. automethod:: set_evaluated_fieldstar_models
+   .. automethod:: set_fieldstar_models

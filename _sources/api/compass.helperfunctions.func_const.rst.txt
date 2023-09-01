@@ -1,0 +1,6 @@
+func_const
+==========
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: func_const

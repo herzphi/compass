@@ -1,0 +1,6 @@
+propagation_plot
+================
+
+.. currentmodule:: compass.preset_plots
+
+.. autofunction:: propagation_plot
