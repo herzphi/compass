@@ -585,6 +585,8 @@ def p_ratio_relative_position(
                 linewidth=1,
                 alpha=0.8,
             )
+    axs[1, 0].invert_xaxis()
+    axs[0, 0].invert_xaxis()
     axs[1, 0].set_xlabel(r"$\Delta RA$ [mas]")
     axs[1, 0].set_ylabel(r"$\Delta DEC$ [mas]")
     axs[0, 0].axis("off")
@@ -601,14 +603,17 @@ def p_ratio_relative_position(
         for marker, label in zip(markers, epochs)
     ]
     axs[1, 0].legend(
-        handles=legend_elements, loc="lower right", title="Epochs", fontsize=8
+        handles=legend_elements, loc="lower left", title="Epochs", fontsize=8
     )
     legend_elements = [
         plt.Line2D([0], [0], color=color, label=label, linestyle="-")
         for color, label in zip(colors, ["Background", "Measured", "Companion"])
     ]
     axs[0, 1].legend(handles=legend_elements, loc="right", title="Type", fontsize=8)
-    fig.suptitle(
+    '''fig.suptitle(
         f"Relative Position: Candidate ({candidate_df['final_uuid'].unique()[0]}) - {target_name} \n  $\log_{{10}} r_{{tcb}}={candidate_df['r_tcb_2Dnmodel'].unique()[0]:.2f}$"
+    )'''
+    fig.suptitle(
+        f"{target_name} - {candidate_df['final_uuid'].unique()[0]}"
     )
     return fig, axs

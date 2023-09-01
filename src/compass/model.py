@@ -352,7 +352,7 @@ class Candidate:
         r_tcb_pmmodel (float): log10(P_tc / P_b).
     """
 
-    def __init__(self, df_survey, index_candidate, host_star, band, catalogue):
+    def __init__(self, df_survey, index_candidate, host_star, band, catalogue, std_min):
         """Init candidates.
 
         Args:
@@ -397,18 +397,23 @@ class Candidate:
                     )
                 elif y_option == "stddev":
                     if len(background_model_parameters) == 3:
-                        cc_pm_background_data[pm_value + "_" + y_option] = (
+                        y_op_std = (
                             background_model_parameters[0]
                             * np.exp(
                                 -background_model_parameters[1] * cc_true_data[band]
                             )
                             + background_model_parameters[2]
                         )
+                        y_op_std = std_min if y_op_std < std_min else y_op_std
+                        cc_pm_background_data[pm_value + "_" + y_option] = y_op_std
                     else:
-                        cc_pm_background_data[pm_value + "_" + y_option] = (
+                        y_op_std = (
                             background_model_parameters[0] * cc_true_data[band]
                             + background_model_parameters[1]
                         )
+                        y_op_std = std_min if y_op_std < std_min else y_op_std
+                        cc_pm_background_data[pm_value + "_" + y_option] = y_op_std
+
         column = f"pmra_pmdec_model_{catalogue}"
         cc_pm_background_data["pmra_pmdec_corr"] = host_star.__getattribute__(column)
         column = f"parallax_mean_model_coeff_{catalogue}"
@@ -937,7 +942,7 @@ class HostStar:
         return df_catalogue_bp
 
     def calc_background_model_parameters(
-        self, list_of_df_bp, band, candidates_df, include_candidates
+        self, list_of_df_bp, band, candidates_df, include_candidates, std_fit="exp"
     ):
         """Fit the binning parameters. For each catalogue and variable there are coeff and cov attributes.
             The syntax:
@@ -980,12 +985,23 @@ class HostStar:
                 if y_option == "mean" and pm_value in ["pmra", "pmdec"]:
                     fitting_func = helperfunctions.func_lin
                     boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
-                elif y_option == "stddev" and pm_value in ["pmra", "pmdec"]:
+                elif (
+                    y_option == "stddev"
+                    and pm_value in ["pmra", "pmdec"]
+                    and std_fit == "exp"
+                ):
                     fitting_func = helperfunctions.func_exp
                     boundaries = (
                         [0, 0, -np.inf],
                         [np.inf, np.inf, np.inf],
                     )  # ([-np.inf, -np.inf],[np.inf, np.inf],)
+                elif (
+                    y_option == "stddev"
+                    and pm_value in ["pmra", "pmdec"]
+                    and std_fit == "lin"
+                ):
+                    fitting_func = helperfunctions.func_lin
+                    boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
                 elif pm_value == "parallax" and y_option == "mean":
                     fitting_func = helperfunctions.func_const
                     boundaries = ([-np.inf], [np.inf])
@@ -1053,6 +1069,7 @@ class HostStar:
                     host_star=self,
                     band="band",
                     catalogue=catalogue,
+                    std_min=sigma_model_min,
                 )
                 epochs = list(
                     np.around(
@@ -1363,7 +1380,12 @@ class Survey:
         self.target_names = targets
 
     def set_fieldstar_models(
-        self, binning_band_trafo, binning_band, cone_radius=0.3, binsize=200
+        self,
+        binning_band_trafo,
+        binning_band,
+        cone_radius=0.3,
+        binsize=200,
+        std_fit="exp",
     ):
         """Build for each host star given in survey a field star model.
 
@@ -1409,6 +1431,7 @@ class Survey:
                 band="band",
                 candidates_df=None,
                 include_candidates=False,
+                std_fit=std_fit,
             )
             self.__setattr__(f"fieldstar_model_{target_name}", host_star)
 
