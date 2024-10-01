@@ -1412,7 +1412,7 @@ class Survey:
             df_tmass = host_star.cone_tmass_cross
             #  Gaia data without 2MASS
             df_gaia_without_tmass = df_gaia[
-                ~df_gaia.source_id.isin(df_tmass.source_id.to_list())
+                ~df_gaia.SOURCE_ID.isin(df_tmass.SOURCE_ID.to_list())
             ]
             #  Binning parameters for 2MASS and Gaia
             #  Merge the binning parameters to a gaia df and tmass df
