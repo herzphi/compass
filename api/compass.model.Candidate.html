@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Candidate &mdash; compass  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CovarianceMatrix" href="compass.model.CovarianceMatrix.html" />
+    <link rel="prev" title="BackgroundModel" href="compass.model.BackgroundModel.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            compass
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="compass.model.BackgroundModel.html">BackgroundModel</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Candidate</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#compass.model.Candidate"><code class="docutils literal notranslate"><span class="pre">Candidate</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.cc_true_data"><code class="docutils literal notranslate"><span class="pre">Candidate.cc_true_data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Candidate.cc_true_data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.g2d_model"><code class="docutils literal notranslate"><span class="pre">Candidate.g2d_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.g2d_conv"><code class="docutils literal notranslate"><span class="pre">Candidate.g2d_conv</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.g2d_cc"><code class="docutils literal notranslate"><span class="pre">Candidate.g2d_cc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.g2d_pmuM1"><code class="docutils literal notranslate"><span class="pre">Candidate.g2d_pmuM1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.cov_model"><code class="docutils literal notranslate"><span class="pre">Candidate.cov_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.cov_cc"><code class="docutils literal notranslate"><span class="pre">Candidate.cov_cc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.cov_conv"><code class="docutils literal notranslate"><span class="pre">Candidate.cov_conv</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.cov_pmuM1"><code class="docutils literal notranslate"><span class="pre">Candidate.cov_pmuM1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.p_b"><code class="docutils literal notranslate"><span class="pre">Candidate.p_b</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.p_ratio"><code class="docutils literal notranslate"><span class="pre">Candidate.p_ratio</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.p_tc"><code class="docutils literal notranslate"><span class="pre">Candidate.p_tc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.back_true"><code class="docutils literal notranslate"><span class="pre">Candidate.back_true</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.mean_measured_positions"><code class="docutils literal notranslate"><span class="pre">Candidate.mean_measured_positions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.mean_true_companion"><code class="docutils literal notranslate"><span class="pre">Candidate.mean_true_companion</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.mean_background_object"><code class="docutils literal notranslate"><span class="pre">Candidate.mean_background_object</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.cov_measured_positions"><code class="docutils literal notranslate"><span class="pre">Candidate.cov_measured_positions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.cov_true_companion"><code class="docutils literal notranslate"><span class="pre">Candidate.cov_true_companion</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.cov_background_object"><code class="docutils literal notranslate"><span class="pre">Candidate.cov_background_object</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.r_tcb_2Dnmodel"><code class="docutils literal notranslate"><span class="pre">Candidate.r_tcb_2Dnmodel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.r_tcb_pmmodel"><code class="docutils literal notranslate"><span class="pre">Candidate.r_tcb_pmmodel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.calc_likelihoods_2Dnmodel"><code class="docutils literal notranslate"><span class="pre">Candidate.calc_likelihoods_2Dnmodel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.calc_likelihoods_pmmodel"><code class="docutils literal notranslate"><span class="pre">Candidate.calc_likelihoods_pmmodel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.calc_prob_ratio_2Dnmodel"><code class="docutils literal notranslate"><span class="pre">Candidate.calc_prob_ratio_2Dnmodel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Candidate.calc_prob_ratio_pmmodel"><code class="docutils literal notranslate"><span class="pre">Candidate.calc_prob_ratio_pmmodel()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="compass.model.CovarianceMatrix.html">CovarianceMatrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.model.HostStar.html">HostStar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.model.Survey.html">Survey</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.add_ellp_patch.html">add_ellp_patch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.add_ellp_patch2.html">add_ellp_patch2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.calc_prime_1.html">calc_prime_1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.color_trafo_2MASS_H.html">color_trafo_2MASS_H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.color_trafo_2MASS_J.html">color_trafo_2MASS_J</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.color_trafo_2MASS_K_S.html">color_trafo_2MASS_K_S</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.convert_df_to_array.html">convert_df_to_array</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.convolution2d.html">convolution2d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.ellipse.html">ellipse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_const.html">func_const</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_exp.html">func_exp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_exp_inc.html">func_exp_inc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_lin.html">func_lin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.gaussian1D.html">gaussian1D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.get_ellipse_props.html">get_ellipse_props</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.get_g2d_func.html">get_g2d_func</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.get_g2d_parameters.html">get_g2d_parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.n_dim_gauss_evaluated.html">n_dim_gauss_evaluated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.parallax_projection.html">parallax_projection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.odds_ratio_sep_mag_plot.html">odds_ratio_sep_mag_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.p_ratio_plot.html">p_ratio_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.p_ratio_relative_position.html">p_ratio_relative_position</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.plot_pm_plx_binning_parameters.html">plot_pm_plx_binning_parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.pm_mag_plot.html">pm_mag_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.propagation_plot.html">propagation_plot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">compass</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Candidate</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/compass.model.Candidate.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="candidate">
+<h1>Candidate<a class="headerlink" href="#candidate" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="compass.model.Candidate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compass.model.</span></span><span class="sig-name descname"><span class="pre">Candidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_survey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_candidate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalogue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_min</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.Candidate" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Model, true data and likelihoods, p_ratios of one candidate.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.cc_true_data">
+<span class="sig-name descname"><span class="pre">cc_true_data</span></span><a class="headerlink" href="#compass.model.Candidate.cc_true_data" title="Link to this definition"></a></dt>
+<dd><p>True data from df_survey.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">cc_true_data</span></span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Model data based on host star fits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.g2d_model">
+<span class="sig-name descname"><span class="pre">g2d_model</span></span><a class="headerlink" href="#compass.model.Candidate.g2d_model" title="Link to this definition"></a></dt>
+<dd><p>2D Gaussian of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>astropy.modeling.functional_models.Gaussian2D</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.g2d_conv">
+<span class="sig-name descname"><span class="pre">g2d_conv</span></span><a class="headerlink" href="#compass.model.Candidate.g2d_conv" title="Link to this definition"></a></dt>
+<dd><p>2D Gaussian of the convolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>astropy.modeling.functional_models.Gaussian2D</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.g2d_cc">
+<span class="sig-name descname"><span class="pre">g2d_cc</span></span><a class="headerlink" href="#compass.model.Candidate.g2d_cc" title="Link to this definition"></a></dt>
+<dd><p>2D Gaussian of the candidate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>astropy.modeling.functional_models.Gaussian2D</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.g2d_pmuM1">
+<span class="sig-name descname"><span class="pre">g2d_pmuM1</span></span><a class="headerlink" href="#compass.model.Candidate.g2d_pmuM1" title="Link to this definition"></a></dt>
+<dd><p>2D Gaussian of the candidate at (0,0).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>astropy.modeling.functional_models.Gaussian2D</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.cov_model">
+<span class="sig-name descname"><span class="pre">cov_model</span></span><a class="headerlink" href="#compass.model.Candidate.cov_model" title="Link to this definition"></a></dt>
+<dd><p>2x2 covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.cov_cc">
+<span class="sig-name descname"><span class="pre">cov_cc</span></span><a class="headerlink" href="#compass.model.Candidate.cov_cc" title="Link to this definition"></a></dt>
+<dd><p>2x2 covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.cov_conv">
+<span class="sig-name descname"><span class="pre">cov_conv</span></span><a class="headerlink" href="#compass.model.Candidate.cov_conv" title="Link to this definition"></a></dt>
+<dd><p>2x2 covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.cov_pmuM1">
+<span class="sig-name descname"><span class="pre">cov_pmuM1</span></span><a class="headerlink" href="#compass.model.Candidate.cov_pmuM1" title="Link to this definition"></a></dt>
+<dd><p>2x2 covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.p_b">
+<span class="sig-name descname"><span class="pre">p_b</span></span><a class="headerlink" href="#compass.model.Candidate.p_b" title="Link to this definition"></a></dt>
+<dd><p>Odd for being a background object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.p_ratio">
+<span class="sig-name descname"><span class="pre">p_ratio</span></span><a class="headerlink" href="#compass.model.Candidate.p_ratio" title="Link to this definition"></a></dt>
+<dd><p>Odds ratio.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.p_tc">
+<span class="sig-name descname"><span class="pre">p_tc</span></span><a class="headerlink" href="#compass.model.Candidate.p_tc" title="Link to this definition"></a></dt>
+<dd><p>Odd for being a true companion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.back_true">
+<span class="sig-name descname"><span class="pre">back_true</span></span><a class="headerlink" href="#compass.model.Candidate.back_true" title="Link to this definition"></a></dt>
+<dd><p>true companion or background object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.mean_measured_positions">
+<span class="sig-name descname"><span class="pre">mean_measured_positions</span></span><a class="headerlink" href="#compass.model.Candidate.mean_measured_positions" title="Link to this definition"></a></dt>
+<dd><p>Measured position of candidate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.mean_true_companion">
+<span class="sig-name descname"><span class="pre">mean_true_companion</span></span><a class="headerlink" href="#compass.model.Candidate.mean_true_companion" title="Link to this definition"></a></dt>
+<dd><p>Calculated position of candidate by pm and plx of star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.mean_background_object">
+<span class="sig-name descname"><span class="pre">mean_background_object</span></span><a class="headerlink" href="#compass.model.Candidate.mean_background_object" title="Link to this definition"></a></dt>
+<dd><p>Calculated position of candidate by pm and plx of backgorund model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.cov_measured_positions">
+<span class="sig-name descname"><span class="pre">cov_measured_positions</span></span><a class="headerlink" href="#compass.model.Candidate.cov_measured_positions" title="Link to this definition"></a></dt>
+<dd><p>Covariance matrix of measured position of candidate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.cov_true_companion">
+<span class="sig-name descname"><span class="pre">cov_true_companion</span></span><a class="headerlink" href="#compass.model.Candidate.cov_true_companion" title="Link to this definition"></a></dt>
+<dd><p>Covariance matrix of candidate by pm and plx of star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.cov_background_object">
+<span class="sig-name descname"><span class="pre">cov_background_object</span></span><a class="headerlink" href="#compass.model.Candidate.cov_background_object" title="Link to this definition"></a></dt>
+<dd><p>Covariance matrix of candidate by pm and plx of backgorund model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.r_tcb_2Dnmodel">
+<span class="sig-name descname"><span class="pre">r_tcb_2Dnmodel</span></span><a class="headerlink" href="#compass.model.Candidate.r_tcb_2Dnmodel" title="Link to this definition"></a></dt>
+<dd><p>log10(P_tc / P_b).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.Candidate.r_tcb_pmmodel">
+<span class="sig-name descname"><span class="pre">r_tcb_pmmodel</span></span><a class="headerlink" href="#compass.model.Candidate.r_tcb_pmmodel" title="Link to this definition"></a></dt>
+<dd><p>log10(P_tc / P_b).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Init candidates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_survey</strong> (<em>pandas.DataFrame</em>) – Data of the candidates of a single host star.</p></li>
+<li><p><strong>index_candidate</strong> (<em>int</em>) – index integer of the candidate in df_survey.</p></li>
+<li><p><strong>host_star</strong> (<em>Class Object</em>) – Previously initiated class for the host star.</p></li>
+<li><p><strong>band</strong> (<em>str</em>) – Band which the candidate was observed in df_survey (columnname).</p></li>
+<li><p><strong>catalogue</strong> (<em>str</em>) – Name of the catalogue the model is based on: gaia, gaiacalctmass or tmass.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Methods Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#compass.model.Candidate.calc_likelihoods_2Dnmodel" title="compass.model.Candidate.calc_likelihoods_2Dnmodel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_likelihoods_2Dnmodel</span></code></a>(host_star[, ...])</p></td>
+<td><p>Attributes the likelihoods to the candidate object in terms of the means and covariance matrices.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#compass.model.Candidate.calc_likelihoods_pmmodel" title="compass.model.Candidate.calc_likelihoods_pmmodel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_likelihoods_pmmodel</span></code></a>(host_star, ...)</p></td>
+<td><p>Attributes the likelihoods to the candidate object in terms of the means and covariance matrices.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#compass.model.Candidate.calc_prob_ratio_2Dnmodel" title="compass.model.Candidate.calc_prob_ratio_2Dnmodel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_prob_ratio_2Dnmodel</span></code></a>()</p></td>
+<td><p>Calculates the odds ratio based on the pm and plx model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#compass.model.Candidate.calc_prob_ratio_pmmodel" title="compass.model.Candidate.calc_prob_ratio_pmmodel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_prob_ratio_pmmodel</span></code></a>()</p></td>
+<td><p>Calculates the odds ratio based on the modelled g2d functions.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.Candidate.calc_likelihoods_2Dnmodel">
+<span class="sig-name descname"><span class="pre">calc_likelihoods_2Dnmodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalogue_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gaiacalctmass'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.Candidate.calc_likelihoods_2Dnmodel" title="Link to this definition"></a></dt>
+<dd><p>Attributes the likelihoods to the candidate object in terms of the means and covariance matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host_star</strong> (<em>class object</em>) – Use of proper motion and parallax of the star.</p></li>
+<li><p><strong>background</strong> (<em>class object</em>) – Use of proper motion and parallax of the backgorund distribution.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.Candidate.calc_likelihoods_pmmodel">
+<span class="sig-name descname"><span class="pre">calc_likelihoods_pmmodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_model_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_cc_min</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.Candidate.calc_likelihoods_pmmodel" title="Link to this definition"></a></dt>
+<dd><p>Attributes the likelihoods to the candidate object in terms
+of the means and covariance matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host_star</strong> (<em>class</em>) – Previously initiated class for the host star.</p></li>
+<li><p><strong>sigma_model_min</strong> (<em>float</em>) – The inflating factor for the model likelihood.</p></li>
+<li><p><strong>sigma_cc_min</strong> (<em>float</em>) – The inflating factor for its likelihood.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.Candidate.calc_prob_ratio_2Dnmodel">
+<span class="sig-name descname"><span class="pre">calc_prob_ratio_2Dnmodel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.Candidate.calc_prob_ratio_2Dnmodel" title="Link to this definition"></a></dt>
+<dd><p>Calculates the odds ratio based on the pm and plx model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.Candidate.calc_prob_ratio_pmmodel">
+<span class="sig-name descname"><span class="pre">calc_prob_ratio_pmmodel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.Candidate.calc_prob_ratio_pmmodel" title="Link to this definition"></a></dt>
+<dd><p>Calculates the odds ratio based on the modelled g2d functions.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="compass.model.BackgroundModel.html" class="btn btn-neutral float-left" title="BackgroundModel" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="compass.model.CovarianceMatrix.html" class="btn btn-neutral float-right" title="CovarianceMatrix" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Philipp Herz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+odds_ratio_sep_mag_plot
+=======================
+
+.. currentmodule:: compass.preset_plots
+
+.. autofunction:: odds_ratio_sep_mag_plot

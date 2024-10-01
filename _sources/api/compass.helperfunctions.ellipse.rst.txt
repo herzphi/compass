@@ -1,0 +1,6 @@
+ellipse
+=======
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: ellipse

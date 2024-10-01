@@ -1,0 +1,6 @@
+get_ellipse_props
+=================
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: get_ellipse_props

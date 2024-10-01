@@ -1,0 +1,7 @@
+BackgroundModel
+===============
+
+.. currentmodule:: compass.model
+
+.. autoclass:: BackgroundModel
+   :show-inheritance:

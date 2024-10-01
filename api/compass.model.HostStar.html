@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HostStar &mdash; compass  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Survey" href="compass.model.Survey.html" />
+    <link rel="prev" title="CovarianceMatrix" href="compass.model.CovarianceMatrix.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            compass
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="compass.model.BackgroundModel.html">BackgroundModel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.model.Candidate.html">Candidate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.model.CovarianceMatrix.html">CovarianceMatrix</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">HostStar</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#compass.model.HostStar"><code class="docutils literal notranslate"><span class="pre">HostStar</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.ra"><code class="docutils literal notranslate"><span class="pre">HostStar.ra</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.ra_error"><code class="docutils literal notranslate"><span class="pre">HostStar.ra_error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.dec"><code class="docutils literal notranslate"><span class="pre">HostStar.dec</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.dec_error"><code class="docutils literal notranslate"><span class="pre">HostStar.dec_error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.ref_epoch"><code class="docutils literal notranslate"><span class="pre">HostStar.ref_epoch</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.parallax"><code class="docutils literal notranslate"><span class="pre">HostStar.parallax</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.parallax_error"><code class="docutils literal notranslate"><span class="pre">HostStar.parallax_error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.pmra"><code class="docutils literal notranslate"><span class="pre">HostStar.pmra</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.pmdec"><code class="docutils literal notranslate"><span class="pre">HostStar.pmdec</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.pmra_error"><code class="docutils literal notranslate"><span class="pre">HostStar.pmra_error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.pmdec_error"><code class="docutils literal notranslate"><span class="pre">HostStar.pmdec_error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.pmra_pmdec_corr"><code class="docutils literal notranslate"><span class="pre">HostStar.pmra_pmdec_corr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.parallax_pmra_corr"><code class="docutils literal notranslate"><span class="pre">HostStar.parallax_pmra_corr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.parallax_pmdec_corr"><code class="docutils literal notranslate"><span class="pre">HostStar.parallax_pmdec_corr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.phot_g_mean_mag"><code class="docutils literal notranslate"><span class="pre">HostStar.phot_g_mean_mag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.phot_bp_mean_mag"><code class="docutils literal notranslate"><span class="pre">HostStar.phot_bp_mean_mag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.phot_rp_mean_mag"><code class="docutils literal notranslate"><span class="pre">HostStar.phot_rp_mean_mag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.object_found"><code class="docutils literal notranslate"><span class="pre">HostStar.object_found</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.cone_tmass_cross"><code class="docutils literal notranslate"><span class="pre">HostStar.cone_tmass_cross</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">HostStar.cone_tmass_cross</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.candidates"><code class="docutils literal notranslate"><span class="pre">HostStar.candidates</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.logger"><code class="docutils literal notranslate"><span class="pre">HostStar.logger</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.binning_parameters"><code class="docutils literal notranslate"><span class="pre">HostStar.binning_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.calc_background_model_parameters"><code class="docutils literal notranslate"><span class="pre">HostStar.calc_background_model_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.concat_binning_parameters"><code class="docutils literal notranslate"><span class="pre">HostStar.concat_binning_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.cone_gaia_objects"><code class="docutils literal notranslate"><span class="pre">HostStar.cone_gaia_objects()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.cone_tmasscross_objects"><code class="docutils literal notranslate"><span class="pre">HostStar.cone_tmasscross_objects()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.HostStar.evaluate_candidates_table"><code class="docutils literal notranslate"><span class="pre">HostStar.evaluate_candidates_table()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="compass.model.Survey.html">Survey</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.add_ellp_patch.html">add_ellp_patch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.add_ellp_patch2.html">add_ellp_patch2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.calc_prime_1.html">calc_prime_1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.color_trafo_2MASS_H.html">color_trafo_2MASS_H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.color_trafo_2MASS_J.html">color_trafo_2MASS_J</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.color_trafo_2MASS_K_S.html">color_trafo_2MASS_K_S</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.convert_df_to_array.html">convert_df_to_array</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.convolution2d.html">convolution2d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.ellipse.html">ellipse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_const.html">func_const</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_exp.html">func_exp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_exp_inc.html">func_exp_inc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_lin.html">func_lin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.gaussian1D.html">gaussian1D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.get_ellipse_props.html">get_ellipse_props</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.get_g2d_func.html">get_g2d_func</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.get_g2d_parameters.html">get_g2d_parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.n_dim_gauss_evaluated.html">n_dim_gauss_evaluated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.parallax_projection.html">parallax_projection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.odds_ratio_sep_mag_plot.html">odds_ratio_sep_mag_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.p_ratio_plot.html">p_ratio_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.p_ratio_relative_position.html">p_ratio_relative_position</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.plot_pm_plx_binning_parameters.html">plot_pm_plx_binning_parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.pm_mag_plot.html">pm_mag_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.propagation_plot.html">propagation_plot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">compass</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">HostStar</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/compass.model.HostStar.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hoststar">
+<h1>HostStar<a class="headerlink" href="#hoststar" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="compass.model.HostStar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compass.model.</span></span><span class="sig-name descname"><span class="pre">HostStar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.HostStar" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Host star of the candidates. Properties of the host star have the units given in gaiadr3.gaia_source.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.ra">
+<span class="sig-name descname"><span class="pre">ra</span></span><a class="headerlink" href="#compass.model.HostStar.ra" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.ra_error">
+<span class="sig-name descname"><span class="pre">ra_error</span></span><a class="headerlink" href="#compass.model.HostStar.ra_error" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.dec">
+<span class="sig-name descname"><span class="pre">dec</span></span><a class="headerlink" href="#compass.model.HostStar.dec" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.dec_error">
+<span class="sig-name descname"><span class="pre">dec_error</span></span><a class="headerlink" href="#compass.model.HostStar.dec_error" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.ref_epoch">
+<span class="sig-name descname"><span class="pre">ref_epoch</span></span><a class="headerlink" href="#compass.model.HostStar.ref_epoch" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.parallax">
+<span class="sig-name descname"><span class="pre">parallax</span></span><a class="headerlink" href="#compass.model.HostStar.parallax" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.parallax_error">
+<span class="sig-name descname"><span class="pre">parallax_error</span></span><a class="headerlink" href="#compass.model.HostStar.parallax_error" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.pmra">
+<span class="sig-name descname"><span class="pre">pmra</span></span><a class="headerlink" href="#compass.model.HostStar.pmra" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.pmdec">
+<span class="sig-name descname"><span class="pre">pmdec</span></span><a class="headerlink" href="#compass.model.HostStar.pmdec" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.pmra_error">
+<span class="sig-name descname"><span class="pre">pmra_error</span></span><a class="headerlink" href="#compass.model.HostStar.pmra_error" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.pmdec_error">
+<span class="sig-name descname"><span class="pre">pmdec_error</span></span><a class="headerlink" href="#compass.model.HostStar.pmdec_error" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.pmra_pmdec_corr">
+<span class="sig-name descname"><span class="pre">pmra_pmdec_corr</span></span><a class="headerlink" href="#compass.model.HostStar.pmra_pmdec_corr" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.parallax_pmra_corr">
+<span class="sig-name descname"><span class="pre">parallax_pmra_corr</span></span><a class="headerlink" href="#compass.model.HostStar.parallax_pmra_corr" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.parallax_pmdec_corr">
+<span class="sig-name descname"><span class="pre">parallax_pmdec_corr</span></span><a class="headerlink" href="#compass.model.HostStar.parallax_pmdec_corr" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.phot_g_mean_mag">
+<span class="sig-name descname"><span class="pre">phot_g_mean_mag</span></span><a class="headerlink" href="#compass.model.HostStar.phot_g_mean_mag" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.phot_bp_mean_mag">
+<span class="sig-name descname"><span class="pre">phot_bp_mean_mag</span></span><a class="headerlink" href="#compass.model.HostStar.phot_bp_mean_mag" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.phot_rp_mean_mag">
+<span class="sig-name descname"><span class="pre">phot_rp_mean_mag</span></span><a class="headerlink" href="#compass.model.HostStar.phot_rp_mean_mag" title="Link to this definition"></a></dt>
+<dd><p>Properties of the host star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.object_found">
+<span class="sig-name descname"><span class="pre">object_found</span></span><a class="headerlink" href="#compass.model.HostStar.object_found" title="Link to this definition"></a></dt>
+<dd><p>Boolean whether the object was found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Boolean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.cone_tmass_cross">
+<span class="sig-name descname"><span class="pre">cone_tmass_cross</span></span><a class="headerlink" href="#compass.model.HostStar.cone_tmass_cross" title="Link to this definition"></a></dt>
+<dd><p>Containing the cone cross matched objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">cone_tmass_cross</span></span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>containing the cone Gaia objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.candidates">
+<span class="sig-name descname"><span class="pre">candidates</span></span><a class="headerlink" href="#compass.model.HostStar.candidates" title="Link to this definition"></a></dt>
+<dd><p>Containing id, p_ratio and p_ratio_catalogue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Searches for the given target id in the Simbad database
+for the Gaia source id and returns the data on the star.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target</strong> (<em>str</em>) – Name of the target.</p>
+</dd>
+</dl>
+<p class="rubric">Attributes Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#compass.model.HostStar.logger" title="compass.model.HostStar.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#compass.model.HostStar.binning_parameters" title="compass.model.HostStar.binning_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binning_parameters</span></code></a>(df, x_col_name, ...)</p></td>
+<td><p>Gaussian 2D fits to each bin.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#compass.model.HostStar.calc_background_model_parameters" title="compass.model.HostStar.calc_background_model_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_background_model_parameters</span></code></a>(...[, std_fit])</p></td>
+<td><p>Fit the binning parameters. For each catalogue and variable there are coeff and cov attributes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#compass.model.HostStar.concat_binning_parameters" title="compass.model.HostStar.concat_binning_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concat_binning_parameters</span></code></a>(df_catalogue, ...)</p></td>
+<td><p>Concat the binning parameters of the combinations of pmra, pmdec, parallax.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#compass.model.HostStar.cone_gaia_objects" title="compass.model.HostStar.cone_gaia_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cone_gaia_objects</span></code></a>(cone_radius)</p></td>
+<td><p>Cone around the target star and colour transform G-Band to K_S-Band.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#compass.model.HostStar.cone_tmasscross_objects" title="compass.model.HostStar.cone_tmasscross_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cone_tmasscross_objects</span></code></a>(cone_radius)</p></td>
+<td><p>Cone around the target star and cross match with 2MASS.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#compass.model.HostStar.evaluate_candidates_table" title="compass.model.HostStar.evaluate_candidates_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_candidates_table</span></code></a>(candidates_df, ...)</p></td>
+<td><p>Returns all the candidates data of this host star for both catalogues.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="compass.model.HostStar.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;AstropyLogger</span> <span class="pre">astroquery</span> <span class="pre">(ERROR)&gt;</span></em><a class="headerlink" href="#compass.model.HostStar.logger" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.HostStar.binning_parameters">
+<span class="sig-name descname"><span class="pre">binning_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_col_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_col_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.HostStar.binning_parameters" title="Link to this definition"></a></dt>
+<dd><p>Gaussian 2D fits to each bin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Cone catalouge data.</p></li>
+<li><p><strong>x_col_name</strong> (<em>str</em>) – pmra, pmdec or parallax.</p></li>
+<li><p><strong>y_col_name</strong> (<em>str</em>) – pmra, pmdec or parallax.</p></li>
+<li><p><strong>binsize</strong> (<em>float</em>) – Number of objects in each single bin.</p></li>
+<li><p><strong>band</strong> (<em>str</em>) – <p>Bandwidth from the catalogue column
+e.g. ‘ks_m_calc’ for Gaia or ‘ks_m’ for 2MASS.</p>
+<blockquote>
+<div><p>’h_m_calc’ for Gaia or ‘h_m’ for 2MASS.
+‘j_m_calc’ for Gaia or ‘j_m’ for 2MASS.</p>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>pandas.DataFrame</em> – Parameters for each bin and each correlation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.HostStar.calc_background_model_parameters">
+<span class="sig-name descname"><span class="pre">calc_background_model_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_df_bp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidates_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_candidates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exp'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.HostStar.calc_background_model_parameters" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Fit the binning parameters. For each catalogue and variable there are coeff and cov attributes.</dt><dd><dl class="simple">
+<dt>The syntax:</dt><dd><p>variable _ mean or stddev _ coeff or cov _ catalogue name</p>
+</dd>
+<dt>The coeff attributes contain the fitting coefficients:</dt><dd><p>len(coeff)=3: Fitted with helperfunctions.func_exp.
+len(coeff)=2: Fitted with helperfunctions.func_lin.
+len(coeff)=1: Fitted with helperfunctions.const.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_of_df_bp</strong> (<em>list</em><em> of </em><em>pandas.DataFrame s</em>)</p></li>
+<li><p><strong>Parameters.</strong> (<em>Binned 2D Gaussian</em>)</p></li>
+<li><p><strong>band</strong> (<em>str</em>) – Bandwidth from the catalogue column
+e.g. ‘ks_m_calc’ for Gaia or ‘ks_m’ for 2MASS.</p></li>
+<li><p><strong>candidates_df</strong> (<em>pandas.DataFrame</em>) – Data on all candidates</p></li>
+<li><p><strong>star.</strong> (<em>of this host</em>)</p></li>
+<li><p><strong>include_candidates</strong> (<em>Boolean</em>) – Including the data of the caniddates
+in the fitting.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.HostStar.concat_binning_parameters">
+<span class="sig-name descname"><span class="pre">concat_binning_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_catalogue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.HostStar.concat_binning_parameters" title="Link to this definition"></a></dt>
+<dd><p>Concat the binning parameters of the combinations of pmra,
+pmdec, parallax.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_catalogue</strong> (<em>pandas.DataFrame</em>) – Cone catalouge data.</p></li>
+<li><p><strong>band</strong> (<em>str</em>) – Bandwidth from the catalogue column
+e.g. ‘ks_m_calc’ for Gaia or ‘ks_m’ for 2MASS.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>pandas.DataFrame</em> – Binning parameters of different catalogues and variables parameters in a single dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.HostStar.cone_gaia_objects">
+<span class="sig-name descname"><span class="pre">cone_gaia_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cone_radius</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.HostStar.cone_gaia_objects" title="Link to this definition"></a></dt>
+<dd><p>Cone around the target star and colour transform G-Band to K_S-Band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cone_radius</strong> (<em>float</em>) – Search cone radius in degree.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.HostStar.cone_tmasscross_objects">
+<span class="sig-name descname"><span class="pre">cone_tmasscross_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cone_radius</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.HostStar.cone_tmasscross_objects" title="Link to this definition"></a></dt>
+<dd><p>Cone around the target star and cross match with 2MASS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cone_radius</strong> (<em>float</em>) – Search cone radius in degree.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.HostStar.evaluate_candidates_table">
+<span class="sig-name descname"><span class="pre">evaluate_candidates_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_model_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_cc_min</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.HostStar.evaluate_candidates_table" title="Link to this definition"></a></dt>
+<dd><p>Returns all the candidates data of this host star for both catalogues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>candidates_df</strong> (<em>pandas.DataFrame</em>) – Data on all candidates of this host star.</p></li>
+<li><p><strong>sigma_model_min</strong> (<em>float</em><em> or </em><em>int</em>) – The inflating factor for the model likelihood.</p></li>
+<li><p><strong>sigma_cc_min</strong> (<em>float</em><em> or </em><em>int</em>) – The inflating factor for its likelihood.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="compass.model.CovarianceMatrix.html" class="btn btn-neutral float-left" title="CovarianceMatrix" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="compass.model.Survey.html" class="btn btn-neutral float-right" title="Survey" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Philipp Herz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

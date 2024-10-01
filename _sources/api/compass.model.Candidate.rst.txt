@@ -1,0 +1,23 @@
+Candidate
+=========
+
+.. currentmodule:: compass.model
+
+.. autoclass:: Candidate
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Candidate.calc_likelihoods_2Dnmodel
+      ~Candidate.calc_likelihoods_pmmodel
+      ~Candidate.calc_prob_ratio_2Dnmodel
+      ~Candidate.calc_prob_ratio_pmmodel
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: calc_likelihoods_2Dnmodel
+   .. automethod:: calc_likelihoods_pmmodel
+   .. automethod:: calc_prob_ratio_2Dnmodel
+   .. automethod:: calc_prob_ratio_pmmodel

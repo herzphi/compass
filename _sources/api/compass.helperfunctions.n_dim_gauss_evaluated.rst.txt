@@ -1,0 +1,6 @@
+n_dim_gauss_evaluated
+=====================
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: n_dim_gauss_evaluated

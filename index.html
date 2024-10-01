@@ -1,110 +1,310 @@
-
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8" />
-    <title>Welcome to No Errors Test Project’s documentation! &#8212; No Errors Test Project  documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to compass’s documentation! &mdash; compass  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="next" title="BackgroundModel" href="api/compass.model.BackgroundModel.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
           
+          
+          <a href="#" class="icon icon-home">
+            compass
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.model.BackgroundModel.html">BackgroundModel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.model.Candidate.html">Candidate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.model.CovarianceMatrix.html">CovarianceMatrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.model.HostStar.html">HostStar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.model.Survey.html">Survey</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.add_ellp_patch.html">add_ellp_patch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.add_ellp_patch2.html">add_ellp_patch2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.calc_prime_1.html">calc_prime_1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.color_trafo_2MASS_H.html">color_trafo_2MASS_H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.color_trafo_2MASS_J.html">color_trafo_2MASS_J</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.color_trafo_2MASS_K_S.html">color_trafo_2MASS_K_S</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.convert_df_to_array.html">convert_df_to_array</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.convolution2d.html">convolution2d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.ellipse.html">ellipse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.func_const.html">func_const</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.func_exp.html">func_exp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.func_exp_inc.html">func_exp_inc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.func_lin.html">func_lin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.gaussian1D.html">gaussian1D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.get_ellipse_props.html">get_ellipse_props</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.get_g2d_func.html">get_g2d_func</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.get_g2d_parameters.html">get_g2d_parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.n_dim_gauss_evaluated.html">n_dim_gauss_evaluated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.helperfunctions.parallax_projection.html">parallax_projection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.preset_plots.odds_ratio_sep_mag_plot.html">odds_ratio_sep_mag_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.preset_plots.p_ratio_plot.html">p_ratio_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.preset_plots.p_ratio_relative_position.html">p_ratio_relative_position</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.preset_plots.plot_pm_plx_binning_parameters.html">plot_pm_plx_binning_parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.preset_plots.pm_mag_plot.html">pm_mag_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compass.preset_plots.propagation_plot.html">propagation_plot</a></li>
+</ul>
 
-          <div class="body" role="main">
-            
-  <div class="section" id="welcome-to-no-errors-test-project-s-documentation">
-<h1>Welcome to No Errors Test Project’s documentation!<a class="headerlink" href="#welcome-to-no-errors-test-project-s-documentation" title="Permalink to this headline">¶</a></h1>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">compass</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to compass’s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="welcome-to-compass-s-documentation">
+<h1>Welcome to compass’s documentation!<a class="headerlink" href="#welcome-to-compass-s-documentation" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<p>The code described by this documentation is available on <a class="reference external" href="https://github.com/herzphi/compass">https://github.com/herzphi/compass</a>.
+This package presents a method to evaluate the likelihood of a candidate being a true companion to a host star using a proper motion model based on stochastic models.</p>
+</section>
+<section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<section id="installation">
+<span id="id1"></span><h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>You can install <cite>compass</cite> by installing this repo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">herzphi</span><span class="o">/</span><span class="n">compass</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+</section>
+<section id="code">
+<h2>Code<a class="headerlink" href="#code" title="Link to this heading"></a></h2>
+<p>To get the odds ratios of all candidates use the <code class="docutils literal notranslate"><span class="pre">Survey</span></code> class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">compass</span> <span class="kn">import</span> <span class="n">model</span>
+<span class="kn">from</span> <span class="nn">compass</span> <span class="kn">import</span> <span class="n">helperfunctions</span>
+
+<span class="n">observation</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;observation.csv&#39;</span><span class="p">)</span>
+<span class="n">survey_object</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Survey</span><span class="p">(</span><span class="n">observation</span><span class="p">,</span> <span class="n">magnitudes_column_name</span><span class="p">)</span>
+<span class="n">survey_object</span><span class="o">.</span><span class="n">set_fieldstar_models</span><span class="p">(</span>
+    <span class="c1"># Color transformed column name from Gaias G-Band.</span>
+    <span class="n">magnitudes_column_name_CALC</span><span class="p">,</span>
+    <span class="c1"># Column name of the corresponding magnitude in 2MASS.</span>
+    <span class="n">magnitudes_column_name_2MASS</span><span class="p">,</span>
+    <span class="n">cone_radius</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>  <span class="c1"># in degree</span>
+    <span class="n">binsize</span><span class="o">=</span><span class="mi">200</span>  <span class="c1"># Number of objects in a single magnitude bin</span>
+<span class="p">)</span>
+<span class="c1"># Inflating parameters to adjust the sharp drop-off of the Gaussians.</span>
+
+<span class="n">survey_object</span><span class="o">.</span><span class="n">set_evaluated_fieldstar_models</span><span class="p">(</span>
+    <span class="n">sigma_cc_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">sigma_model_min</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
+<section id="module-compass.model">
+<span id="compass-model-module"></span><h2>compass.model Module<a class="headerlink" href="#module-compass.model" title="Link to this heading"></a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.model.BackgroundModel.html#compass.model.BackgroundModel" title="compass.model.BackgroundModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackgroundModel</span></code></a>(candidate_mag, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.model.Candidate.html#compass.model.Candidate" title="compass.model.Candidate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Candidate</span></code></a>(df_survey, index_candidate, ...)</p></td>
+<td><p>Model, true data and likelihoods, p_ratios of one candidate.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.model.CovarianceMatrix.html#compass.model.CovarianceMatrix" title="compass.model.CovarianceMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CovarianceMatrix</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.model.HostStar.html#compass.model.HostStar" title="compass.model.HostStar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HostStar</span></code></a>(target)</p></td>
+<td><p>Host star of the candidates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.model.Survey.html#compass.model.Survey" title="compass.model.Survey"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Survey</span></code></a>(survey, survey_bandfilter_colname)</p></td>
+<td><p>Creates odds ratio table based on the observational data of candidates and the field star models.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="module-compass.helperfunctions">
+<span id="compass-helperfunctions-module"></span><h2>compass.helperfunctions Module<a class="headerlink" href="#module-compass.helperfunctions" title="Link to this heading"></a></h2>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.add_ellp_patch.html#compass.helperfunctions.add_ellp_patch" title="compass.helperfunctions.add_ellp_patch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_ellp_patch</span></code></a>(pdf, major, minor, angle, ...)</p></td>
+<td><p>Adds a patch to a figure.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.helperfunctions.add_ellp_patch2.html#compass.helperfunctions.add_ellp_patch2" title="compass.helperfunctions.add_ellp_patch2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_ellp_patch2</span></code></a>(x_mean, y_mean, major, ...)</p></td>
+<td><p>Adds a patch to a figure.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.calc_prime_1.html#compass.helperfunctions.calc_prime_1" title="compass.helperfunctions.calc_prime_1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_prime_1</span></code></a>(prime_0, pm, plx, time, plx_proj)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.helperfunctions.color_trafo_2MASS_H.html#compass.helperfunctions.color_trafo_2MASS_H" title="compass.helperfunctions.color_trafo_2MASS_H"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_trafo_2MASS_H</span></code></a>(g_band_mag, bp_rp_mag)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.color_trafo_2MASS_J.html#compass.helperfunctions.color_trafo_2MASS_J" title="compass.helperfunctions.color_trafo_2MASS_J"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_trafo_2MASS_J</span></code></a>(g_band_mag, bp_rp_mag)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.helperfunctions.color_trafo_2MASS_K_S.html#compass.helperfunctions.color_trafo_2MASS_K_S" title="compass.helperfunctions.color_trafo_2MASS_K_S"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_trafo_2MASS_K_S</span></code></a>(g_band_mag, bp_rp_mag)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.convert_df_to_array.html#compass.helperfunctions.convert_df_to_array" title="compass.helperfunctions.convert_df_to_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_df_to_array</span></code></a>(df, x_col_name, y_col_name)</p></td>
+<td><p>Convert dataframe to two 1D arrays.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.helperfunctions.convolution2d.html#compass.helperfunctions.convolution2d" title="compass.helperfunctions.convolution2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convolution2d</span></code></a>(a, b, A, B)</p></td>
+<td><p>Returns a Gaussian2D functions and its covariance matrix of the convolution from the two Gaussian2D.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.ellipse.html#compass.helperfunctions.ellipse" title="compass.helperfunctions.ellipse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ellipse</span></code></a>(x_mean, y_mean, cov, color, axis[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.helperfunctions.func_const.html#compass.helperfunctions.func_const" title="compass.helperfunctions.func_const"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_const</span></code></a>(x, a)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.func_exp.html#compass.helperfunctions.func_exp" title="compass.helperfunctions.func_exp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_exp</span></code></a>(x, a, b, c)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.helperfunctions.func_exp_inc.html#compass.helperfunctions.func_exp_inc" title="compass.helperfunctions.func_exp_inc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_exp_inc</span></code></a>(x, a, b, c)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.func_lin.html#compass.helperfunctions.func_lin" title="compass.helperfunctions.func_lin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_lin</span></code></a>(x, a, b)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.helperfunctions.gaussian1D.html#compass.helperfunctions.gaussian1D" title="compass.helperfunctions.gaussian1D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian1D</span></code></a>(g2d_astropy_func, x_or_y)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.get_ellipse_props.html#compass.helperfunctions.get_ellipse_props" title="compass.helperfunctions.get_ellipse_props"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ellipse_props</span></code></a>(cov, confidence)</p></td>
+<td><p>Calculates the eigenvalues/eigenvectors of the covariance matrix and returns the major and minor axis length of the ellipse. Args:         cov (numpy.array (2x2)): Covariance matrix. confidence (float): Probability between 0 and 1. Returns:         major_axis (float): Semi-major axis. minor_axis (float): Semi-minor axis. angle (float): Angle of rotation of the ellipse.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.helperfunctions.get_g2d_func.html#compass.helperfunctions.get_g2d_func" title="compass.helperfunctions.get_g2d_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_g2d_func</span></code></a>(x_mean, y_mean, x_std, y_std, rho)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.get_g2d_parameters.html#compass.helperfunctions.get_g2d_parameters" title="compass.helperfunctions.get_g2d_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_g2d_parameters</span></code></a>(x_data, y_data)</p></td>
+<td><p>Calculate 2D Gaussian parameters based on two arrays.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.helperfunctions.n_dim_gauss_evaluated.html#compass.helperfunctions.n_dim_gauss_evaluated" title="compass.helperfunctions.n_dim_gauss_evaluated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n_dim_gauss_evaluated</span></code></a>(obs, mean, cov)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.helperfunctions.parallax_projection.html#compass.helperfunctions.parallax_projection" title="compass.helperfunctions.parallax_projection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parallax_projection</span></code></a>(time, host_star)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="module-compass.preset_plots">
+<span id="compass-preset-plots-module"></span><h2>compass.preset_plots Module<a class="headerlink" href="#module-compass.preset_plots" title="Link to this heading"></a></h2>
+<section id="id2">
+<h3>Functions<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.preset_plots.odds_ratio_sep_mag_plot.html#compass.preset_plots.odds_ratio_sep_mag_plot" title="compass.preset_plots.odds_ratio_sep_mag_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">odds_ratio_sep_mag_plot</span></code></a>(candidates_table, ...)</p></td>
+<td><p>Creates a odds ratio vs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.preset_plots.p_ratio_plot.html#compass.preset_plots.p_ratio_plot" title="compass.preset_plots.p_ratio_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">p_ratio_plot</span></code></a>(candidate_object, target, band)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.preset_plots.p_ratio_relative_position.html#compass.preset_plots.p_ratio_relative_position" title="compass.preset_plots.p_ratio_relative_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">p_ratio_relative_position</span></code></a>(candidate_df, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.preset_plots.plot_pm_plx_binning_parameters.html#compass.preset_plots.plot_pm_plx_binning_parameters" title="compass.preset_plots.plot_pm_plx_binning_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_pm_plx_binning_parameters</span></code></a>(...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/compass.preset_plots.pm_mag_plot.html#compass.preset_plots.pm_mag_plot" title="compass.preset_plots.pm_mag_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pm_mag_plot</span></code></a>(catalogue, catalogue_name, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/compass.preset_plots.propagation_plot.html#compass.preset_plots.propagation_plot" title="compass.preset_plots.propagation_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagation_plot</span></code></a>(candidate_object, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
 
 
+           </div>
           </div>
-          
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api/compass.model.BackgroundModel.html" class="btn btn-neutral float-right" title="BackgroundModel" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Philipp Herz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">No Errors Test Project</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="#">Documentation overview</a><ul>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2019, sphinx-action Test Suite.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/index.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

@@ -1,0 +1,6 @@
+get_g2d_func
+============
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: get_g2d_func

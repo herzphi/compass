@@ -1,0 +1,37 @@
+CovarianceMatrix
+================
+
+.. currentmodule:: compass.model
+
+.. autoclass:: CovarianceMatrix
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~CovarianceMatrix.calc_covariance_xixj
+      ~CovarianceMatrix.calc_covariance_xiyi
+      ~CovarianceMatrix.calc_covariance_xiyj
+      ~CovarianceMatrix.calc_covariance_yixj
+      ~CovarianceMatrix.calc_covariance_yiyj
+      ~CovarianceMatrix.calc_variance_x
+      ~CovarianceMatrix.calc_variance_y
+      ~CovarianceMatrix.cov_pmdirection_plx
+      ~CovarianceMatrix.cov_pmra_pmdec
+      ~CovarianceMatrix.cov_propagation
+      ~CovarianceMatrix.covariance_matrix
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: calc_covariance_xixj
+   .. automethod:: calc_covariance_xiyi
+   .. automethod:: calc_covariance_xiyj
+   .. automethod:: calc_covariance_yixj
+   .. automethod:: calc_covariance_yiyj
+   .. automethod:: calc_variance_x
+   .. automethod:: calc_variance_y
+   .. automethod:: cov_pmdirection_plx
+   .. automethod:: cov_pmra_pmdec
+   .. automethod:: cov_propagation
+   .. automethod:: covariance_matrix

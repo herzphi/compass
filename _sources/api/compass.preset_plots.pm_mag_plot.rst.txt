@@ -1,0 +1,6 @@
+pm_mag_plot
+===========
+
+.. currentmodule:: compass.preset_plots
+
+.. autofunction:: pm_mag_plot

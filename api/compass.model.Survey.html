@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survey &mdash; compass  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="add_ellp_patch" href="compass.helperfunctions.add_ellp_patch.html" />
+    <link rel="prev" title="HostStar" href="compass.model.HostStar.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            compass
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="compass.model.BackgroundModel.html">BackgroundModel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.model.Candidate.html">Candidate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.model.CovarianceMatrix.html">CovarianceMatrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.model.HostStar.html">HostStar</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Survey</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#compass.model.Survey"><code class="docutils literal notranslate"><span class="pre">Survey</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Survey.get_true_companions"><code class="docutils literal notranslate"><span class="pre">Survey.get_true_companions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Survey.set_evaluated_fieldstar_models"><code class="docutils literal notranslate"><span class="pre">Survey.set_evaluated_fieldstar_models()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compass.model.Survey.set_fieldstar_models"><code class="docutils literal notranslate"><span class="pre">Survey.set_fieldstar_models()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.add_ellp_patch.html">add_ellp_patch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.add_ellp_patch2.html">add_ellp_patch2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.calc_prime_1.html">calc_prime_1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.color_trafo_2MASS_H.html">color_trafo_2MASS_H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.color_trafo_2MASS_J.html">color_trafo_2MASS_J</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.color_trafo_2MASS_K_S.html">color_trafo_2MASS_K_S</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.convert_df_to_array.html">convert_df_to_array</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.convolution2d.html">convolution2d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.ellipse.html">ellipse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_const.html">func_const</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_exp.html">func_exp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_exp_inc.html">func_exp_inc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.func_lin.html">func_lin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.gaussian1D.html">gaussian1D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.get_ellipse_props.html">get_ellipse_props</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.get_g2d_func.html">get_g2d_func</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.get_g2d_parameters.html">get_g2d_parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.n_dim_gauss_evaluated.html">n_dim_gauss_evaluated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.helperfunctions.parallax_projection.html">parallax_projection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.odds_ratio_sep_mag_plot.html">odds_ratio_sep_mag_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.p_ratio_plot.html">p_ratio_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.p_ratio_relative_position.html">p_ratio_relative_position</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.plot_pm_plx_binning_parameters.html">plot_pm_plx_binning_parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.pm_mag_plot.html">pm_mag_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compass.preset_plots.propagation_plot.html">propagation_plot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">compass</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Survey</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/compass.model.Survey.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="survey">
+<h1>Survey<a class="headerlink" href="#survey" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="compass.model.Survey">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compass.model.</span></span><span class="sig-name descname"><span class="pre">Survey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">survey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">survey_bandfilter_colname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.Survey" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Creates odds ratio table based on the observational data of candidates
+and the field star models.</p>
+<p>Based on the target name returns a dataframe
+containing all the survey data to this target
+and calculates the proper motion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>survey</strong> (<em>pandas.DataFrame</em>) – <p>Contains survey data. Necessary columns are:</p>
+<ul>
+<li><p>Main_ID: Host star name.</p></li>
+<li><p>final_uuid: Unique identifier of the two measurements of the same candidate.</p></li>
+<li><p>dRA: Relative distance candidate-hoststar in mas.</p></li>
+<li><p>dRA_err: Respective error.</p></li>
+<li><p>dDEC: Relative distance candidate-hoststar in mas.</p></li>
+<li><p>dDEC_err: Respective error.</p></li>
+<li><p>mag0: Magnitude of the candidate.</p></li>
+</ul>
+</p></li>
+<li><p><strong>survey_bandfilter_colname</strong> (<em>str</em>) – Column name of survey magnitudes, e.g. ‘mag0’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>pandas.DataFrame</em> – Contains the filtered survey data.</p>
+</dd>
+</dl>
+<p class="rubric">Methods Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#compass.model.Survey.get_true_companions" title="compass.model.Survey.get_true_companions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_true_companions</span></code></a>([threshold])</p></td>
+<td><p>Return all candidates with a odds ratio greater than the threshold.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#compass.model.Survey.set_evaluated_fieldstar_models" title="compass.model.Survey.set_evaluated_fieldstar_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_evaluated_fieldstar_models</span></code></a>([...])</p></td>
+<td><p>Evaluate the field star models with candidate data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#compass.model.Survey.set_fieldstar_models" title="compass.model.Survey.set_fieldstar_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_fieldstar_models</span></code></a>(binning_band_trafo, ...)</p></td>
+<td><p>Build for each host star given in survey a field star model.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.Survey.get_true_companions">
+<span class="sig-name descname"><span class="pre">get_true_companions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.Survey.get_true_companions" title="Link to this definition"></a></dt>
+<dd><p>Return all candidates with a odds ratio greater than the threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threshold</strong> (<em>float</em>) – Odds ratio greater than the threshold will be returned.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>pandas.DataFrame</em> – Candidates with r_tcb&gt;threshold.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.Survey.set_evaluated_fieldstar_models">
+<span class="sig-name descname"><span class="pre">set_evaluated_fieldstar_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_cc_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_model_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.Survey.set_evaluated_fieldstar_models" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the field star models with candidate data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma_cc_min</strong> (<em>float</em>) – Minimum sigma for the candidates likelihoods.</p></li>
+<li><p><strong>sigma_model_min</strong> (<em>float</em>) – Minimum sigma for the field star model likelihoods.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compass.model.Survey.set_fieldstar_models">
+<span class="sig-name descname"><span class="pre">set_fieldstar_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">binning_band_trafo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binning_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exp'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compass.model.Survey.set_fieldstar_models" title="Link to this definition"></a></dt>
+<dd><p>Build for each host star given in survey a field star model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>binning_band_trafo</strong> (<em>str</em>) – Color transformed bandwidth, e.g. ks_m_calc.</p></li>
+<li><p><strong>binning_band</strong> (<em>str</em>) – Color bandwidth, e.g. ks_m.</p></li>
+<li><p><strong>cone_radius</strong> (<em>float</em>) – Default=0.3 in degrees.</p></li>
+<li><p><strong>binsize</strong> (<em>int</em>) – Default=200 in number of field stars per magnitude bin.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="compass.model.HostStar.html" class="btn btn-neutral float-left" title="HostStar" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="compass.helperfunctions.add_ellp_patch.html" class="btn btn-neutral float-right" title="add_ellp_patch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Philipp Herz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+color_trafo_2MASS_J
+===================
+
+.. currentmodule:: compass.helperfunctions
+
+.. autofunction:: color_trafo_2MASS_J
