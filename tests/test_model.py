@@ -14,6 +14,7 @@ def test_get_ellipse_props():
     )
 
 
+@pytest.mark.remote_data
 def test_host_star_object():
     """Test the host star object wether all parameters are given."""
     host_star = model.HostStar(target="HIP82545")

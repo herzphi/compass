@@ -2,6 +2,14 @@ import itertools
 import logging
 import re
 
+__all__ = [
+    "Survey",
+    "HostStar",
+    "Candidate",
+    "BackgroundModel",
+    "CovarianceMatrix",
+]
+
 import tqdm
 import numpy as np
 import pandas as pd
@@ -707,10 +715,11 @@ class HostStar:
         Args:
             target (str): Name of the target.
         """
+        self.object_found = False
         logger = logging.getLogger("astroquery")
         customSimbad = Simbad()
         customSimbad.add_votable_fields("ids")
-        simbad_object_ids = customSimbad.query_object(target)["IDS"][0].split("|")
+        simbad_object_ids = customSimbad.query_object(target)["ids"][0].split("|")
         if len(simbad_object_ids) >= 1:
             for identifier in simbad_object_ids:
                 if "Gaia DR3" in identifier:
@@ -737,7 +746,7 @@ class HostStar:
                     """
                 try:
                     # Fetch the GAIA data with source_id from target name
-                    job = Gaia.launch_job_async(sql_query)
+                    job = Gaia.launch_job(sql_query)
                     target_data = job.get_results().to_pandas()
                     self.ra = target_data.ra[0]
                     self.ra_error = target_data.ra_error[0]
@@ -761,7 +770,8 @@ class HostStar:
                         self.object_found = False
                         logger.info(f"{target}: Proper motion is missing in Gaia.")
                 except exceptions.HTTPError as hperr:
-                    logger.error("Received exceptions.HTTPError", hperr)
+                    self.object_found = False
+                    logger.error("Received exceptions.HTTPError: %s", hperr)
         else:
             self.object_found = False
             logger.error("Not found in Simbad.")
@@ -773,10 +783,11 @@ class HostStar:
             cone_radius (float): Search cone radius in degree.
         """
         if self.object_found:
-            job = Gaia.launch_job_async(
-                f"""SELECT 
+            try:
+                job = Gaia.launch_job_async(
+                    f"""SELECT
                 gaia.source_id as source_id,
-                gaia.ra as ra ,
+                gaia.ra as ra,
                 gaia.ra_error as ra_error,
                 gaia.dec as dec,
                 gaia.dec_error as dec_error,
@@ -803,11 +814,10 @@ class HostStar:
             AS xjoin USING (clean_tmass_psc_xsc_oid)
             JOIN gaiadr1.tmass_original_valid AS tmass
             ON xjoin.original_psc_source_id = tmass.designation
-            WHERE 1 = CONTAINS(
-                POINT({self.ra}, {self.dec}),
-                CIRCLE(gaia.ra, gaia.dec, {cone_radius}))"""
-            )
-            try:
+            WHERE CONTAINS(
+                POINT('ICRS', gaia.ra, gaia.dec),
+                CIRCLE('ICRS', {self.ra}, {self.dec}, {cone_radius})) = 1"""
+                )
                 cone_objects = job.get_results().to_pandas()
                 self.cone_tmass_cross = cone_objects
             except exceptions.HTTPError as hperr:
@@ -820,14 +830,14 @@ class HostStar:
             cone_radius (float): Search cone radius in degree.
         """
         if self.object_found:
-            job = Gaia.launch_job_async(
-                f"""SELECT source_id, ra, dec, parallax, parallax_error, pmra, pmdec, pmra_error, pmdec_error, phot_g_mean_mag, phot_bp_mean_mag, phot_rp_mean_mag
-            FROM gaiadr3.gaia_source AS gaia
-            WHERE 1 = CONTAINS(
-                POINT({self.ra}, {self.dec}),
-                CIRCLE(gaia.ra, gaia.dec, {cone_radius}))"""
-            )
             try:
+                job = Gaia.launch_job_async(
+                    f"""SELECT source_id, ra, dec, parallax, parallax_error, pmra, pmdec, pmra_error, pmdec_error, phot_g_mean_mag, phot_bp_mean_mag, phot_rp_mean_mag
+            FROM gaiadr3.gaia_source AS gaia
+            WHERE CONTAINS(
+                POINT('ICRS', gaia.ra, gaia.dec),
+                CIRCLE('ICRS', {self.ra}, {self.dec}, {cone_radius})) = 1"""
+                )
                 cone_objects = job.get_results().to_pandas()
                 cone_objects["phot_bp_rp_mean_mag"] = (
                     cone_objects["phot_bp_mean_mag"] - cone_objects["phot_rp_mean_mag"]
@@ -1412,7 +1422,7 @@ class Survey:
             df_tmass = host_star.cone_tmass_cross
             #  Gaia data without 2MASS
             df_gaia_without_tmass = df_gaia[
-                ~df_gaia.SOURCE_ID.isin(df_tmass.SOURCE_ID.to_list())
+                ~df_gaia.source_id.isin(df_tmass.source_id.to_list())
             ]
             #  Binning parameters for 2MASS and Gaia
             #  Merge the binning parameters to a gaia df and tmass df

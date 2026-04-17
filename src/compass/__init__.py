@@ -1,11 +1,8 @@
-import sys
-
-if sys.version_info >= (3, 8):
-    from importlib import metadata
-else:
-    import importlib_metadata as metadata
+from importlib.metadata import PackageNotFoundError, version
 
 try:
-    __version__ = metadata.version(__package__ or __name__)
-except:
+    __version__ = version(__package__ or __name__)
+except PackageNotFoundError:
     __version__ = "dev"
+
+__all__ = ["__version__"]

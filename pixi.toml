@@ -1,0 +1,32 @@
+[workspace]
+name = "compass"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "osx-64"]
+
+[dependencies]
+python = ">=3.13,<3.14"
+astropy = ">=6.0"
+astroquery = ">=0.4.9"
+matplotlib = ">=3.9"
+numpy = ">=2.0"
+pandas = ">=2.2"
+requests = ">=2.32"
+scipy = ">=1.13"
+seaborn = ">=0.13"
+tqdm = ">=4.66"
+# test dependencies
+pytest = "*"
+pytest-cov = "*"
+ruff = "*"
+# optional: editable install support
+pip = "*"
+
+[pypi-dependencies]
+compass = { path = ".", editable = true }
+
+[tasks]
+test = "pytest tests/ -v"
+test-remote = "pytest tests/ -v --remote-data"
+lint = "ruff check src/ tests/"
+format = "ruff format src/ tests/"
+format-check = "ruff format --check src/ tests/"

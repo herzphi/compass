@@ -2,6 +2,33 @@ import numpy as np
 from astropy.modeling.functional_models import Gaussian1D, Gaussian2D
 from matplotlib.patches import Ellipse
 
+__all__ = [
+    # Astrometry
+    "parallax_projection",
+    "calc_prime_1",
+    # Gaussian operations
+    "get_g2d_parameters",
+    "get_g2d_func",
+    "gaussian1D",
+    "convolution2d",
+    "n_dim_gauss_evaluated",
+    # Fitting functions
+    "func_exp",
+    "func_exp_inc",
+    "func_lin",
+    "func_const",
+    # Visualization helpers
+    "get_ellipse_props",
+    "ellipse",
+    "add_ellp_patch",
+    "add_ellp_patch2",
+    "convert_df_to_array",
+    # Color transformations
+    "color_trafo_2MASS_K_S",
+    "color_trafo_2MASS_H",
+    "color_trafo_2MASS_J",
+]
+
 
 def parallax_projection(time, host_star):
     t = time

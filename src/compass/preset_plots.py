@@ -1,6 +1,15 @@
 #  Making plots
 from decimal import Decimal
 
+__all__ = [
+    "pm_mag_plot",
+    "p_ratio_plot",
+    "odds_ratio_sep_mag_plot",
+    "propagation_plot",
+    "plot_pm_plx_binning_parameters",
+    "p_ratio_relative_position",
+]
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
