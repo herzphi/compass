@@ -59,12 +59,12 @@ class CovarianceMatrix:
         cov_plx_pm_h = (
             host_star.pmdec_error
             * host_star.parallax_error
-            * host_star.parallax_pmra_corr
+            * host_star.parallax_pmdec_corr
         )
         cov_plx_pm_b = (
             backgroundmodel.pmdec_error
             * backgroundmodel.parallax_error
-            * backgroundmodel.parallax_pmra_corr
+            * backgroundmodel.parallax_pmdec_corr
         )
         var_prime = (
             time**2 * (backgroundmodel.pmdec_error**2 + host_star.pmdec_error**2)
@@ -205,22 +205,6 @@ class CovarianceMatrix:
             + plx_proj_ra_j * plx_proj_dec_i * cov_plx
         )
         return cov
-
-    def cov_propagation(C_0, days_1, days_2, plx_proj_x, plx_proj_y, host_star):
-        time = (days_2 - days_1) / 365.35
-        var_x_prime_2 = CovarianceMatrix.calc_variance_x(time, plx_proj_x, host_star)
-        var_y_prime_2 = CovarianceMatrix.calc_variance_y(time, plx_proj_y, host_star)
-        cov_x_prime_2_y_prime_2 = CovarianceMatrix.calc_covariance_xiyi(
-            time, plx_proj_x, plx_proj_y, host_star
-        )
-        C_prime_2 = np.array(
-            [
-                [var_x_prime_2, cov_x_prime_2_y_prime_2],
-                [cov_x_prime_2_y_prime_2, var_y_prime_2],
-            ]
-        )
-        C = C_0 + C_prime_2
-        return C
 
     def covariance_matrix(
         times,
@@ -515,9 +499,9 @@ class Candidate:
         self.mean_background_object = mean_b
 
         # Covariance matrix for the measured position
-        cov_obs = {}
+        cov_blocks = []
         for row in range(len(cc_true_data["dRA_err"])):
-            cov_obs[f"cov_{row}"] = np.array(
+            cov_blocks.append(np.array(
                 [
                     [
                         cc_true_data["dRA_err"][row] ** 2,
@@ -532,37 +516,34 @@ class Candidate:
                         cc_true_data["dDEC_err"][row] ** 2,
                     ],
                 ]
-            )
+            ))
         empty_matrix = np.zeros((int(len(mean_obs)), int(len(mean_obs))))
-        i = 0
-        for key in cov_obs.keys():
-            empty_matrix[i : 2 + i][:, i : 2 + i] = cov_obs[key]
-            i += 2
+        for i, block in enumerate(cov_blocks):
+            empty_matrix[2 * i : 2 * i + 2, 2 * i : 2 * i + 2] = block
         self.cov_measured_positions = empty_matrix
 
         # Covariance matrix for the true companion model
-        cov_obs = {}
-        cov_obs = np.array(
-            [
+        cov_tc_blocks = []
+        for row in range(len(cc_true_data["dRA_err"])):
+            cov_tc_blocks.append(np.array(
                 [
-                    cc_true_data["dRA_err"][0] ** 2,
-                    cc_true_data["dRA_dDEC_corr"][0]
-                    * cc_true_data["dRA_err"][0]
-                    * cc_true_data["dDEC_err"][0],
-                ],
-                [
-                    cc_true_data["dRA_dDEC_corr"][0]
-                    * cc_true_data["dRA_err"][0]
-                    * cc_true_data["dDEC_err"][0],
-                    cc_true_data["dDEC_err"][0] ** 2,
-                ],
-            ]
-        )
+                    [
+                        cc_true_data["dRA_err"][row] ** 2,
+                        cc_true_data["dRA_dDEC_corr"][row]
+                        * cc_true_data["dRA_err"][row]
+                        * cc_true_data["dDEC_err"][row],
+                    ],
+                    [
+                        cc_true_data["dRA_dDEC_corr"][row]
+                        * cc_true_data["dRA_err"][row]
+                        * cc_true_data["dDEC_err"][row],
+                        cc_true_data["dDEC_err"][row] ** 2,
+                    ],
+                ]
+            ))
         empty_matrix = np.zeros((int(len(mean_obs)), int(len(mean_obs))))
-        i = 0
-        for key in range(int(empty_matrix.shape[0] / 2)):
-            empty_matrix[i : 2 + i][:, i : 2 + i] = cov_obs
-            i += 2
+        for i, block in enumerate(cov_tc_blocks):
+            empty_matrix[2 * i : 2 * i + 2, 2 * i : 2 * i + 2] = block
         self.cov_true_companion = empty_matrix
 
         # Covariance matrix for being background object
@@ -970,8 +951,11 @@ class HostStar:
                  e.g. 'ks_m_calc' for Gaia or 'ks_m' for 2MASS.
             candidates_df (pandas.DataFrame): Data on all candidates
             of this host star.
-            include_candidates (Boolean): Including the data of the caniddates
-              in the fitting.
+            include_candidates (Boolean): Include the candidate's own data point
+              in the field-star model fit. Not recommended — the model is then
+              partially fitted to the object being tested, which biases the
+              background likelihood upward (makes the candidate appear more
+              background-like). Default is False.
         """
         df_label = ["gaiacalc", "tmass", "gaiacalctmass"]
         concated_data = pd.concat(list_of_df_bp)
@@ -990,8 +974,8 @@ class HostStar:
                 x_data = data_g2m[band].values
                 y_data = data_g2m[f"{pm_value}_{y_option}"].values
                 if include_candidates:
-                    np.append(x_data, candidates_df[band].values)
-                    np.append(y_data, candidates_df[pm_value + "_abs"].values)
+                    x_data = np.append(x_data, candidates_df[band].values)
+                    y_data = np.append(y_data, candidates_df[pm_value + "_abs"].values)
                 if y_option == "mean" and pm_value in ["pmra", "pmdec"]:
                     fitting_func = helperfunctions.func_lin
                     boundaries = ([-np.inf, -np.inf], [np.inf, np.inf])
