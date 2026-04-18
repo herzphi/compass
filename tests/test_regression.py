@@ -64,7 +64,7 @@ class TestRegressionOddsRatios:
 
     def test_r_tcb_2Dnmodel_gaiacalctmass(self, baseline, survey_results):
         scalars, _ = baseline
-        row = survey_results.fieldstar_model_HIP82545.candidates
+        row = survey_results.fieldstar_models["HIP82545"].candidates
         val = row[row["r_tcb_catalogue"] == "gaiacalctmass"]["r_tcb_2Dnmodel"].values[0]
         assert abs(val - scalars["r_tcb_2Dnmodel_gaiacalctmass"]) < 0.01, (
             f"r_tcb_2Dnmodel (gaiacalctmass): {val:.4f} vs baseline {scalars['r_tcb_2Dnmodel_gaiacalctmass']:.4f}"
@@ -72,7 +72,7 @@ class TestRegressionOddsRatios:
 
     def test_r_tcb_pmmodel_gaiacalctmass(self, baseline, survey_results):
         scalars, _ = baseline
-        row = survey_results.fieldstar_model_HIP82545.candidates
+        row = survey_results.fieldstar_models["HIP82545"].candidates
         val = row[row["r_tcb_catalogue"] == "gaiacalctmass"]["r_tcb_pmmodel"].values[0]
         assert abs(val - scalars["r_tcb_pmmodel_gaiacalctmass"]) < 0.01, (
             f"r_tcb_pmmodel (gaiacalctmass): {val:.4f} vs baseline {scalars['r_tcb_pmmodel_gaiacalctmass']:.4f}"
@@ -80,7 +80,7 @@ class TestRegressionOddsRatios:
 
     def test_r_tcb_2Dnmodel_tmass(self, baseline, survey_results):
         scalars, _ = baseline
-        row = survey_results.fieldstar_model_HIP82545.candidates
+        row = survey_results.fieldstar_models["HIP82545"].candidates
         val = row[row["r_tcb_catalogue"] == "tmass"]["r_tcb_2Dnmodel"].values[0]
         assert abs(val - scalars["r_tcb_2Dnmodel_tmass"]) < 0.01, (
             f"r_tcb_2Dnmodel (tmass): {val:.4f} vs baseline {scalars['r_tcb_2Dnmodel_tmass']:.4f}"
@@ -88,7 +88,7 @@ class TestRegressionOddsRatios:
 
     def test_r_tcb_pmmodel_tmass(self, baseline, survey_results):
         scalars, _ = baseline
-        row = survey_results.fieldstar_model_HIP82545.candidates
+        row = survey_results.fieldstar_models["HIP82545"].candidates
         val = row[row["r_tcb_catalogue"] == "tmass"]["r_tcb_pmmodel"].values[0]
         assert abs(val - scalars["r_tcb_pmmodel_tmass"]) < 0.01, (
             f"r_tcb_pmmodel (tmass): {val:.4f} vs baseline {scalars['r_tcb_pmmodel_tmass']:.4f}"
@@ -100,7 +100,7 @@ class TestRegressionArrays:
     """Means and covariance matrices must match baseline within numerical tolerance."""
 
     def _get_row(self, survey_results):
-        candidates = survey_results.fieldstar_model_HIP82545.candidates
+        candidates = survey_results.fieldstar_models["HIP82545"].candidates
         return candidates[candidates["r_tcb_catalogue"] == "gaiacalctmass"].iloc[0]
 
     def test_mean_measured_positions(self, baseline, survey_results):
@@ -160,21 +160,21 @@ class TestRegressionHostStar:
 
     def test_host_pmra(self, baseline, survey_results):
         scalars, _ = baseline
-        hs = survey_results.fieldstar_model_HIP82545
+        hs = survey_results.fieldstar_models["HIP82545"]
         assert abs(hs.pmra - scalars["host_pmra"]) < 0.001, (
             f"host pmra: {hs.pmra:.4f} vs baseline {scalars['host_pmra']:.4f}"
         )
 
     def test_host_pmdec(self, baseline, survey_results):
         scalars, _ = baseline
-        hs = survey_results.fieldstar_model_HIP82545
+        hs = survey_results.fieldstar_models["HIP82545"]
         assert abs(hs.pmdec - scalars["host_pmdec"]) < 0.001, (
             f"host pmdec: {hs.pmdec:.4f} vs baseline {scalars['host_pmdec']:.4f}"
         )
 
     def test_host_parallax(self, baseline, survey_results):
         scalars, _ = baseline
-        hs = survey_results.fieldstar_model_HIP82545
+        hs = survey_results.fieldstar_models["HIP82545"]
         assert abs(hs.parallax - scalars["host_parallax"]) < 0.001, (
             f"host parallax: {hs.parallax:.4f} vs baseline {scalars['host_parallax']:.4f}"
         )

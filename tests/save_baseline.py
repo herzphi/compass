@@ -41,7 +41,7 @@ survey = model.Survey(df_test, "mag0")
 survey.set_fieldstar_models("ks_m_calc", "ks_m", cone_radius=0.1, binsize=50)
 survey.set_evaluated_fieldstar_models(sigma_cc_min=0, sigma_model_min=0)
 
-host_star = survey.fieldstar_model_HIP82545
+host_star = survey.fieldstar_models["HIP82545"]
 candidates = host_star.candidates
 
 # ---------------------------------------------------------------------------
@@ -63,12 +63,12 @@ scalars = {
     "host_pmdec":           float(host_star.pmdec),
     "host_parallax":        float(host_star.parallax),
     # Background model coefficients (gaiacalctmass)
-    "pmra_mean_coeff":      list(host_star.pmra_mean_model_coeff_gaiacalctmass.tolist()),
-    "pmdec_mean_coeff":     list(host_star.pmdec_mean_model_coeff_gaiacalctmass.tolist()),
-    "pmra_stddev_coeff":    list(host_star.pmra_stddev_model_coeff_gaiacalctmass.tolist()),
-    "pmdec_stddev_coeff":   list(host_star.pmdec_stddev_model_coeff_gaiacalctmass.tolist()),
-    "parallax_mean":        float(host_star.parallax_mean_model_coeff_gaiacalctmass[0]),
-    "parallax_stddev":      float(host_star.parallax_stddev_model_coeff_gaiacalctmass[0]),
+    "pmra_mean_coeff":   list(host_star.background_model_coeffs["gaiacalctmass"]["pmra_mean_coeff"].tolist()),
+    "pmdec_mean_coeff":  list(host_star.background_model_coeffs["gaiacalctmass"]["pmdec_mean_coeff"].tolist()),
+    "pmra_stddev_coeff": list(host_star.background_model_coeffs["gaiacalctmass"]["pmra_stddev_coeff"].tolist()),
+    "pmdec_stddev_coeff":list(host_star.background_model_coeffs["gaiacalctmass"]["pmdec_stddev_coeff"].tolist()),
+    "parallax_mean":     float(host_star.background_model_coeffs["gaiacalctmass"]["parallax_mean_coeff"][0]),
+    "parallax_stddev":   float(host_star.background_model_coeffs["gaiacalctmass"]["parallax_stddev_coeff"][0]),
 }
 
 # Arrays: means and covariance matrices (gaiacalctmass row)

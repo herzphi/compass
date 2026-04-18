@@ -31,9 +31,9 @@ class CovarianceMatrix:
 
     def cov_pmdirection_plx(model_object, pmdirection):
         return (
-            model_object.__getattribute__(f"{pmdirection}_error")
+            getattr(model_object, f"{pmdirection}_error")
             * model_object.parallax_error
-            * model_object.__getattribute__(f"parallax_{pmdirection}_corr")
+            * getattr(model_object, f"parallax_{pmdirection}_corr")
         )
 
     def calc_variance_x(time, plx_proj, host_star, backgroundmodel):
@@ -378,10 +378,10 @@ class Candidate:
         pm_options = ["pmra", "pmdec"]
         y_options = ["mean", "stddev"]
         cc_pm_background_data = {}
+        cat_coeffs = host_star.background_model_coeffs[catalogue]
         for pm_value in pm_options:
             for y_option in y_options:
-                column = f"{pm_value}_{y_option}_model_coeff_{catalogue}"
-                background_model_parameters = host_star.__getattribute__(column)
+                background_model_parameters = cat_coeffs[f"{pm_value}_{y_option}_coeff"]
                 if y_option == "mean" or len(background_model_parameters) == 2:
                     cc_pm_background_data[pm_value + "_" + y_option] = (
                         background_model_parameters[0] * cc_true_data[band]
@@ -406,19 +406,11 @@ class Candidate:
                         y_op_std = std_min if y_op_std < std_min else y_op_std
                         cc_pm_background_data[pm_value + "_" + y_option] = y_op_std
 
-        column = f"pmra_pmdec_model_{catalogue}"
-        cc_pm_background_data["pmra_pmdec_corr"] = host_star.__getattribute__(column)
-        column = f"parallax_mean_model_coeff_{catalogue}"
-        cc_pm_background_data["parallax_mean"] = host_star.__getattribute__(column)
-        column = f"parallax_stddev_model_coeff_{catalogue}"
-        cc_pm_background_data["parallax_stddev"] = host_star.__getattribute__(column)
-        # pmra_parallax_model_gaiacalc
-        column = f"pmra_parallax_model_{catalogue}"
-        cc_pm_background_data["parallax_pmra_corr"] = host_star.__getattribute__(column)
-        column = f"pmdec_parallax_model_{catalogue}"
-        cc_pm_background_data["parallax_pmdec_corr"] = host_star.__getattribute__(
-            column
-        )
+        cc_pm_background_data["pmra_pmdec_corr"] = cat_coeffs["pmra_pmdec"]
+        cc_pm_background_data["parallax_mean"] = cat_coeffs["parallax_mean_coeff"]
+        cc_pm_background_data["parallax_stddev"] = cat_coeffs["parallax_stddev_coeff"]
+        cc_pm_background_data["parallax_pmra_corr"] = cat_coeffs["pmra_parallax"]
+        cc_pm_background_data["parallax_pmdec_corr"] = cat_coeffs["pmdec_parallax"]
 
         self.cc_true_data = cc_true_data
         self.cc_pm_background_data = cc_pm_background_data
@@ -697,6 +689,8 @@ class HostStar:
             target (str): Name of the target.
         """
         self.object_found = False
+        self.background_model_coeffs: dict = {}  # keyed by catalogue name
+        self.binning_parameters_tables: dict = {}  # keyed by band name
         logger = logging.getLogger("astroquery")
         customSimbad = Simbad()
         customSimbad.add_votable_fields("ids")
@@ -929,7 +923,7 @@ class HostStar:
         df_catalogue_bp = df_catalogue_bp.loc[
             :, ~df_catalogue_bp.columns.duplicated()
         ].copy()
-        self.__setattr__(f"binning_parameters_table_{band}", df_catalogue_bp)
+        self.binning_parameters_tables[band] = df_catalogue_bp
         return df_catalogue_bp
 
     def calc_background_model_parameters(
@@ -960,6 +954,8 @@ class HostStar:
         df_label = ["gaiacalc", "tmass", "gaiacalctmass"]
         concated_data = pd.concat(list_of_df_bp)
         for idx, df in enumerate([*list_of_df_bp, concated_data]):
+            catalogue = df_label[idx]
+            cat_dict = self.background_model_coeffs.setdefault(catalogue, {})
             for y_option_value in list(
                 itertools.product(["mean", "stddev"], ["pmra", "pmdec", "parallax"])
             ):
@@ -1006,30 +1002,21 @@ class HostStar:
                     popt, pcov = optimize.curve_fit(
                         fitting_func, x_data, y_data, bounds=boundaries
                     )
-                    attr_name = f"{pm_value}_{y_option}_model_coeff_{df_label[idx]}"
-                    setattr(self, attr_name, popt)
-                    attr_name = f"{pm_value}_{y_option}_model_cov_{df_label[idx]}"
-                    setattr(self, attr_name, pcov)
+                    cat_dict[f"{pm_value}_{y_option}_coeff"] = popt
+                    cat_dict[f"{pm_value}_{y_option}_cov"] = pcov
                 except (RuntimeError, optimize.OptimizeWarning):
                     if y_option == "stddev":
                         try:
                             popt, pcov = optimize.curve_fit(
                                 helperfunctions.func_lin, x_data, y_data
                             )
-                            attr_name = (
-                                f"{pm_value}_{y_option}_model_coeff_{df_label[idx]}"
-                            )
-                            setattr(self, attr_name, popt)
-                            attr_name = (
-                                f"{pm_value}_{y_option}_model_cov_{df_label[idx]}"
-                            )
-                            setattr(self, attr_name, pcov)
+                            cat_dict[f"{pm_value}_{y_option}_coeff"] = popt
+                            cat_dict[f"{pm_value}_{y_option}_cov"] = pcov
                         except (RuntimeError, optimize.OptimizeWarning):
                             print("Fitting error", y_option, pm_value)
             for col in df.columns:
                 if "rho" in col:
-                    attr_name = f"{col[4:]}_model_{df_label[idx]}"
-                    setattr(self, attr_name, df[col].mean())
+                    cat_dict[col[4:]] = df[col].mean()
 
     def evaluate_candidates_table(self, candidates_df, sigma_model_min, sigma_cc_min):
         """
@@ -1112,108 +1099,35 @@ class HostStar:
 
 class BackgroundModel:
     def __init__(self, candidate_mag, host_star_object, catalogue_name):
-        self.pmra = (
-            host_star_object.__getattribute__(
-                f"pmra_mean_model_coeff_{catalogue_name}"
-            )[0]
-            * candidate_mag
-            + host_star_object.__getattribute__(
-                f"pmra_mean_model_coeff_{catalogue_name}"
-            )[1]
-        )
+        c = host_star_object.background_model_coeffs[catalogue_name]
 
-        if (
-            len(
-                host_star_object.__getattribute__(
-                    f"pmra_stddev_model_coeff_{catalogue_name}"
-                )
-            )
-            == 3
-        ):
+        pmra_mean = c["pmra_mean_coeff"]
+        self.pmra = pmra_mean[0] * candidate_mag + pmra_mean[1]
+
+        pmra_stddev = c["pmra_stddev_coeff"]
+        if len(pmra_stddev) == 3:
             self.pmra_error = (
-                host_star_object.__getattribute__(
-                    f"pmra_stddev_model_coeff_{catalogue_name}"
-                )[0]
-                * np.exp(
-                    -host_star_object.__getattribute__(
-                        f"pmra_stddev_model_coeff_{catalogue_name}"
-                    )[1]
-                    * candidate_mag
-                )
-                + host_star_object.__getattribute__(
-                    f"pmra_stddev_model_coeff_{catalogue_name}"
-                )[2]
+                pmra_stddev[0] * np.exp(-pmra_stddev[1] * candidate_mag) + pmra_stddev[2]
             )
         else:
-            self.pmra_error = (
-                host_star_object.__getattribute__(
-                    f"pmra_stddev_model_coeff_{catalogue_name}"
-                )[0]
-                * candidate_mag
-                + host_star_object.__getattribute__(
-                    f"pmra_stddev_model_coeff_{catalogue_name}"
-                )[1]
-            )
-        self.pmdec = (
-            host_star_object.__getattribute__(
-                f"pmdec_mean_model_coeff_{catalogue_name}"
-            )[0]
-            * candidate_mag
-            + host_star_object.__getattribute__(
-                f"pmdec_mean_model_coeff_{catalogue_name}"
-            )[1]
-        )
-        if (
-            len(
-                host_star_object.__getattribute__(
-                    f"pmdec_stddev_model_coeff_{catalogue_name}"
-                )
-            )
-            == 3
-        ):
+            self.pmra_error = pmra_stddev[0] * candidate_mag + pmra_stddev[1]
+
+        pmdec_mean = c["pmdec_mean_coeff"]
+        self.pmdec = pmdec_mean[0] * candidate_mag + pmdec_mean[1]
+
+        pmdec_stddev = c["pmdec_stddev_coeff"]
+        if len(pmdec_stddev) == 3:
             self.pmdec_error = (
-                host_star_object.__getattribute__(
-                    f"pmdec_stddev_model_coeff_{catalogue_name}"
-                )[0]
-                * np.exp(
-                    -host_star_object.__getattribute__(
-                        f"pmdec_stddev_model_coeff_{catalogue_name}"
-                    )[1]
-                    * candidate_mag
-                )
-                + host_star_object.__getattribute__(
-                    f"pmdec_stddev_model_coeff_{catalogue_name}"
-                )[2]
+                pmdec_stddev[0] * np.exp(-pmdec_stddev[1] * candidate_mag) + pmdec_stddev[2]
             )
         else:
-            self.pmdec_error = (
-                host_star_object.__getattribute__(
-                    f"pmdec_stddev_model_coeff_{catalogue_name}"
-                )[0]
-                * candidate_mag
-                + host_star_object.__getattribute__(
-                    f"pmdec_stddev_model_coeff_{catalogue_name}"
-                )[1]
-            )
+            self.pmdec_error = pmdec_stddev[0] * candidate_mag + pmdec_stddev[1]
 
-        self.pmra_pmdec_corr = host_star_object.__getattribute__(
-            f"pmra_pmdec_model_{catalogue_name}"
-        )
-
-        self.parallax = host_star_object.__getattribute__(
-            f"parallax_mean_model_coeff_{catalogue_name}"
-        )[0]
-
-        self.parallax_error = host_star_object.__getattribute__(
-            f"parallax_stddev_model_coeff_{catalogue_name}"
-        )[0]
-
-        self.parallax_pmra_corr = host_star_object.__getattribute__(
-            f"pmra_parallax_model_{catalogue_name}"
-        )
-        self.parallax_pmdec_corr = host_star_object.__getattribute__(
-            f"pmdec_parallax_model_{catalogue_name}"
-        )
+        self.pmra_pmdec_corr = c["pmra_pmdec"]
+        self.parallax = c["parallax_mean_coeff"][0]
+        self.parallax_error = c["parallax_stddev_coeff"][0]
+        self.parallax_pmra_corr = c["pmra_parallax"]
+        self.parallax_pmdec_corr = c["pmdec_parallax"]
 
 
 class Survey:
@@ -1248,6 +1162,10 @@ class Survey:
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         logger.setLevel(logging.ERROR)
+
+        self.fieldstar_models: dict = {}          # target_name -> HostStar
+        self.candidates_data: dict = {}           # target_name -> DataFrame
+        self.fieldstar_model_results: dict = {}   # target_name -> DataFrame
 
         logger.info("Preprocessing data starts...")
         targets = []
@@ -1370,7 +1288,7 @@ class Survey:
                 df_survey["pmdec_abs_error"] = (
                     df_survey["pmdec_error"] ** 2 + host_star.pmdec_error**2
                 ) ** (1 / 2)
-                self.__setattr__(f"candidates_data_{target_name}", df_survey)
+                self.candidates_data[target_name] = df_survey
         self.target_names = targets
 
     def set_fieldstar_models(
@@ -1427,7 +1345,7 @@ class Survey:
                 include_candidates=False,
                 std_fit=std_fit,
             )
-            self.__setattr__(f"fieldstar_model_{target_name}", host_star)
+            self.fieldstar_models[target_name] = host_star
 
     def set_evaluated_fieldstar_models(self, sigma_cc_min=0, sigma_model_min=0):
         """Evaluate the field star models with candidate data.
@@ -1437,25 +1355,22 @@ class Survey:
             sigma_model_min (float): Minimum sigma for the field star model likelihoods.
         """
         for target_name in tqdm.tqdm(
-            [el[16:] for el in list(self.__dict__) if "candidates_data" in el],
+            list(self.candidates_data.keys()),
             desc="Evaluate candidates",
             ncols=100,
             colour="green",
             ascii=" 123456789#",
         ):
             # Load the model for target_name
-            field_star_model = self.__getattribute__(f"fieldstar_model_{target_name}")
+            field_star_model = self.fieldstar_models[target_name]
             # Evaluate the model for target_name
             field_star_model.evaluate_candidates_table(
-                self.__getattribute__(f"candidates_data_{target_name}"),
+                self.candidates_data[target_name],
                 sigma_cc_min=sigma_cc_min,
                 sigma_model_min=sigma_model_min,
             )
             # Write the results
-            candidates_table = self.__getattribute__(
-                f"fieldstar_model_{target_name}"
-            ).candidates
-            self.__setattr__(f"fieldstar_model_results_{target_name}", candidates_table)
+            self.fieldstar_model_results[target_name] = field_star_model.candidates
 
     def get_true_companions(self, threshold=0):
         """Return all candidates with a odds ratio greater than the threshold.
@@ -1467,13 +1382,8 @@ class Survey:
             pandas.DataFrame: Candidates with r_tcb>threshold.
         """
         candidate_results = []
-        target_names = [
-            el[24:] for el in list(self.__dict__) if "fieldstar_model_results_" in el
-        ]
-        for target_name in target_names:
-            candidates_table = self.__getattribute__(
-                f"fieldstar_model_results_{target_name}"
-            )
+        for target_name, candidates_table in self.fieldstar_model_results.items():
+            candidates_table = candidates_table.copy()
             candidates_table["target_name"] = target_name
             candidates_table = candidates_table[
                 candidates_table.r_tcb_2Dnmodel > threshold

@@ -50,13 +50,13 @@ class TestSurveyEndToEnd:
         assert "HIP82545" in survey.target_names
 
     def test_candidates_data_created(self, survey):
-        df = survey.candidates_data_HIP82545
+        df = survey.candidates_data["HIP82545"]
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 1  # one unique final_uuid
         assert "id0" in df["final_uuid"].values
 
     def test_candidate_relative_pm_computed(self, survey):
-        df = survey.candidates_data_HIP82545
+        df = survey.candidates_data["HIP82545"]
         # pmra_mean = (dRA_last - dRA_first) / dt  ≈ small number
         assert np.isfinite(df["pmra_mean"].values[0])
         assert np.isfinite(df["pmdec_mean"].values[0])
@@ -66,50 +66,47 @@ class TestSurveyEndToEnd:
     # ------------------------------------------------------------------
 
     def test_fieldstar_model_created(self, survey):
-        assert hasattr(survey, "fieldstar_model_HIP82545")
-        host_star = survey.fieldstar_model_HIP82545
+        assert "HIP82545" in survey.fieldstar_models
+        host_star = survey.fieldstar_models["HIP82545"]
         # Check fitted model coefficients exist for the combined catalogue
-        assert hasattr(host_star, "pmra_mean_model_coeff_gaiacalctmass")
-        assert hasattr(host_star, "pmdec_mean_model_coeff_gaiacalctmass")
-        assert hasattr(host_star, "pmra_stddev_model_coeff_gaiacalctmass")
-        assert hasattr(host_star, "parallax_mean_model_coeff_gaiacalctmass")
+        cat = host_star.background_model_coeffs["gaiacalctmass"]
+        assert "pmra_mean_coeff" in cat
+        assert "pmdec_mean_coeff" in cat
+        assert "pmra_stddev_coeff" in cat
+        assert "parallax_mean_coeff" in cat
 
     def test_fieldstar_model_coefficients_finite(self, survey):
-        host_star = survey.fieldstar_model_HIP82545
-        for attr in [
-            "pmra_mean_model_coeff_gaiacalctmass",
-            "pmdec_mean_model_coeff_gaiacalctmass",
-            "pmra_stddev_model_coeff_gaiacalctmass",
-            "pmdec_stddev_model_coeff_gaiacalctmass",
-        ]:
-            coeffs = getattr(host_star, attr)
-            assert np.all(np.isfinite(coeffs)), f"{attr} contains non-finite values"
+        host_star = survey.fieldstar_models["HIP82545"]
+        cat = host_star.background_model_coeffs["gaiacalctmass"]
+        for key in ["pmra_mean_coeff", "pmdec_mean_coeff",
+                    "pmra_stddev_coeff", "pmdec_stddev_coeff"]:
+            assert np.all(np.isfinite(cat[key])), f"{key} contains non-finite values"
 
     # ------------------------------------------------------------------
     # Candidate evaluation
     # ------------------------------------------------------------------
 
     def test_candidates_evaluated(self, survey):
-        host_star = survey.fieldstar_model_HIP82545
+        host_star = survey.fieldstar_models["HIP82545"]
         assert hasattr(host_star, "candidates")
         assert isinstance(host_star.candidates, pd.DataFrame)
         assert len(host_star.candidates) > 0
 
     def test_odds_ratio_2d_finite(self, survey):
-        host_star = survey.fieldstar_model_HIP82545
+        host_star = survey.fieldstar_models["HIP82545"]
         r = host_star.candidates["r_tcb_2Dnmodel"]
         assert r.notna().all(), "r_tcb_2Dnmodel contains NaN"
         assert np.isfinite(r).all(), "r_tcb_2Dnmodel contains inf"
 
     def test_odds_ratio_pm_finite(self, survey):
-        host_star = survey.fieldstar_model_HIP82545
+        host_star = survey.fieldstar_models["HIP82545"]
         r = host_star.candidates["r_tcb_pmmodel"]
         assert r.notna().all(), "r_tcb_pmmodel contains NaN"
         assert np.isfinite(r).all(), "r_tcb_pmmodel contains inf"
 
     def test_nearly_static_candidate_favours_companion(self, survey):
         """Candidate with <10 mas drift over 5 yr should have positive odds ratio."""
-        host_star = survey.fieldstar_model_HIP82545
+        host_star = survey.fieldstar_models["HIP82545"]
         gaiacalctmass = host_star.candidates[
             host_star.candidates["r_tcb_catalogue"] == "gaiacalctmass"
         ]
@@ -119,7 +116,7 @@ class TestSurveyEndToEnd:
         )
 
     def test_covariance_matrices_correct_shape(self, survey):
-        host_star = survey.fieldstar_model_HIP82545
+        host_star = survey.fieldstar_models["HIP82545"]
         # 3 epochs → 2N = 6
         row = host_star.candidates.iloc[0]
         assert np.array(row["cov_background_object"]).shape == (6, 6)

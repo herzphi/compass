@@ -39,7 +39,7 @@ print("=" * 60)
 survey = model.Survey(df_test, "mag0")
 
 print(f"\nTargets found: {survey.target_names}")
-candidates_data = survey.candidates_data_HIP82545
+candidates_data = survey.candidates_data["HIP82545"]
 print(f"\nPreprocessed candidates table ({len(candidates_data)} row):")
 print(candidates_data[["final_uuid", "band", "sep", "pmra_mean", "pmdec_mean",
                         "pmra_error", "pmdec_error"]].to_string(index=False))
@@ -52,16 +52,17 @@ print("Step 2: Building field star model (cone search around HIP82545)...")
 print("=" * 60)
 survey.set_fieldstar_models("ks_m_calc", "ks_m", cone_radius=0.1, binsize=50)
 
-host_star = survey.fieldstar_model_HIP82545
+host_star = survey.fieldstar_models["HIP82545"]
 print(f"\nHost star astrometry from Gaia DR3:")
 print(f"  pmra  = {host_star.pmra:.3f} ± {host_star.pmra_error:.3f} mas/yr")
 print(f"  pmdec = {host_star.pmdec:.3f} ± {host_star.pmdec_error:.3f} mas/yr")
 print(f"  plx   = {host_star.parallax:.3f} ± {host_star.parallax_error:.3f} mas")
 
 print("\nBackground model coefficients (gaiacalctmass catalogue):")
+cat = host_star.background_model_coeffs["gaiacalctmass"]
 for param in ["pmra_mean", "pmdec_mean", "pmra_stddev", "pmdec_stddev",
               "parallax_mean", "parallax_stddev"]:
-    coeffs = getattr(host_star, f"{param}_model_coeff_gaiacalctmass")
+    coeffs = cat[f"{param}_coeff"]
     print(f"  {param:20s}: {np.array2string(coeffs, precision=4)}")
 
 # ---------------------------------------------------------------------------
